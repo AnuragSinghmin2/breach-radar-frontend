@@ -1,0 +1,207 @@
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: 1.12fr repeat(5, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.dashboard-score-card,
+.dashboard-stat-card {
+  min-width: 0;
+  min-height: 116px;
+  border: 0;
+  border: 1px solid rgba(42, 69, 96, 0.74);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(34, 197, 94, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(8, 20, 35, 0.98), rgba(4, 14, 26, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 18px 34px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.dashboard-score-card:hover,
+.dashboard-stat-card:hover,
+.dashboard-score-card:focus-visible,
+.dashboard-stat-card:focus-visible {
+  border-color: rgba(0, 214, 143, 0.72);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.dashboard-score-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 18px 17px;
+}
+
+.dashboard-score-copy {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.dashboard-score-copy p,
+.dashboard-stat-card p {
+  color: #f8fafc;
+  font-size: clamp(11px, 0.78vw, 13px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.dashboard-score-copy strong {
+  color: #00d68f;
+  display: block;
+  font-size: clamp(13px, 0.9vw, 16px);
+  line-height: 1;
+  margin-top: auto;
+}
+
+.dashboard-score-copy small,
+.dashboard-stat-card small {
+  color: #00d68f;
+  display: block;
+  font-size: clamp(10px, 0.72vw, 12px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 7px;
+  white-space: nowrap;
+}
+
+.dashboard-score-ring {
+  width: clamp(76px, 6.3vw, 92px);
+  height: clamp(76px, 6.3vw, 92px);
+  border-radius: 50%;
+  background: conic-gradient(#00d68f 0 68%, rgba(51, 65, 85, 0.88) 68% 100%);
+  display: grid;
+  place-items: center;
+  position: relative;
+  box-shadow: 0 0 22px rgba(0, 214, 143, 0.2);
+}
+
+.dashboard-score-ring::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: #071321;
+}
+
+.dashboard-score-ring div {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.dashboard-score-ring strong {
+  color: #f8fafc;
+  display: block;
+  font-size: clamp(25px, 2vw, 34px);
+  line-height: 0.95;
+}
+
+.dashboard-score-ring span {
+  color: #cbd5e1;
+  display: block;
+  font-size: clamp(10px, 0.72vw, 12px);
+  font-weight: 800;
+}
+
+.dashboard-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.dashboard-stat-icon {
+  width: clamp(48px, 4vw, 60px);
+  height: clamp(48px, 4vw, 60px);
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.dashboard-stat-icon.critical {
+  color: #ff4545;
+  background: rgba(239, 68, 68, 0.16);
+}
+
+.dashboard-stat-icon.high {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.dashboard-stat-icon.medium {
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.16);
+}
+
+.dashboard-stat-icon.low {
+  color: #00d68f;
+  background: rgba(0, 214, 143, 0.14);
+}
+
+.dashboard-stat-icon.scans {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.22);
+}
+
+.dashboard-stat-card strong {
+  color: #f8fafc;
+  display: block;
+  font-size: clamp(28px, 2.15vw, 38px);
+  font-weight: 850;
+  line-height: 0.98;
+  margin: 8px 0 0;
+}
+
+.dashboard-stat-card small {
+  color: #aeb8c7;
+}
+
+.dashboard-stat-card small.positive {
+  color: #00d68f;
+}
+
+.dashboard-stat-card small.neutral {
+  color: #dbe3ee;
+  font-size: clamp(12px, 0.82vw, 14px);
+  font-weight: 700;
+  margin-top: 12px;
+}
+
+@media (max-width: 1320px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-score-card,
+  .dashboard-stat-card {
+    min-height: 104px;
+  }
+
+  .dashboard-score-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}

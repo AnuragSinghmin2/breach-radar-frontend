@@ -1,0 +1,133 @@
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at top, rgba(0, 214, 143, 0.08), transparent 45%),
+    linear-gradient(180deg, #071220 0%, #030c17 100%);
+}
+
+.auth-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+}
+
+.login-card {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 10px;
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  background: linear-gradient(180deg, rgba(7, 18, 32, 0.98), rgba(3, 12, 23, 0.98));
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.2);
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.login-brand span {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 214, 143, 0.12);
+  color: #00d68f;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #f8fafc;
+}
+
+.login-brand p {
+  margin: 4px 0 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.login-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.login-tabs button {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.login-tabs button.active {
+  color: #00d68f;
+  border-color: rgba(0, 214, 143, 0.5);
+  background: rgba(0, 214, 143, 0.08);
+}
+
+.login-card label {
+  display: grid;
+  gap: 6px;
+}
+
+.login-card label span {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.login-card input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  background: rgba(3, 12, 23, 0.9);
+  color: #f8fafc;
+}
+
+.login-error {
+  margin: 0;
+  color: #f87171;
+  font-size: 0.88rem;
+}
+
+.login-submit {
+  margin-top: 4px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #00d68f;
+  color: #03121f;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  margin: 0;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.88rem;
+}
+
+.auth-switch a {
+  color: #00d68f;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,1060 @@
+.rem-page {
+  width: 100%;
+  color: #e5e7eb;
+}
+
+.rem-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.rem-stat-card,
+.rem-panel {
+  background: linear-gradient(180deg, rgba(7, 18, 32, 0.98), rgba(3, 12, 23, 0.98));
+  border: 1px solid rgba(42, 69, 96, 0.74);
+  border-radius: 7px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 18px 36px rgba(0, 0, 0, 0.15);
+}
+
+.rem-stat-card {
+  min-height: 112px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  min-width: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.rem-stat-card:hover,
+.rem-stat-card:focus-visible {
+  border-color: rgba(0, 214, 143, 0.62);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.rem-stat-icon {
+  width: clamp(52px, 4.2vw, 64px);
+  height: clamp(52px, 4.2vw, 64px);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.rem-stat-icon.critical {
+  color: #ff3434;
+  background: rgba(239, 68, 68, 0.16);
+}
+
+.rem-stat-icon.fixable,
+.rem-stat-icon.resolved {
+  color: #00d68f;
+  background: rgba(0, 214, 143, 0.14);
+}
+
+.rem-stat-icon.progress {
+  color: #008dff;
+  background: rgba(0, 117, 255, 0.16);
+}
+
+.rem-stat-icon.risk {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.22);
+}
+
+.rem-stat-card p,
+.rem-stat-card small {
+  color: #aeb8c7;
+  margin: 0;
+}
+
+.rem-stat-card p {
+  font-size: clamp(11px, 0.82vw, 13px);
+}
+
+.rem-stat-card strong {
+  color: #f8fafc;
+  display: block;
+  font-size: clamp(25px, 2.05vw, 34px);
+  line-height: 1;
+  margin: 7px 0 8px;
+}
+
+.rem-stat-card small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: clamp(10px, 0.74vw, 12px);
+  font-weight: 800;
+}
+
+.rem-stat-card small.good {
+  color: #00d68f;
+}
+
+.rem-stat-card small.bad {
+  color: #ff4545;
+}
+
+.rem-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(330px, 0.84fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.rem-main-column,
+.rem-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.rem-panel {
+  padding: 20px;
+  min-width: 0;
+}
+
+.rem-panel h3,
+.rem-detail-panel h3 {
+  color: #f8fafc;
+  font-size: clamp(16px, 1.08vw, 20px);
+  font-weight: 850;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.rem-issues-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.rem-issues-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 20px 0;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.48);
+}
+
+.rem-tabs {
+  display: flex;
+  gap: 30px;
+  overflow-x: auto;
+}
+
+.rem-tabs button,
+.rem-detail-tabs button {
+  border: 0;
+  background: transparent;
+  color: #c4ccd8;
+  height: 50px;
+  padding: 0 2px;
+  font: inherit;
+  font-size: clamp(12px, 0.84vw, 14px);
+  font-weight: 800;
+  white-space: nowrap;
+  position: relative;
+  cursor: pointer;
+}
+
+.rem-tabs button.active,
+.rem-detail-tabs button.active {
+  color: #00d68f;
+}
+
+.rem-tabs button.active::after,
+.rem-detail-tabs button.active::after {
+  content: "";
+  height: 2px;
+  border-radius: 999px;
+  background: #00d68f;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: 0 0 12px rgba(0, 214, 143, 0.7);
+}
+
+.rem-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 12px;
+}
+
+.rem-controls button,
+.rem-controls label,
+.rem-actions button,
+.rem-pagination button,
+.rem-detail-actions button {
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.78);
+  color: #dbe3ee;
+  font: inherit;
+}
+
+.rem-controls button,
+.rem-actions button,
+.rem-pagination button,
+.rem-detail-actions button {
+  cursor: pointer;
+}
+
+.rem-message {
+  border: 1px solid rgba(0, 214, 143, 0.34);
+  border-radius: 7px;
+  background: rgba(0, 214, 143, 0.1);
+  color: #9ae6b4;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+}
+
+.rem-controls button,
+.rem-controls label {
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  font-size: clamp(11px, 0.78vw, 12px);
+  font-weight: 800;
+}
+
+.rem-controls label {
+  width: min(330px, 30vw);
+}
+
+.rem-controls input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #dbe3ee;
+  font: inherit;
+  font-size: 12px;
+}
+
+.rem-table-wrap {
+  overflow-x: auto;
+}
+
+.rem-issue-table {
+  min-width: 1080px;
+}
+
+.rem-issue-row {
+  display: grid;
+  grid-template-columns: minmax(310px, 1.8fr) 92px minmax(170px, 1fr) 142px 128px 150px;
+  align-items: center;
+  gap: 20px;
+  min-height: 77px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.42);
+  color: #dbe3ee;
+  font-size: clamp(11px, 0.78vw, 13px);
+}
+
+.rem-issue-row.rem-head {
+  min-height: 58px;
+  color: #aeb8c7;
+  font-size: clamp(10px, 0.74vw, 12px);
+  font-weight: 850;
+}
+
+.rem-vuln-cell,
+.rem-asset-cell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.rem-vuln-cell:hover strong,
+.rem-vuln-cell:focus-visible strong,
+.rem-asset-cell:hover strong,
+.rem-asset-cell:focus-visible strong {
+  color: #00d68f;
+}
+
+.rem-vuln-cell:focus-visible,
+.rem-asset-cell:focus-visible,
+.rem-plain-btn:focus-visible {
+  outline: none;
+}
+
+.rem-vuln-cell strong,
+.rem-asset-cell strong {
+  color: #f8fafc;
+  display: block;
+  min-width: 0;
+  font-size: clamp(12px, 0.86vw, 14px);
+  line-height: 1.3;
+}
+
+.rem-vuln-cell small,
+.rem-asset-cell small {
+  color: #aeb8c7;
+  display: block;
+  font-size: clamp(10px, 0.74vw, 12px);
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.rem-vuln-cell em {
+  background: rgba(148, 163, 184, 0.14);
+  border-radius: 4px;
+  color: #cbd5e1;
+  font-style: normal;
+  margin-left: 8px;
+  padding: 2px 6px;
+}
+
+.rem-issue-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+}
+
+.rem-issue-icon.critical {
+  color: #ff3434;
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.rem-issue-icon.high {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.14);
+}
+
+.rem-issue-icon.medium {
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.14);
+}
+
+.rem-issue-icon.low {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.18);
+}
+
+.rem-issue-icon.blue {
+  color: #008dff;
+  background: rgba(0, 117, 255, 0.14);
+}
+
+.rem-pill {
+  width: max-content;
+  min-height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.rem-pill.critical {
+  color: #ff4545;
+  background: rgba(239, 68, 68, 0.16);
+}
+
+.rem-pill.high {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.rem-pill.medium {
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.16);
+}
+
+.rem-pill.low {
+  color: #008dff;
+  background: rgba(0, 117, 255, 0.16);
+}
+
+.rem-status-select {
+  width: max-content;
+  min-width: 116px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.rem-plain-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.rem-status-select.open {
+  color: #ff4545;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.rem-status-select.progress {
+  color: #008dff;
+  background: rgba(0, 117, 255, 0.11);
+}
+
+.rem-status-select.resolved {
+  color: #00d68f;
+  background: rgba(0, 214, 143, 0.11);
+}
+
+.rem-priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 900;
+}
+
+.rem-priority.high {
+  color: #ff4545;
+}
+
+.rem-priority.medium {
+  color: #facc15;
+}
+
+.rem-priority.low {
+  color: #00d68f;
+}
+
+.rem-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  position: relative;
+}
+
+.rem-actions button {
+  height: 35px;
+  color: #f8fafc;
+  display: inline-grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rem-actions button:first-child {
+  min-width: 116px;
+  padding: 0 13px;
+}
+
+.rem-actions button:last-child {
+  width: 36px;
+}
+
+.rem-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+}
+
+.rem-pagination p {
+  color: #aeb8c7;
+  font-size: clamp(11px, 0.8vw, 13px);
+  margin: 0;
+}
+
+.rem-pagination div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rem-pagination button {
+  width: 34px;
+  height: 34px;
+  color: #dbe3ee;
+  display: grid;
+  place-items: center;
+}
+
+.rem-pagination button.active {
+  color: #00d68f;
+  border-color: rgba(0, 214, 143, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(0, 214, 143, 0.14);
+}
+
+.rem-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.rem-row-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: 140px;
+  border: 1px solid rgba(42, 69, 96, 0.82);
+  border-radius: 7px;
+  background: #071321;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+  padding: 6px;
+}
+
+.rem-row-menu button {
+  width: 100%;
+  height: auto;
+  min-height: 32px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #dbe3ee;
+  display: block;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 8px;
+  text-align: left;
+}
+
+.rem-row-menu button:hover,
+.rem-row-menu button:focus-visible {
+  background: rgba(31, 41, 55, 0.86);
+  outline: none;
+}
+
+.rem-empty {
+  color: #aeb8c7;
+  font-size: 13px;
+  padding: 22px;
+  text-align: center;
+}
+
+.rem-pagination span {
+  color: #aeb8c7;
+  padding: 0 8px;
+}
+
+.rem-detail-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.rem-detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px 8px;
+}
+
+.rem-detail-title {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rem-detail-title p {
+  grid-column: 2 / -1;
+  color: #aeb8c7;
+  font-size: clamp(11px, 0.78vw, 13px);
+}
+
+.rem-detail-title > span {
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.14);
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.rem-detail-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.rem-detail-actions button {
+  height: 36px;
+  color: #dbe3ee;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.rem-detail-actions button:first-child {
+  color: #008dff;
+  border-color: rgba(0, 117, 255, 0.58);
+}
+
+.rem-detail-actions button:nth-child(2) {
+  color: #00d68f;
+  border-color: rgba(0, 214, 143, 0.58);
+}
+
+.rem-detail-actions button:nth-child(n + 3) {
+  width: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.rem-detail-tabs {
+  display: flex;
+  gap: 30px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.48);
+  overflow-x: auto;
+}
+
+.rem-detail-tabs button {
+  height: 42px;
+}
+
+.rem-solution-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 1fr);
+  gap: 34px;
+  padding: 16px 20px 22px;
+}
+
+.rem-solution-grid h4 {
+  color: #f8fafc;
+  margin: 0 0 9px;
+  font-size: 14px;
+}
+
+.rem-solution-grid p {
+  color: #aeb8c7;
+  font-size: clamp(11px, 0.78vw, 13px);
+  margin: 0 0 12px;
+}
+
+.rem-solution-grid pre {
+  min-height: 126px;
+  overflow-x: auto;
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px solid rgba(42, 69, 96, 0.74);
+  border-radius: 6px;
+  background: #06101d;
+  color: #facc15;
+  font: 12px/1.55 Consolas, ui-monospace, monospace;
+}
+
+.rem-recommended p,
+.rem-recommended button {
+  border: 0;
+  background: transparent;
+  color: #dbe3ee;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font: inherit;
+  margin-bottom: 10px;
+  padding: 0;
+  text-align: left;
+}
+
+.rem-recommended button.done {
+  color: #00d68f;
+}
+
+.rem-recommended svg {
+  color: #00d68f;
+  flex: 0 0 auto;
+}
+
+.rem-meta-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 28px;
+  margin-top: 20px;
+  color: #aeb8c7;
+  font-size: 13px;
+}
+
+.rem-meta-row b {
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.16);
+  border-radius: 7px;
+  padding: 7px 13px;
+  margin-left: 8px;
+}
+
+.rem-meta-row span:last-child b {
+  color: #dbe3ee;
+  background: rgba(3, 12, 23, 0.72);
+  border: 1px solid rgba(42, 69, 96, 0.72);
+}
+
+.rem-summary-panel h3,
+.rem-list-panel h3 {
+  margin-bottom: 24px;
+}
+
+.rem-summary-body {
+  display: grid;
+  grid-template-columns: minmax(135px, 0.85fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.rem-risk-donut {
+  width: clamp(140px, 12vw, 170px);
+  height: clamp(140px, 12vw, 170px);
+  border-radius: 50%;
+  background: conic-gradient(#ff3434 0 13.4%, #f97316 13.4% 41%, #facc15 41% 82.8%, #7c3aed 82.8% 100%);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.rem-risk-donut::before {
+  content: "";
+  position: absolute;
+  inset: 19px;
+  border-radius: 50%;
+  background: #061323;
+}
+
+.rem-risk-donut strong,
+.rem-risk-donut span {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.rem-risk-donut strong {
+  align-self: end;
+  color: #f8fafc;
+  font-size: clamp(34px, 2.45vw, 48px);
+  line-height: 1;
+}
+
+.rem-risk-donut span {
+  align-self: start;
+  color: #aeb8c7;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.rem-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rem-legend button {
+  display: grid;
+  grid-template-columns: 13px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: #f8fafc;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(12px, 0.82vw, 14px);
+  font-weight: 850;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.rem-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.rem-legend .critical {
+  background: #ff3434;
+}
+
+.rem-legend .high {
+  background: #f97316;
+}
+
+.rem-legend .medium {
+  background: #facc15;
+}
+
+.rem-legend .low {
+  background: #7c3aed;
+}
+
+.rem-legend span {
+  color: #dbe3ee;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.rem-risk-bar {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(42, 69, 96, 0.48);
+}
+
+.rem-risk-bar p {
+  color: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 850;
+  margin: 0 0 10px;
+}
+
+.rem-risk-bar strong {
+  color: #00d68f;
+  font-size: 18px;
+}
+
+.rem-risk-bar > span {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(42, 69, 96, 0.72);
+  display: block;
+  overflow: hidden;
+}
+
+.rem-risk-bar i {
+  width: 68%;
+  height: 100%;
+  border-radius: inherit;
+  background: #00d68f;
+  display: block;
+}
+
+.rem-list-panel {
+  padding-bottom: 18px;
+}
+
+.rem-list-panel a,
+.rem-list-panel button {
+  min-height: 62px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  color: #f8fafc;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+}
+
+.rem-list-panel a > span,
+.rem-list-panel button > span {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: rgba(0, 214, 143, 0.12);
+  color: #00d68f;
+  display: grid;
+  place-items: center;
+}
+
+.rem-list-panel strong {
+  display: block;
+  color: #f8fafc;
+  font-size: clamp(13px, 0.9vw, 15px);
+}
+
+.rem-list-panel small {
+  display: block;
+  color: #aeb8c7;
+  font-size: clamp(11px, 0.78vw, 13px);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.rem-resource-panel a,
+.rem-resource-panel button {
+  grid-template-columns: 40px minmax(0, 1fr);
+}
+
+.rem-resource-panel a > span,
+.rem-resource-panel button > span {
+  width: 38px;
+  height: 38px;
+}
+
+.rem-resource-panel .rem-resource-cta {
+  min-height: 38px;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: transparent;
+  color: #00d68f;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@media (max-width: 1360px) {
+  .rem-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rem-layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rem-side-column {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rem-summary-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 920px) {
+  .rem-stats-grid,
+  .rem-side-column,
+  .rem-summary-body,
+  .rem-solution-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rem-summary-panel {
+    grid-column: auto;
+  }
+
+  .rem-issues-toolbar,
+  .rem-pagination,
+  .rem-detail-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .rem-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .rem-controls label {
+    width: auto;
+    flex: 1 1 230px;
+  }
+
+  .rem-detail-title {
+    grid-template-columns: auto 1fr;
+  }
+
+  .rem-detail-title > span,
+  .rem-detail-title p {
+    grid-column: 2;
+  }
+
+  .rem-detail-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 620px) {
+  .rem-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rem-panel {
+    padding: 16px;
+  }
+
+  .rem-issues-panel,
+  .rem-detail-panel {
+    padding: 0;
+  }
+
+  .rem-issues-toolbar,
+  .rem-detail-head,
+  .rem-detail-tabs,
+  .rem-solution-grid,
+  .rem-pagination {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .rem-tabs {
+    gap: 20px;
+    width: 100%;
+  }
+
+  .rem-controls button,
+  .rem-detail-actions button:nth-child(-n + 2) {
+    flex: 1 1 180px;
+    justify-content: center;
+  }
+
+  .rem-pagination div {
+    flex-wrap: wrap;
+  }
+
+  .rem-meta-row {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .rem-summary-body {
+    justify-items: center;
+  }
+
+  .rem-legend {
+    width: 100%;
+  }
+
+  .rem-legend button {
+    grid-template-columns: 13px minmax(0, 1fr);
+  }
+
+  .rem-legend span {
+    grid-column: 2;
+  }
+}

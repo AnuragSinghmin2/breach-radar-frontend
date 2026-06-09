@@ -1,0 +1,979 @@
+.vuln-page {
+  width: 100%;
+  color: #e5e7eb;
+}
+
+.vuln-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.vuln-stat-card,
+.vuln-panel,
+.vuln-guide-panel {
+  background: linear-gradient(180deg, rgba(7, 18, 32, 0.98), rgba(3, 12, 23, 0.98));
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  border-radius: 7px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018), 0 18px 36px rgba(0, 0, 0, 0.16);
+}
+
+.vuln-stat-card {
+  min-height: 104px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px;
+  box-sizing: border-box;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.vuln-stat-card:hover,
+.vuln-stat-card:focus-visible {
+  border-color: rgba(0, 214, 143, 0.62);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.vuln-stat-icon {
+  width: clamp(50px, 4vw, 62px);
+  height: clamp(50px, 4vw, 62px);
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.vuln-stat-icon.critical,
+.vuln-bug-icon.critical {
+  color: #ff3434;
+  background: rgba(239, 68, 68, 0.16);
+}
+
+.vuln-stat-icon.high,
+.vuln-bug-icon.high {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.vuln-stat-icon.medium,
+.vuln-bug-icon.medium {
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.16);
+}
+
+.vuln-stat-icon.low,
+.vuln-bug-icon.low {
+  color: #8b5cf6;
+  background: rgba(124, 58, 237, 0.18);
+}
+
+.vuln-stat-icon.total {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.17);
+}
+
+.vuln-stat-card p,
+.vuln-stat-card small {
+  color: #aeb8c7;
+  margin: 0;
+}
+
+.vuln-stat-card p {
+  font-size: clamp(11px, 0.82vw, 13px);
+}
+
+.vuln-stat-card strong {
+  color: #f8fafc;
+  display: block;
+  font-size: clamp(25px, 2vw, 34px);
+  line-height: 1;
+  margin: 7px 0;
+}
+
+.vuln-stat-card small {
+  display: block;
+  font-size: clamp(10px, 0.74vw, 12px);
+}
+
+.vuln-stat-card .up {
+  color: #ff4545;
+}
+
+.vuln-stat-card .down {
+  color: #00d68f;
+}
+
+.vuln-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.05fr) minmax(320px, 0.75fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.vuln-left-column,
+.vuln-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.vuln-panel {
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.vuln-panel h3,
+.vuln-guide-panel h3 {
+  color: #f8fafc;
+  font-size: clamp(16px, 1.05vw, 19px);
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.vuln-table-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.vuln-table-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 14px;
+}
+
+.vuln-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vuln-controls label,
+.vuln-controls button {
+  height: 34px;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.86);
+  color: #aeb8c7;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.vuln-controls label {
+  min-width: min(280px, 42vw);
+}
+
+.vuln-controls input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #dbe3ee;
+  font: inherit;
+  font-size: clamp(11px, 0.78vw, 12px);
+  cursor: pointer;
+}
+
+.vuln-controls button {
+  min-width: 116px;
+  justify-content: space-between;
+  font-size: clamp(11px, 0.78vw, 12px);
+}
+
+.vuln-tabs {
+  display: flex;
+  gap: 12px;
+  padding: 0 20px 18px;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.56);
+  overflow-x: auto;
+}
+
+.vuln-tabs button {
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #c4ccd8;
+  padding: 0 12px;
+  font-size: clamp(11px, 0.78vw, 12px);
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.vuln-tabs button.active {
+  color: #00d68f;
+  background: rgba(0, 214, 143, 0.12);
+}
+
+.vuln-table-wrap {
+  overflow-x: auto;
+}
+
+.vuln-table {
+  min-width: 920px;
+}
+
+.vuln-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.6fr) 100px minmax(120px, 0.85fr) 115px minmax(180px, 1fr) 78px;
+  gap: 14px;
+  align-items: center;
+  min-height: 66px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.44);
+  color: #dbe3ee;
+  font-size: clamp(11px, 0.78vw, 13px);
+}
+
+.vuln-head {
+  min-height: 50px;
+  color: #aeb8c7;
+  font-size: clamp(10px, 0.74vw, 12px);
+  font-weight: 800;
+}
+
+.vuln-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.vuln-name-cell:hover strong,
+.vuln-name-cell:focus-visible strong {
+  color: #00d68f;
+}
+
+.vuln-name-cell:focus-visible,
+.vuln-plain-btn:focus-visible,
+.vuln-domain:focus-visible {
+  outline: none;
+}
+
+.vuln-bug-icon {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+}
+
+.vuln-name-cell strong {
+  color: #f8fafc;
+  display: block;
+  min-width: 0;
+  font-size: clamp(12px, 0.86vw, 14px);
+  line-height: 1.35;
+}
+
+.vuln-name-cell small {
+  color: #aeb8c7;
+  display: block;
+  font-size: clamp(10px, 0.72vw, 12px);
+  font-weight: 500;
+}
+
+.vuln-badge {
+  width: max-content;
+  min-height: 25px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.vuln-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.vuln-badge.critical,
+.vuln-badge.open {
+  color: #ff4545;
+  background: rgba(239, 68, 68, 0.16);
+}
+
+.vuln-badge.high {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.vuln-badge.medium {
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.16);
+}
+
+.vuln-badge.low {
+  color: #6366f1;
+  background: rgba(37, 99, 235, 0.17);
+}
+
+.vuln-badge.progress {
+  color: #0084ff;
+  background: rgba(0, 113, 255, 0.16);
+}
+
+.vuln-badge.resolved {
+  color: #00d68f;
+  background: rgba(0, 214, 143, 0.14);
+}
+
+.vuln-domain {
+  border: 0;
+  background: transparent;
+  color: #f8fafc;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.vuln-domain:hover,
+.vuln-domain:focus-visible {
+  color: #00d68f;
+}
+
+.vuln-plain-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.vuln-actions {
+  display: flex;
+  gap: 8px;
+  position: relative;
+}
+
+.vuln-actions button,
+.vuln-pagination button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.72);
+  color: #dbe3ee;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.vuln-row-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: 150px;
+  border: 1px solid rgba(42, 69, 96, 0.82);
+  border-radius: 7px;
+  background: #071321;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+  padding: 6px;
+}
+
+.vuln-row-menu button {
+  width: 100%;
+  height: auto;
+  min-height: 32px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #dbe3ee;
+  display: block;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 8px;
+  text-align: left;
+}
+
+.vuln-row-menu button:hover,
+.vuln-row-menu button:focus-visible {
+  background: rgba(31, 41, 55, 0.86);
+  outline: none;
+}
+
+.vuln-message,
+.vuln-detail-panel {
+  border: 1px solid rgba(0, 214, 143, 0.34);
+  border-radius: 7px;
+  background: rgba(0, 214, 143, 0.1);
+}
+
+.vuln-message {
+  color: #9ae6b4;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+}
+
+.vuln-empty {
+  color: #aeb8c7;
+  font-size: 13px;
+  padding: 22px;
+  text-align: center;
+}
+
+.vuln-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 20px;
+}
+
+.vuln-pagination p {
+  color: #aeb8c7;
+  font-size: clamp(11px, 0.8vw, 13px);
+  margin: 0;
+}
+
+.vuln-pagination div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vuln-pagination button.active {
+  color: #00d68f;
+  border-color: rgba(0, 214, 143, 0.72);
+}
+
+.vuln-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.vuln-detail-panel {
+  position: relative;
+  padding: 18px;
+  color: #dbe3ee;
+}
+
+.vuln-detail-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.72);
+  color: #dbe3ee;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.vuln-detail-panel h3 {
+  color: #f8fafc;
+  margin: 10px 0 4px;
+}
+
+.vuln-detail-panel p {
+  color: #aeb8c7;
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.vuln-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.vuln-detail-grid span {
+  border: 1px solid rgba(42, 69, 96, 0.55);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.55);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 10px;
+}
+
+.vuln-detail-grid b,
+.vuln-detail-copy strong {
+  color: #aeb8c7;
+  display: block;
+  font-size: 10px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.vuln-detail-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.vuln-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.vuln-detail-actions button {
+  min-height: 36px;
+  border: 1px solid rgba(0, 214, 143, 0.42);
+  border-radius: 6px;
+  background: rgba(3, 13, 25, 0.72);
+  color: #00d68f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 13px;
+}
+
+.vuln-pagination span {
+  color: #aeb8c7;
+  padding: 0 8px;
+}
+
+.vuln-guide-panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+  background: linear-gradient(90deg, rgba(0, 214, 143, 0.16), rgba(3, 12, 23, 0.98) 62%);
+}
+
+.vuln-guide-panel > span {
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #00d68f;
+  background: rgba(0, 214, 143, 0.17);
+}
+
+.vuln-guide-panel p {
+  color: #aeb8c7;
+  font-size: clamp(11px, 0.82vw, 13px);
+  margin: 7px 0 0;
+}
+
+.vuln-guide-panel button,
+.vuln-risk-panel button {
+  height: 38px;
+  border: 1px solid rgba(0, 214, 143, 0.55);
+  border-radius: 6px;
+  background: rgba(3, 13, 25, 0.72);
+  color: #00d68f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 18px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.vuln-distribution {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.9fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 28px;
+  margin-top: 26px;
+}
+
+.vuln-donut {
+  width: clamp(125px, 10.2vw, 150px);
+  height: clamp(125px, 10.2vw, 150px);
+  border-radius: 50%;
+  background: conic-gradient(#ff3434 0 13.4%, #f97316 13.4% 41%, #facc15 41% 82.8%, #8b5cf6 82.8% 100%);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.vuln-donut::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: #061323;
+}
+
+.vuln-donut strong,
+.vuln-donut span {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.vuln-donut strong {
+  align-self: end;
+  color: #f8fafc;
+  font-size: clamp(28px, 2.1vw, 36px);
+  line-height: 1;
+}
+
+.vuln-donut span {
+  align-self: start;
+  color: #aeb8c7;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.vuln-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.vuln-legend button {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: #f8fafc;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(11px, 0.78vw, 13px);
+  font-weight: 800;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.vuln-legend i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.vuln-legend span {
+  color: #dbe3ee;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vuln-legend .critical {
+  background: #ff3434;
+}
+
+.vuln-legend .high {
+  background: #f97316;
+}
+
+.vuln-legend .medium {
+  background: #facc15;
+}
+
+.vuln-legend .low {
+  background: #8b5cf6;
+}
+
+.vuln-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vuln-side-head button {
+  border: 0;
+  background: transparent;
+  color: #3b82f6;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 0;
+}
+
+.vuln-domain-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 22px;
+}
+
+.vuln-domain-bar span {
+  color: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(11px, 0.82vw, 13px);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.vuln-domain-bar {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.vuln-domain-bar i {
+  height: 6px;
+  border-radius: 999px;
+  display: block;
+  background: rgba(42, 69, 96, 0.5);
+  overflow: hidden;
+}
+
+.vuln-domain-bar em {
+  height: 100%;
+  border-radius: inherit;
+  display: block;
+}
+
+.vuln-domain-bar em.critical {
+  background: #ff3434;
+}
+
+.vuln-domain-bar em.high {
+  background: #f97316;
+}
+
+.vuln-domain-bar em.medium {
+  background: #facc15;
+}
+
+.vuln-domain-bar em.low {
+  background: #8b5cf6;
+}
+
+.vuln-domain-bar em.green {
+  background: #00d68f;
+}
+
+.vuln-risk-panel {
+  text-align: center;
+}
+
+.vuln-risk-panel h3 {
+  text-align: left;
+}
+
+.vuln-gauge {
+  width: min(230px, 100%);
+  height: 134px;
+  display: grid;
+  place-items: end center;
+  margin: 28px auto 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.vuln-gauge-arc {
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: conic-gradient(from 270deg, #f97316 0 34%, #facc15 34% 67%, #16c784 67% 100%);
+  position: absolute;
+  top: 16px;
+}
+
+.vuln-gauge-arc::before {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  border-radius: 50%;
+  background: #061323;
+}
+
+.vuln-gauge-arc::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 0;
+  background: #061323;
+}
+
+.vuln-gauge strong {
+  color: #f8fafc;
+  font-size: clamp(36px, 2.8vw, 48px);
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 16px;
+}
+
+.vuln-gauge small {
+  color: #aeb8c7;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.vuln-risk-label {
+  color: #f8fafc;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: clamp(15px, 1vw, 18px);
+  font-weight: 800;
+  margin-top: 16px;
+}
+
+.vuln-risk-label svg {
+  color: #f97316;
+}
+
+.vuln-risk-panel p {
+  color: #ff4545;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 900;
+  margin: 28px 0 20px;
+}
+
+.vuln-risk-panel p span {
+  color: #aeb8c7;
+  font-weight: 600;
+}
+
+.vuln-risk-panel button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+@media (max-width: 1280px) {
+  .vuln-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .vuln-layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vuln-right-column {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vuln-risk-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .vuln-stats-grid,
+  .vuln-right-column,
+  .vuln-distribution {
+    grid-template-columns: 1fr;
+  }
+
+  .vuln-risk-panel {
+    grid-column: auto;
+  }
+
+  .vuln-table-top,
+  .vuln-pagination,
+  .vuln-guide-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .vuln-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .vuln-controls label {
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+
+  .vuln-guide-panel {
+    display: flex;
+  }
+}
+
+@media (max-width: 620px) {
+  .vuln-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vuln-panel {
+    padding: 16px;
+  }
+
+  .vuln-table-top,
+  .vuln-tabs,
+  .vuln-pagination {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .vuln-controls button,
+  .vuln-guide-panel button {
+    width: 100%;
+  }
+
+  .vuln-pagination div {
+    flex-wrap: wrap;
+  }
+
+  .vuln-distribution {
+    justify-items: center;
+  }
+
+  .vuln-legend {
+    width: 100%;
+  }
+
+  .vuln-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vuln-legend button {
+    grid-template-columns: 12px 1fr;
+  }
+
+  .vuln-legend span {
+    grid-column: 2;
+  }
+}
