@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./header.css";
+import "./Header.css";
 import { Bell, Download, FileText, Menu, Moon, Plus, Sun } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
