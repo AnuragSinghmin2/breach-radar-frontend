@@ -15,6 +15,7 @@ import {
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import BrandLogo from "./BrandLogo";
 
 const settingsLinks = [
   ["Profile", "/settings/profile"],
@@ -43,9 +44,8 @@ export default function Sidebar({ isOpen }) {
   return (
     <div className={`sidebar ${isOpen ? "show" : "hide"}`}>
       <div className="logo">
-        <div className="logo-icon">SS</div>
         <div>
-          <h2>SecureScan</h2>
+          <BrandLogo className="sidebar-brand-logo" iconSize={30} />
           <p>Security Platform</p>
         </div>
       </div>

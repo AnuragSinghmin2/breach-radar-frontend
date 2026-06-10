@@ -1,73 +1,83 @@
+import { FaGithub, FaLinkedinIn, FaTwitter, FaYoutube } from "react-icons/fa";
+import BrandLogo from "./BrandLogo";
 import "./footer.css";
+
+const footerGroups = [
+  {
+    title: "Product",
+    links: ["Features", "How It Works", "Pricing", "Changelog"],
+  },
+  {
+    title: "Solutions",
+    links: ["Web Applications", "API Security", "Compliance", "Integrations"],
+  },
+  {
+    title: "Resources",
+    links: ["Documentation", "Blog", "Security Guide", "Help Center"],
+  },
+  {
+    title: "Company",
+    links: ["About Us", "Careers", "Privacy Policy", "Terms of Service"],
+  },
+];
 
 export default function Footer() {
   return (
-    <div className="footer">
+    <footer className="ss-footer">
+      <div className="ss-footer-brand">
+        <BrandLogo className="ss-footer-logo" iconSize={24} />
+        <p>AI-powered security scanning platform to protect your digital assets.</p>
 
-      {/* LEFT */}
-      <div className="footer-left">
-        <h2>🛡 SecureScan</h2>
-        <p>
-          AI-powered security scanning platform <br />
-          to protect your digital assets.
-        </p>
-
-        <div className="socials">
-          <span>🐦</span>
-          <span>💼</span>
-          <span>💻</span>
-          <span>▶️</span>
+        <div className="ss-footer-socials" aria-label="Social links">
+          <button type="button" aria-label="Twitter" title="Twitter">
+            <FaTwitter aria-hidden="true" />
+          </button>
+          <button type="button" aria-label="LinkedIn" title="LinkedIn">
+            <FaLinkedinIn aria-hidden="true" />
+          </button>
+          <button type="button" aria-label="GitHub" title="GitHub">
+            <FaGithub aria-hidden="true" />
+          </button>
+          <button type="button" aria-label="YouTube" title="YouTube">
+            <FaYoutube aria-hidden="true" />
+          </button>
         </div>
       </div>
 
-      {/* LINKS */}
-      <div className="footer-links">
-
-        <div>
-          <h4>Product</h4>
-          <p>Features</p>
-          <p>How It Works</p>
-          <p>Pricing</p>
-          <p>Changelog</p>
-        </div>
-
-        <div>
-          <h4>Solutions</h4>
-          <p>Web Applications</p>
-          <p>API Security</p>
-          <p>Compliance</p>
-          <p>Integrations</p>
-        </div>
-
-        <div>
-          <h4>Resources</h4>
-          <p>Documentation</p>
-          <p>Blog</p>
-          <p>Security Guide</p>
-          <p>Help Center</p>
-        </div>
-
-        <div>
-          <h4>Company</h4>
-          <p>About Us</p>
-          <p>Careers</p>
-          <p>Privacy Policy</p>
-          <p>Terms of Service</p>
-        </div>
-
+      <div className="ss-footer-links">
+        {footerGroups.map((group) => (
+          <div key={group.title}>
+            <h4>{group.title}</h4>
+            {group.links.map((link) => (
+              <button key={link} type="button">
+                {link}
+              </button>
+            ))}
+          </div>
+        ))}
       </div>
 
-      {/* RIGHT */}
-      <div className="footer-right">
-        <p>© 2024 SecureScan. All rights reserved.</p>
+      <div className="ss-footer-trust">
+        <p>&copy; 2024 SecureScan. All rights reserved.</p>
 
-        <div className="badges">
-          <span>ISO 27001<br/>Certified</span>
-          <span>GDPR<br/>Compliant</span>
-          <span>SOC 2<br/>Type II</span>
+        <div className="ss-footer-badges">
+          <span>
+            <i>ISO</i>
+            <b>ISO 27001</b>
+            <small>Certified</small>
+          </span>
+          <span>
+            <i>GD</i>
+            <b>GDPR</b>
+            <small>Compliant</small>
+          </span>
+          <span>
+            <i>S2</i>
+            <b>SOC 2</b>
+            <small>Type II</small>
+          </span>
         </div>
       </div>
-
-    </div>
+    </footer>
   );
 }

@@ -71,9 +71,6 @@ export default function Header({ toggleSidebar }) {
   function downloadReport() {
     const csv = [
       ["Domain", "Critical", "High", "Medium", "Low", "Score"],
-      ["example.com", 3, 7, 12, 20, 68],
-      ["testsite.com", 2, 8, 14, 25, 72],
-      ["demo.org", 1, 5, 9, 15, 80],
     ]
       .map((row) => row.join(","))
       .join("\n");
@@ -134,7 +131,7 @@ export default function Header({ toggleSidebar }) {
       <div className="header-left">
         <Menu size={20} className="icon" onClick={toggleSidebar} />
 
-        <div>
+        <div className="header-title">
           <h2>{title}</h2>
           <p>{subtitle}</p>
         </div>

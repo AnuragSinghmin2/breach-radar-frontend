@@ -38,29 +38,9 @@
   overflow: hidden;
 }
 
-.logo-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  border: 2px solid rgba(0, 214, 143, 0.9);
-  background: rgba(0, 214, 143, 0.12);
-  color: #00d68f;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 0;
-  line-height: 1;
-}
-
-.logo h2 {
-  color: white;
+.sidebar-brand-logo strong {
   font-size: 20px;
   font-weight: 900;
-  line-height: 1.1;
-  margin: 0;
-  white-space: nowrap;
 }
 
 .logo p {
@@ -313,4 +293,28 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 100;
+    width: min(280px, 86vw);
+    max-width: 86vw;
+    border-right: 1px solid rgba(42, 69, 96, 0.72);
+    box-shadow: 18px 0 42px rgba(0, 0, 0, 0.34);
+  }
+
+  .sidebar.show {
+    width: min(280px, 86vw);
+    padding: 18px;
+  }
+
+  .sidebar.hide {
+    width: 0;
+    padding: 0;
+    border-right: 0;
+    box-shadow: none;
+  }
 }

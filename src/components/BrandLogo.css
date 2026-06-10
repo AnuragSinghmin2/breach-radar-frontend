@@ -1,0 +1,22 @@
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #f8fafc;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.brand-logo svg {
+  color: #00d68f;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 10px rgba(0, 214, 143, 0.28));
+}
+
+.brand-logo strong {
+  color: #f8fafc;
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: 0;
+}

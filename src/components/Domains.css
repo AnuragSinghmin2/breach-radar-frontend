@@ -20,7 +20,7 @@
 }
 
 .domain-stat-card {
-  min-height: 102px;
+  min-height: 96px;
   border-radius: 7px;
   padding: 18px;
   box-sizing: border-box;
@@ -89,7 +89,7 @@
 .domain-stat-copy strong {
   color: #f9fafb;
   display: block;
-  font-size: 24px;
+  font-size: 23px;
   line-height: 1;
   margin-bottom: 8px;
 }
@@ -110,8 +110,8 @@
 }
 
 .domains-panel-header {
-  min-height: 74px;
-  padding: 0 18px;
+  min-height: 68px;
+  padding: 0 20px;
   border-bottom: 1px solid rgba(67, 83, 104, 0.5);
   display: flex;
   align-items: center;
@@ -202,7 +202,7 @@
 
 .domains-table {
   width: 100%;
-  min-width: 980px;
+  min-width: 1040px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -212,15 +212,15 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1;
-  height: 43px;
-  padding: 0 18px;
+  height: 42px;
+  padding: 0 16px;
   text-align: left;
   border-bottom: 1px solid rgba(67, 83, 104, 0.42);
 }
 
 .domains-table td {
-  height: 84px;
-  padding: 0 18px;
+  height: 76px;
+  padding: 10px 16px;
   vertical-align: middle;
   border-top: 0;
   border-bottom: 1px solid rgba(67, 83, 104, 0.34);
@@ -232,12 +232,12 @@
 
 .domains-table th:nth-child(1),
 .domains-table td:nth-child(1) {
-  width: 23%;
+  width: 22%;
 }
 
 .domains-table th:nth-child(2),
 .domains-table td:nth-child(2) {
-  width: 13%;
+  width: 15%;
 }
 
 .domains-table th:nth-child(3),
@@ -247,12 +247,12 @@
 
 .domains-table th:nth-child(4),
 .domains-table td:nth-child(4) {
-  width: 27%;
+  width: 24%;
 }
 
 .domains-table th:nth-child(5),
 .domains-table td:nth-child(5) {
-  width: 17%;
+  width: 15%;
 }
 
 .domains-table th:nth-child(6),
@@ -309,6 +309,7 @@
   color: #f9fafb;
   font-size: 12px;
   line-height: 1.3;
+  flex-wrap: wrap;
 }
 
 .domain-name-cell em {
@@ -338,6 +339,7 @@
   gap: 8px;
   font-size: 12px;
   margin-bottom: 5px;
+  white-space: normal;
 }
 
 .domain-status i {
@@ -358,50 +360,53 @@
 }
 
 .domain-score-cell {
-  gap: 10px;
+  gap: 8px;
+  justify-content: flex-start;
 }
 
-.score-ring {
+.domain-score-ring {
   --score: 0;
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: conic-gradient(#00d68f calc(var(--score) * 1%), #183049 0);
   position: relative;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
+  margin: 0;
+  box-shadow: none;
 }
 
-.score-ring.warning {
+.domain-score-ring.warning {
   background: conic-gradient(#ff7a1a calc(var(--score) * 1%), #183049 0);
 }
 
-.score-ring::before {
+.domain-score-ring::before {
   content: "";
   position: absolute;
-  inset: 6px;
+  inset: 5px;
   border-radius: 50%;
   background: #081525;
 }
 
-.score-ring strong,
-.score-ring span {
+.domain-score-ring strong,
+.domain-score-ring span {
   position: relative;
   z-index: 1;
 }
 
-.score-ring strong {
+.domain-score-ring strong {
   color: #f9fafb;
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1;
-  margin-top: 7px;
+  margin-top: 5px;
 }
 
-.score-ring span {
+.domain-score-ring span {
   color: #aeb8c7;
-  font-size: 8px;
-  margin-top: -17px;
+  font-size: 7px;
+  margin-top: -14px;
 }
 
 .score-label {
@@ -421,8 +426,9 @@
 
 .severity-list {
   display: grid;
-  grid-template-columns: repeat(4, 44px);
-  gap: 18px;
+  grid-template-columns: repeat(4, minmax(36px, 1fr));
+  gap: 10px;
+  max-width: 220px;
 }
 
 .severity-item {
@@ -445,9 +451,9 @@
 }
 
 .severity-item b {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
   display: inline-grid;
   place-items: center;
   font-size: 13px;
@@ -505,22 +511,23 @@
 }
 
 .domain-actions {
-  gap: 16px;
+  gap: 8px;
   position: relative;
+  justify-content: flex-end;
 }
 
 .domain-actions > button:not(.domain-menu-trigger) {
-  height: 31px;
-  min-width: 78px;
-  padding: 0 13px;
+  height: 32px;
+  min-width: 82px;
+  padding: 0 10px;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .domain-menu-trigger {
-  width: 31px;
-  height: 31px;
+  width: 32px;
+  height: 32px;
   border: 1px solid rgba(65, 82, 104, 0.62);
   border-radius: 5px;
   background: rgba(6, 15, 28, 0.72);
@@ -719,10 +726,12 @@
 
   .domain-controls {
     width: 100%;
+    flex-wrap: wrap;
   }
 
   .domain-search {
     flex: 1 1 auto;
+    min-width: 220px;
   }
 }
 
@@ -1021,4 +1030,3 @@
   color: #60a5fa;
   background: rgba(59, 130, 246, 0.06);
 }
-

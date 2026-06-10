@@ -36,7 +36,7 @@ function totalVulnerabilities(item) {
 function ScoreRing({ value, tone }) {
   return (
     <div
-      className={`score-ring ${tone === "attention" ? "warning" : ""}`}
+      className={`domain-score-ring ${tone === "attention" ? "warning" : ""}`}
       style={{ "--score": value }}
       aria-label={`Security score ${value} out of 100`}
     >
@@ -196,7 +196,7 @@ export default function Domains() {
     try {
       const instructions = await domainApi.getVerificationInstructions(domainItem._id);
       setVerificationInstructions(instructions);
-    } catch (error) {
+    } catch {
       setVerifyError("Failed to fetch verification setup instructions.");
     }
   }

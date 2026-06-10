@@ -6,8 +6,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import "../App.css";
 
-export default function AppLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+export default function AppLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 760);
 
   return (
     <DashboardProvider>
@@ -17,7 +17,7 @@ export default function AppLayout() {
         <div className="main-content">
           <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="content-area">
-            <Outlet />
+            {children ?? <Outlet />}
           </div>
         </div>
       </div>
