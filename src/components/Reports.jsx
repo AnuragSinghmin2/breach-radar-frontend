@@ -323,7 +323,7 @@ export default function Reports() {
                   <button
                     className="reports-domain-btn"
                     type="button"
-                    onClick={() => navigate(`/domains?domain=${report.domain}`)}
+                    onClick={() => navigate(`/dashboard/domains?domain=${report.domain}`)}
                   >
                     {report.domain}
                   </button>
@@ -346,7 +346,7 @@ export default function Reports() {
                           type="button"
                           key={tone}
                           onClick={() =>
-                            navigate(`/vulnerabilities?domain=${report.domain}&severity=${tone}`)
+                            navigate(`/dashboard/vulnerabilities?domain=${report.domain}&severity=${tone}`)
                           }
                         >
                           <b>{report.vulns[index]}</b>
@@ -388,7 +388,7 @@ export default function Reports() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => navigate(`/scans?domain=${report.domain}`)}
+                          onClick={() => navigate(`/dashboard/scans?domain=${report.domain}`)}
                         >
                           Re-run Scan
                         </button>
@@ -559,7 +559,7 @@ export default function Reports() {
                 <button
                   className="reports-secondary-action"
                   type="button"
-                  onClick={() => navigate(`/scans?domain=${selected.domain}`)}
+                  onClick={() => navigate(`/dashboard/scans?domain=${selected.domain}`)}
                 >
                   <CalendarClock size={16} /> Open Scan
                 </button>
@@ -586,7 +586,7 @@ export default function Reports() {
                       type="button"
                       key={tone}
                       onClick={() =>
-                        navigate(`/vulnerabilities?domain=${selected?.domain || ""}&severity=${tone}`)
+                        navigate(`/dashboard/vulnerabilities?domain=${selected?.domain || ""}&severity=${tone}`)
                       }
                     >
                       <i className={tone} /> {tone[0].toUpperCase() + tone.slice(1)}{" "}

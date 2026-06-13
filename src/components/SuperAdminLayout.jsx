@@ -231,15 +231,6 @@ export default function SuperAdminLayout() {
                 </button>
               </div>
 
-              {/* Back to User Platform if user also wants to see user dashboard */}
-              <button
-                className="add-btn"
-                type="button"
-                onClick={() => navigate("/")}
-                style={{ background: "transparent", border: "1px solid #00d68f", color: "#00d68f" }}
-              >
-                User View
-              </button>
             </div>
           </div>
 

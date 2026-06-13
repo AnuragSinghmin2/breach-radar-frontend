@@ -281,7 +281,7 @@ export default function Scans() {
                 {openMenu === "domain" && (
                   <div className="scans-dropdown">
                     {domains.length === 0 && (
-                      <button type="button" onClick={() => navigate("/domains")}>
+                      <button type="button" onClick={() => navigate("/dashboard/domains")}>
                         Verify a domain first
                       </button>
                     )}
@@ -395,7 +395,7 @@ export default function Scans() {
           <section className="scans-panel scans-vuln-panel">
             <div className="scans-section-head">
               <h3>Recent Vulnerabilities <span>(from last scans)</span></h3>
-              <button type="button" onClick={() => navigate("/vulnerabilities")}>View All</button>
+              <button type="button" onClick={() => navigate("/dashboard/vulnerabilities")}>View All</button>
             </div>
 
             <div className="scans-vuln-table">
@@ -413,7 +413,7 @@ export default function Scans() {
                   key={item.id || `${item.name}-${item.domain}`}
                   onClick={() =>
                     navigate(
-                      `/vulnerabilities?domain=${item.domain}&severity=${item.severity.toLowerCase()}`
+                      `/dashboard/vulnerabilities?domain=${item.domain}&severity=${item.severity.toLowerCase()}`
                     )
                   }
                 >
@@ -426,7 +426,7 @@ export default function Scans() {
               ))}
             </div>
 
-            <button className="scans-muted-btn" type="button" onClick={() => navigate("/vulnerabilities")}>
+            <button className="scans-muted-btn" type="button" onClick={() => navigate("/dashboard/vulnerabilities")}>
               <ListChecks size={15} /> View All Vulnerabilities <ArrowRight size={15} />
             </button>
           </section>
@@ -487,7 +487,7 @@ export default function Scans() {
                   className={scan.active ? "active" : ""}
                   type="button"
                   key={scan.id}
-                  onClick={() => navigate(`/reports?domain=${encodeURIComponent(scan.domain)}`)}
+                  onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(scan.domain)}`)}
                 >
                   <span className="scan-domain-icon"><Globe2 size={17} /></span>
                   <strong>

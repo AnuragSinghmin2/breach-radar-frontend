@@ -92,7 +92,7 @@ export default function BottomSection() {
       <div className="bottom-card">
         <div className="card-header">
           <h3>Notifications</h3>
-          <button type="button" onClick={() => navigate("/settings/notifications")}>
+          <button type="button" onClick={() => navigate("/dashboard/settings/notifications")}>
             View All
           </button>
         </div>
@@ -116,7 +116,7 @@ export default function BottomSection() {
       <div className="bottom-card upgrade">
         <h3>Upgrade Your Plan</h3>
         <p>Unlock advanced features and scan more domains.</p>
-        <button type="button" onClick={() => navigate("/settings/plan-billing")}>
+        <button type="button" onClick={() => navigate("/dashboard/settings/plan-billing")}>
           Upgrade Now
         </button>
       </div>

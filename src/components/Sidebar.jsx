@@ -18,22 +18,22 @@ import { useAuth } from "../context/AuthContext";
 import BrandLogo from "./BrandLogo";
 
 const settingsLinks = [
-  ["Profile", "/settings/profile"],
-  ["Team", "/settings/team"],
-  ["Plan & Billing", "/settings/plan-billing"],
-  ["Notifications", "/settings/notifications"],
-  ["Scan Preferences", "/settings/scan-preferences"],
-  ["Security", "/settings/security"],
-  ["API Access", "/settings/api-access"],
-  ["Integrations", "/settings/integrations"],
-  ["Activity Log", "/settings/activity-log"],
+  ["Profile", "/dashboard/settings/profile"],
+  ["Team", "/dashboard/settings/team"],
+  ["Plan & Billing", "/dashboard/settings/plan-billing"],
+  ["Notifications", "/dashboard/settings/notifications"],
+  ["Scan Preferences", "/dashboard/settings/scan-preferences"],
+  ["Security", "/dashboard/settings/security"],
+  ["API Access", "/dashboard/settings/api-access"],
+  ["Integrations", "/dashboard/settings/integrations"],
+  ["Activity Log", "/dashboard/settings/activity-log"],
 ];
 
 export default function Sidebar({ isOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const isSettingsRoute = location.pathname.startsWith("/settings");
+  const isSettingsRoute = location.pathname.startsWith("/dashboard/settings");
   const [settingsOpen, setSettingsOpen] = useState(isSettingsRoute);
 
   async function handleLogout() {
@@ -60,39 +60,39 @@ export default function Sidebar({ isOpen }) {
         </NavLink>
 
         <NavLink
-          to="/domains"
+          to="/dashboard/domains"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
           <Globe size={18} /> Domains
         </NavLink>
 
         <NavLink
-          to="/scans"
+          to="/dashboard/scans"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
           <Scan size={18} /> Scans
         </NavLink>
 
         <NavLink
-          to="/vulnerabilities"
+          to="/dashboard/vulnerabilities"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
           <ShieldAlert size={18} /> Vulnerabilities
         </NavLink>
         <NavLink
-          to="/reports"
+          to="/dashboard/reports"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
           <FileText size={18} /> Reports
         </NavLink>
         <NavLink
-          to="/monitoring"
+          to="/dashboard/monitoring"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
           <Activity size={18} /> Monitoring
         </NavLink>
         <NavLink
-          to="/remediation"
+          to="/dashboard/remediation"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
           <Wrench size={18} /> Remediation

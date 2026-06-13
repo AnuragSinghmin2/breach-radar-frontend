@@ -60,7 +60,7 @@ export default function MonitoringWidgets() {
       detail: "Within 30 days",
       tone: "orange",
       icon: Shield,
-      onClick: () => navigate("/monitoring"),
+      onClick: () => navigate("/dashboard/monitoring"),
     },
     {
       label: "Domains Expiring Soon",
@@ -68,7 +68,7 @@ export default function MonitoringWidgets() {
       detail: "Registration renewal",
       tone: "purple",
       icon: CalendarClock,
-      onClick: () => navigate("/monitoring"),
+      onClick: () => navigate("/dashboard/monitoring"),
     },
     {
       label: "Recent Alerts",
@@ -76,7 +76,7 @@ export default function MonitoringWidgets() {
       detail: `${summary.criticalAlerts ?? 0} critical`,
       tone: "red",
       icon: AlertTriangle,
-      onClick: () => navigate("/monitoring"),
+      onClick: () => navigate("/dashboard/monitoring"),
     },
     {
       label: "Monitoring Status",
@@ -84,7 +84,7 @@ export default function MonitoringWidgets() {
       detail: loading ? "" : `${summary.verifiedDomains ?? 0} verified domains`,
       tone: toneForStatus(overview?.status),
       icon: Activity,
-      onClick: () => navigate("/monitoring"),
+      onClick: () => navigate("/dashboard/monitoring"),
     },
   ];
 
@@ -95,7 +95,7 @@ export default function MonitoringWidgets() {
           <h3>Breach Radar Monitoring</h3>
           <p>SSL, domain expiry, scheduled scans, and security alerts</p>
         </div>
-        <button type="button" onClick={() => navigate("/monitoring")}>
+        <button type="button" onClick={() => navigate("/dashboard/monitoring")}>
           Open Monitoring
         </button>
       </div>
@@ -132,7 +132,7 @@ export default function MonitoringWidgets() {
               key={alert.id}
               type="button"
               className={`monitoring-widget-alert ${alert.severity?.toLowerCase()}`}
-              onClick={() => navigate("/monitoring")}
+              onClick={() => navigate("/dashboard/monitoring")}
             >
               <strong>{alert.domain || "Workspace"}</strong>
               <span>{alert.message}</span>

@@ -124,7 +124,7 @@ export default function Domains() {
         detail: "all time",
         icon: Target,
         tone: "purple",
-        action: () => navigate("/scans"),
+        action: () => navigate("/dashboard/scans"),
       },
     ];
   }, [dashboardStats.totalDomains, dashboardStats.totalScans, domains, navigate]);
@@ -151,7 +151,7 @@ export default function Domains() {
       await scanApi.startScan({ domain, scanType: "Full Scan" });
       setMessage(`Scan queued for ${domain}.`);
       await Promise.all([refreshScans(), refreshStats(), refreshDomains()]);
-      navigate(`/scans?domain=${encodeURIComponent(domain)}`);
+      navigate(`/dashboard/scans?domain=${encodeURIComponent(domain)}`);
     } catch (error) {
       setMessage(error.response?.data?.message || "Failed to start scan.");
     }
@@ -300,7 +300,7 @@ export default function Domains() {
                     <button
                       className="domain-name-cell domain-name-button"
                       type="button"
-                      onClick={() => navigate(`/reports?domain=${encodeURIComponent(item.domain)}`)}
+                      onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
                     >
                       <span className={`domain-row-icon ${item.iconTone}`}>
                         <Globe2 size={23} />
@@ -338,7 +338,7 @@ export default function Domains() {
                           className="severity-item"
                           type="button"
                           key={key}
-                          onClick={() => navigate(`/vulnerabilities?domain=${item.domain}&severity=${key}`)}
+                          onClick={() => navigate(`/dashboard/vulnerabilities?domain=${item.domain}&severity=${key}`)}
                         >
                           <b className={key}>{item.vulnerabilities[key]}</b>
                           <small>{label}</small>
@@ -353,7 +353,7 @@ export default function Domains() {
                       {item.verificationStatus === "verified" && (
                         <button
                           type="button"
-                          onClick={() => navigate(`/reports?domain=${encodeURIComponent(item.domain)}`)}
+                          onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
                         >
                           View Report
                         </button>
@@ -385,7 +385,7 @@ export default function Domains() {
                         <div className="domain-row-menu">
                           <button
                             type="button"
-                            onClick={() => navigate(`/reports?domain=${encodeURIComponent(item.domain)}`)}
+                            onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
                           >
                             View Details
                           </button>
@@ -394,7 +394,7 @@ export default function Domains() {
                               {item.status === "Active" ? "Pause Scanning" : "Enable Scanning"}
                             </button>
                           )}
-                          <button type="button" onClick={() => navigate("/settings/scan-preferences")}>
+                          <button type="button" onClick={() => navigate("/dashboard/settings/scan-preferences")}>
                             Scan Settings
                           </button>
                         </div>
@@ -450,7 +450,7 @@ export default function Domains() {
             value={newDomain}
             onChange={(event) => setNewDomain(event.target.value)}
           />
-          <button className="outline" type="button" onClick={() => navigate("/settings/plan-billing")}>
+          <button className="outline" type="button" onClick={() => navigate("/dashboard/settings/plan-billing")}>
             Upgrade Plan
           </button>
           <button className="primary" type="submit">

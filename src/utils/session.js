@@ -1,5 +1,9 @@
 const ACCESS_TOKEN_KEY = "accessToken";
 const USER_KEY = "user";
+const ROLE_HOME_PATHS = {
+  user: "/dashboard",
+  super_admin: "/super-admin",
+};
 
 function isAuthTraceEnabled() {
   return import.meta.env.DEV || localStorage.getItem("authDebug") === "true";
@@ -45,6 +49,14 @@ export function normalizeAuthUser(user, accessToken = getStoredAccessToken()) {
     ...sourceUser,
     role,
   };
+}
+
+export function getRoleHomePath(role) {
+  return ROLE_HOME_PATHS[role] || "/login";
+}
+
+export function getUserHomePath(user) {
+  return getRoleHomePath(user?.role);
 }
 
 export function saveAuthSession(accessToken, user) {

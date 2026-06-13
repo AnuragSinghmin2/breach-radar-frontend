@@ -21,6 +21,7 @@ export function AuthProvider({ children }) {
     const normalizedUser = normalizeAuthUser(sessionUser, token);
 
     logAuthTrace("AuthContext applySession user", normalizedUser);
+    logAuthTrace("AuthContext detected role", normalizedUser?.role);
     setUser(normalizedUser);
     saveAuthSession(token, normalizedUser);
     setAccessToken(token);

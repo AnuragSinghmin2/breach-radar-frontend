@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../services/api";
 import { validateLoginForm } from "../utils/authValidation";
-import { logAuthTrace } from "../utils/session";
+import { getUserHomePath, logAuthTrace } from "../utils/session";
 import AuthPageLayout from "./AuthPageLayout";
 
 function AuthErrorMessage({ message }) {
@@ -53,9 +53,13 @@ export default function SignInPage() {
 
     try {
       const data = await login(email, password);
-      const destination = location.state?.from?.pathname || "/dashboard";
+      const destination = getUserHomePath(data.user);
 
-      logAuthTrace("SignInPage stored user after login", data.user);
+      logAuthTrace("SignInPage detected role", data.user?.role);
+      logAuthTrace("SignInPage redirect destination", {
+        requestedPath: location.state?.from?.pathname,
+        destination,
+      });
       navigate(destination, { replace: true });
     } catch (err) {
       setError(getErrorMessage(err, "Login failed"));

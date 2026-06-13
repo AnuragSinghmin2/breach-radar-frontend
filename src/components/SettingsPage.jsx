@@ -1829,7 +1829,7 @@ export default function SettingsPage() {
   const activeSection = section || "profile";
 
   if (!section) {
-    return <Navigate to="/settings/profile" replace />;
+    return <Navigate to="/dashboard/settings/profile" replace />;
   }
 
   return (

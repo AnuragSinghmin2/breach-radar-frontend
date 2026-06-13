@@ -232,7 +232,7 @@ export default function Remediation() {
                     <button className="rem-plain-btn" type="button" onClick={() => setSeverityFilter(issue.severity)}>
                       <Pill tone={issue.severity.toLowerCase()}>{issue.severity}</Pill>
                     </button>
-                    <button className="rem-asset-cell" type="button" onClick={() => navigate(`/domains?domain=${issue.asset}`)}>
+                    <button className="rem-asset-cell" type="button" onClick={() => navigate(`/dashboard/domains?domain=${issue.asset}`)}>
                       <Globe size={18} />
                       <strong>{issue.asset}<small>{issue.path}</small></strong>
                     </button>
@@ -250,7 +250,7 @@ export default function Remediation() {
                         <div className="rem-row-menu">
                           <button type="button" onClick={() => updateStatus(issue, "In Progress")}>Start Fix</button>
                           <button type="button" onClick={() => updateStatus(issue, "Resolved")}>Mark Resolved</button>
-                          <button type="button" onClick={() => navigate(`/vulnerabilities?domain=${issue.asset}`)}>Open Finding</button>
+                          <button type="button" onClick={() => navigate(`/dashboard/vulnerabilities?domain=${issue.asset}`)}>Open Finding</button>
                         </div>
                       )}
                     </div>

@@ -121,14 +121,14 @@ export function DashboardProvider({ children }) {
           id: `scan-${scan._id}`,
           tone: "success",
           text: `Scan completed for ${scan.domainId?.domain || "domain"}`,
-          path: "/scans",
+          path: "/dashboard/scans",
         });
       } else if (scan.status === "Failed") {
         items.push({
           id: `scan-failed-${scan._id}`,
           tone: "danger",
           text: `Scan failed for ${scan.domainId?.domain || "domain"}`,
-          path: "/scans",
+          path: "/dashboard/scans",
         });
       }
     });
@@ -138,7 +138,7 @@ export function DashboardProvider({ children }) {
         id: `vuln-${item._id}`,
         tone: item.severity === "Critical" || item.severity === "High" ? "danger" : "success",
         text: `${item.severity} finding: ${item.name}`,
-        path: `/vulnerabilities?domain=${item.domainId?.domain || ""}&severity=${item.severity?.toLowerCase() || "all"}`,
+        path: `/dashboard/vulnerabilities?domain=${item.domainId?.domain || ""}&severity=${item.severity?.toLowerCase() || "all"}`,
       });
     });
 

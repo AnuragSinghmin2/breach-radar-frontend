@@ -57,7 +57,7 @@ export default function StatsCards() {
       <button
         className="dashboard-score-card"
         type="button"
-        onClick={() => navigate("/reports")}
+        onClick={() => navigate("/dashboard/reports")}
       >
         <div className="dashboard-score-copy">
           <p>Security Score</p>
@@ -79,8 +79,8 @@ export default function StatsCards() {
         const Icon = item.label === "Total Scans" ? ScanLine : item.icon;
         const target =
           item.label === "Total Scans"
-            ? "/scans"
-            : `/vulnerabilities?severity=${item.label.toLowerCase()}`;
+            ? "/dashboard/scans"
+            : `/dashboard/vulnerabilities?severity=${item.label.toLowerCase()}`;
 
         return (
           <button

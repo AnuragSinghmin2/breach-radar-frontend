@@ -273,7 +273,7 @@ export default function VulnerabilitiesTable() {
                     <button className="vuln-plain-btn" type="button" onClick={() => setSeverityFilter(item.severity)}>
                       <Badge tone={item.tone}>{item.severity}</Badge>
                     </button>
-                    <button className="vuln-domain" type="button" onClick={() => navigate(`/domains?domain=${item.domain}`)}>
+                    <button className="vuln-domain" type="button" onClick={() => navigate(`/dashboard/domains?domain=${item.domain}`)}>
                       <Globe2 size={18} /> {item.domain}
                     </button>
                     <button className="vuln-plain-btn" type="button" onClick={() => setStatusFilter(item.status)}>
@@ -295,7 +295,7 @@ export default function VulnerabilitiesTable() {
                         <div className="vuln-row-menu">
                           <button type="button" onClick={() => updateStatus(item, "In Progress")}>Start Fix</button>
                           <button type="button" onClick={() => updateStatus(item, "Resolved")}>Mark Resolved</button>
-                          <button type="button" onClick={() => navigate(`/remediation?issue=${encodeURIComponent(item.name)}`)}>Remediation</button>
+                          <button type="button" onClick={() => navigate(`/dashboard/remediation?issue=${encodeURIComponent(item.name)}`)}>Remediation</button>
                         </div>
                       )}
                     </div>
@@ -342,7 +342,7 @@ export default function VulnerabilitiesTable() {
               </div>
               <div className="vuln-detail-actions">
                 <button type="button" onClick={() => updateStatus(selected, "In Progress")}>Start Fix</button>
-                <button type="button" onClick={() => navigate(`/remediation?issue=${encodeURIComponent(selected.name)}`)}>Open Remediation</button>
+                <button type="button" onClick={() => navigate(`/dashboard/remediation?issue=${encodeURIComponent(selected.name)}`)}>Open Remediation</button>
                 <button type="button" onClick={() => updateStatus(selected, "Resolved")}>Mark Resolved</button>
               </div>
             </section>
@@ -354,7 +354,7 @@ export default function VulnerabilitiesTable() {
               <h3>Fix critical vulnerabilities first!</h3>
               <p>Addressing critical issues can prevent the highest-impact attack paths.</p>
             </div>
-            <button type="button" onClick={() => navigate("/remediation")}>
+            <button type="button" onClick={() => navigate("/dashboard/remediation")}>
               View Remediation Guide <ArrowRight size={16} />
             </button>
           </section>
@@ -386,7 +386,7 @@ export default function VulnerabilitiesTable() {
           <section className="vuln-panel">
             <div className="vuln-side-head">
               <h3>Top Vulnerable Domains</h3>
-              <button type="button" onClick={() => navigate("/domains")}>View All</button>
+              <button type="button" onClick={() => navigate("/dashboard/domains")}>View All</button>
             </div>
             <div className="vuln-domain-bars">
               {domainBars.map(([domain, value, tone, width]) => (

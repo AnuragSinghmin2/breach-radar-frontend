@@ -282,7 +282,7 @@ export default function ChartSection() {
 
             type="button"
 
-            onClick={() => navigate(`/scans?domain=${encodeURIComponent(item.name)}`)}
+            onClick={() => navigate(`/dashboard/scans?domain=${encodeURIComponent(item.name)}`)}
 
           >
 

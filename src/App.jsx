@@ -1,7 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import AppLayout from "./components/AppLayout";
-import ProtectedRoute from "./components/ProtectedRoute";
+import UserRoute from "./components/UserRoute";
 import SuperAdminRoute from "./components/SuperAdminRoute";
 import PublicAuthRoute from "./components/PublicAuthRoute";
 import SignInPage from "./components/SignInPage";
@@ -29,6 +29,16 @@ import SuperAdminAuditLogs from "./components/SuperAdminAuditLogs";
 import SuperAdminSystemHealth from "./components/SuperAdminSystemHealth";
 import SuperAdminSettings from "./components/SuperAdminSettings";
 
+function LegacyDashboardRedirect() {
+  const location = useLocation();
+  return (
+    <Navigate
+      to={`/dashboard${location.pathname}${location.search}${location.hash}`}
+      replace
+    />
+  );
+}
+
 function App() {
   return (
     <Routes>
@@ -52,31 +62,40 @@ function App() {
       />
 
       <Route
+        path="/dashboard"
         element={
-          <ProtectedRoute>
+          <UserRoute>
             <AppLayout />
-          </ProtectedRoute>
+          </UserRoute>
         }
       >
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/domains" element={<Domains />} />
-        <Route path="/scans" element={<Scans />} />
-        <Route path="/vulnerabilities" element={<VulnerabilitiesTable />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/monitoring" element={<Monitoring />} />
-        <Route path="/remediation" element={<Remediation />} />
-        <Route path="/settings" element={<Navigate to="/settings/profile" replace />} />
-        <Route path="/settings/:section" element={<SettingsPage />} />
+        <Route index element={<DashboardPage />} />
+        <Route path="domains" element={<Domains />} />
+        <Route path="scans" element={<Scans />} />
+        <Route path="vulnerabilities" element={<VulnerabilitiesTable />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="monitoring" element={<Monitoring />} />
+        <Route path="remediation" element={<Remediation />} />
+        <Route path="settings" element={<Navigate to="/dashboard/settings/profile" replace />} />
+        <Route path="settings/:section" element={<SettingsPage />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
+
+      <Route path="/domains" element={<LegacyDashboardRedirect />} />
+      <Route path="/scans" element={<LegacyDashboardRedirect />} />
+      <Route path="/vulnerabilities" element={<LegacyDashboardRedirect />} />
+      <Route path="/reports" element={<LegacyDashboardRedirect />} />
+      <Route path="/monitoring" element={<LegacyDashboardRedirect />} />
+      <Route path="/remediation" element={<LegacyDashboardRedirect />} />
+      <Route path="/settings" element={<Navigate to="/dashboard/settings/profile" replace />} />
+      <Route path="/settings/:section" element={<LegacyDashboardRedirect />} />
 
       <Route
         path="/super-admin"
         element={
-          <ProtectedRoute>
-            <SuperAdminRoute>
-              <SuperAdminLayout />
-            </SuperAdminRoute>
-          </ProtectedRoute>
+          <SuperAdminRoute>
+            <SuperAdminLayout />
+          </SuperAdminRoute>
         }
       >
         <Route index element={<SuperAdminDashboard />} />
@@ -91,6 +110,7 @@ function App() {
         <Route path="audit-logs" element={<SuperAdminAuditLogs />} />
         <Route path="system-health" element={<SuperAdminSystemHealth />} />
         <Route path="settings" element={<SuperAdminSettings />} />
+        <Route path="*" element={<Navigate to="/super-admin" replace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

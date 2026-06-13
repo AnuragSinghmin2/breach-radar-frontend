@@ -271,7 +271,7 @@ export default function Monitoring() {
             every 24 hours with email alerts to the workspace owner.
           </p>
         </div>
-        <button type="button" onClick={() => navigate("/domains")}>
+        <button type="button" onClick={() => navigate("/dashboard/domains")}>
           Manage Domains
         </button>
       </section>
@@ -453,7 +453,7 @@ export default function Monitoring() {
                   <div className="monitor-row-actions">
                     <button
                       type="button"
-                      onClick={() => navigate(`/reports?domain=${alert.monitor}`)}
+                      onClick={() => navigate(`/dashboard/reports?domain=${alert.monitor}`)}
                     >
                       Investigate
                     </button>
@@ -471,7 +471,7 @@ export default function Monitoring() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => navigate(`/domains?domain=${alert.monitor}`)}
+                          onClick={() => navigate(`/dashboard/domains?domain=${alert.monitor}`)}
                         >
                           Open Domain
                         </button>
@@ -547,7 +547,7 @@ export default function Monitoring() {
                   <button
                     className="monitor-domain-cell"
                     type="button"
-                    onClick={() => navigate(`/domains?domain=${monitor.domain}`)}
+                    onClick={() => navigate(`/dashboard/domains?domain=${monitor.domain}`)}
                   >
                     <span>
                       <Globe size={17} />
@@ -570,14 +570,14 @@ export default function Monitoring() {
                     <button
                       aria-label="Open scans"
                       type="button"
-                      onClick={() => navigate(`/scans?domain=${monitor.domain}`)}
+                      onClick={() => navigate(`/dashboard/scans?domain=${monitor.domain}`)}
                     >
                       <Activity size={15} />
                     </button>
                     <button
                       aria-label="Open report"
                       type="button"
-                      onClick={() => navigate(`/reports?domain=${monitor.domain}`)}
+                      onClick={() => navigate(`/dashboard/reports?domain=${monitor.domain}`)}
                     >
                       <MoreVertical size={15} />
                     </button>
@@ -591,7 +591,7 @@ export default function Monitoring() {
         <section className="monitor-panel monitor-domains-panel">
           <div className="monitor-panel-head">
             <h3>SSL Certificates Expiring Soon</h3>
-            <button type="button" onClick={() => navigate("/monitoring")}>
+            <button type="button" onClick={() => navigate("/dashboard/monitoring")}>
               View All
             </button>
           </div>

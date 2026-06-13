@@ -1,13 +1,12 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { isSessionValid } from "../utils/auth";
+import { getUserHomePath, logAuthTrace } from "../utils/session";
 import LandingPage from "../components/LandingPage";
-import AppLayout from "../components/AppLayout";
-import DashboardPage from "./DashboardPage";
 
 export default function HomePage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -30,11 +29,14 @@ export default function HomePage() {
   }
 
   if (isAuthenticated && isSessionValid()) {
-    return (
-      <AppLayout>
-        <DashboardPage />
-      </AppLayout>
-    );
+    const destination = getUserHomePath(user);
+
+    logAuthTrace("HomePage authenticated redirect", {
+      role: user?.role,
+      destination,
+    });
+
+    return <Navigate to={destination} replace />;
   }
 
   return <LandingPage />;

@@ -7,6 +7,7 @@ export default function Header({ toggleSidebar }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [theme, setTheme] = useState("dark");
+  const currentPath = location.pathname.replace(/^\/dashboard/, "") || "/dashboard";
 
   let title = "Dashboard";
   let subtitle = "Overview of your security posture";
@@ -14,20 +15,20 @@ export default function Header({ toggleSidebar }) {
   let ActionIcon = Plus;
   let actionType = "add-domain";
 
-  if (location.pathname === "/domains") {
+  if (currentPath === "/domains") {
     title = "Domains";
     subtitle = "Manage and monitor your domains in one place";
     actionType = "domains-add";
   }
 
-  if (location.pathname === "/scans") {
+  if (currentPath === "/scans") {
     title = "Scans";
     subtitle = "Scan your domains and detect security vulnerabilities";
     actionText = "New Scan";
     actionType = "new-scan";
   }
 
-  if (location.pathname === "/vulnerabilities") {
+  if (currentPath === "/vulnerabilities") {
     title = "Vulnerabilities";
     subtitle = "Track, prioritize and fix security vulnerabilities";
     actionText = "Export Report";
@@ -35,7 +36,7 @@ export default function Header({ toggleSidebar }) {
     actionType = "export";
   }
 
-  if (location.pathname === "/reports") {
+  if (currentPath === "/reports") {
     title = "Reports";
     subtitle = "View and download your security scan reports";
     actionText = "Generate Report";
@@ -43,7 +44,7 @@ export default function Header({ toggleSidebar }) {
     actionType = "new-report";
   }
 
-  if (location.pathname === "/monitoring") {
+  if (currentPath === "/monitoring") {
     title = "Monitoring";
     subtitle = "Real-time monitoring of your assets and security health";
     actionText = "Add Monitor";
@@ -51,7 +52,7 @@ export default function Header({ toggleSidebar }) {
     actionType = "add-monitor";
   }
 
-  if (location.pathname === "/remediation") {
+  if (currentPath === "/remediation") {
     title = "Remediation";
     subtitle = "Fix vulnerabilities and improve your security posture";
     actionText = "Export Report";
@@ -59,7 +60,7 @@ export default function Header({ toggleSidebar }) {
     actionType = "export";
   }
 
-  if (location.pathname.startsWith("/settings")) {
+  if (currentPath.startsWith("/settings")) {
     title = "Settings";
     subtitle = "Manage account, team, security, and API preferences";
   }
@@ -90,17 +91,17 @@ export default function Header({ toggleSidebar }) {
     }
 
     if (actionType === "new-scan") {
-      navigate("/scans#new-scan");
+      navigate("/dashboard/scans#new-scan");
       return;
     }
 
     if (actionType === "new-report") {
-      navigate("/reports#new-report");
+      navigate("/dashboard/reports#new-report");
       return;
     }
 
     if (actionType === "add-monitor") {
-      navigate("/monitoring#add-monitor");
+      navigate("/dashboard/monitoring#add-monitor");
       return;
     }
 
@@ -111,17 +112,17 @@ export default function Header({ toggleSidebar }) {
         const input = element.querySelector("input");
         if (input) input.focus();
       } else {
-        navigate("/domains#add-domain");
+        navigate("/dashboard/domains#add-domain");
       }
       return;
     }
 
     if (actionType === "add-domain") {
-      navigate("/domains#add-domain");
+      navigate("/dashboard/domains#add-domain");
       return;
     }
 
-    navigate("/#add-domain");
+    navigate("/dashboard/domains#add-domain");
   }
 
   const ThemeIcon = theme === "dark" ? Moon : Sun;
@@ -167,7 +168,7 @@ export default function Header({ toggleSidebar }) {
           className="user-avatar"
           type="button"
           aria-label="Open profile settings"
-          onClick={() => navigate("/settings/profile")}
+          onClick={() => navigate("/dashboard/settings/profile")}
         >
           <img src="https://i.pravatar.cc/40" alt="user" />
         </button>
