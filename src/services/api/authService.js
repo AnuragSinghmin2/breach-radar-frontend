@@ -1,18 +1,32 @@
 import { apiClient, setAccessToken, clearAccessToken, getErrorMessage } from "./client";
-import { clearAuthSession, getStoredUser, saveAuthSession } from "../../utils/session";
+import {
+  clearAuthSession,
+  getStoredUser,
+  logAuthTrace,
+  normalizeAuthUser,
+  saveAuthSession,
+} from "../../utils/session";
 
 export async function login({ email, password }) {
   const { data } = await apiClient.post("/auth/login", { email, password });
-  saveAuthSession(data.accessToken, data.user);
+  const user = normalizeAuthUser(data.user, data.accessToken);
+
+  logAuthTrace("authService login response", data);
+  saveAuthSession(data.accessToken, user);
   setAccessToken(data.accessToken);
-  return data;
+
+  return { ...data, user };
 }
 
 export async function register({ email, password, name }) {
   const { data } = await apiClient.post("/auth/register", { email, password, name });
-  saveAuthSession(data.accessToken, data.user);
+  const user = normalizeAuthUser(data.user, data.accessToken);
+
+  logAuthTrace("authService register response", data);
+  saveAuthSession(data.accessToken, user);
   setAccessToken(data.accessToken);
-  return data;
+
+  return { ...data, user };
 }
 
 export async function logout() {

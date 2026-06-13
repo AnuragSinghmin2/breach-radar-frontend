@@ -7,3 +7,4 @@ export * as vulnerabilityApi from "./vulnerabilityService";
 export * as reportApi from "./reportService";
 export * as adminApi from "./adminService";
 export * as monitoringApi from "./monitoringService";
+export * as superAdminApi from "./superAdminService";

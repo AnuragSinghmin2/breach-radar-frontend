@@ -1,0 +1,361 @@
+/* Super Admin View Styling */
+
+.sa-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* 1. Stats Cards */
+.sa-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.sa-stat-card {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.95), rgba(11, 18, 32, 0.95));
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.sa-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #00d68f;
+}
+
+.sa-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 214, 143, 0.1);
+  color: #00d68f;
+}
+
+.sa-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sa-stat-label {
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sa-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-top: 4px;
+}
+
+/* 2. Layout Grids */
+.sa-dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .sa-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sa-card {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.95), rgba(11, 18, 32, 0.95));
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.sa-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sa-card-header h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* 3. Tables */
+.sa-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.sa-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.sa-table th {
+  padding: 12px 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.5);
+  font-weight: 700;
+}
+
+.sa-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #cbd5e1;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.3);
+}
+
+.sa-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+  color: #f8fafc;
+}
+
+/* 4. Controls & Filters */
+.sa-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sa-search-input {
+  flex: 1;
+  min-width: 200px;
+  background: #071321;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #dbe3ee;
+  font-size: 13px;
+  outline: none;
+}
+
+.sa-search-input:focus {
+  border-color: #00d68f;
+}
+
+.sa-select {
+  background: #071321;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #dbe3ee;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.sa-select:focus {
+  border-color: #00d68f;
+}
+
+/* 5. Buttons */
+.sa-btn {
+  background: #00d68f;
+  color: #0b1220;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.2s;
+}
+
+.sa-btn:hover {
+  opacity: 0.9;
+}
+
+.sa-btn-secondary {
+  background: transparent;
+  color: #00d68f;
+  border: 1px solid #00d68f;
+}
+
+.sa-btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.sa-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 6. Badges */
+.sa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.sa-badge-active {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.sa-badge-suspended {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.sa-badge-admin {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.sa-badge-superadmin {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+}
+
+.sa-badge-user {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+/* 7. Modal Form UI */
+.sa-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+
+.sa-modal {
+  background: #0b1220;
+  border: 1px solid rgba(42, 69, 96, 0.82);
+  border-radius: 8px;
+  width: min(500px, 90vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.sa-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sa-modal-header h3 {
+  margin: 0;
+  color: #f8fafc;
+}
+
+.sa-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.sa-modal-close:hover {
+  color: white;
+}
+
+.sa-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sa-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sa-form-group label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sa-form-input {
+  background: #071321;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  padding: 10px;
+  color: #dbe3ee;
+  font-size: 13px;
+  outline: none;
+}
+
+.sa-form-input:focus {
+  border-color: #00d68f;
+}
+
+.sa-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(42, 69, 96, 0.5);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* 8. Miscellaneous Widgets */
+.sa-health-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sa-health-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.sa-health-dot.healthy {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.sa-health-dot.error {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.sa-health-dot.warning {
+  background: #facc15;
+  box-shadow: 0 0 8px #facc15;
+}

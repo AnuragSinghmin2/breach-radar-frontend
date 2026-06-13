@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../services/api";
 import { validateLoginForm } from "../utils/authValidation";
+import { logAuthTrace } from "../utils/session";
 import AuthPageLayout from "./AuthPageLayout";
 
 function AuthErrorMessage({ message }) {
@@ -29,6 +30,7 @@ function AuthErrorMessage({ message }) {
 
 export default function SignInPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,8 +52,11 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate("/", { replace: true });
+      const data = await login(email, password);
+      const destination = location.state?.from?.pathname || "/dashboard";
+
+      logAuthTrace("SignInPage stored user after login", data.user);
+      navigate(destination, { replace: true });
     } catch (err) {
       setError(getErrorMessage(err, "Login failed"));
     } finally {

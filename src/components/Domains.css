@@ -791,23 +791,28 @@
   background: rgba(3, 10, 19, 0.82);
   backdrop-filter: blur(10px);
   z-index: 999;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .verification-modal {
   width: 100%;
   max-width: 580px;
+  max-height: calc(100dvh - 32px);
   background: linear-gradient(145deg, #091727, #050d18);
   border: 1px solid rgba(59, 76, 97, 0.62);
   border-radius: 12px;
   box-shadow: 0 24px 54px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  overflow: hidden;
   position: relative;
   animation: modalReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 @keyframes modalReveal {
@@ -822,11 +827,12 @@
 }
 
 .modal-header {
-  padding: 20px 24px;
+  padding: 16px 24px;
   border-bottom: 1px solid rgba(67, 83, 104, 0.45);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex: 0 0 auto;
 }
 
 .modal-header h3 {
@@ -854,7 +860,11 @@
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 20px 24px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-body p {
@@ -893,7 +903,7 @@
 }
 
 .instruction-step {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .instruction-step label {
@@ -922,6 +932,7 @@
   font-size: 12px;
   color: #00d68f;
   word-break: break-all;
+  min-width: 0;
 }
 
 .copy-btn {
@@ -954,7 +965,7 @@
   border-left: 3px solid #3b82f6;
   padding: 10px 14px;
   border-radius: 0 6px 6px 0;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .modal-error-banner {
@@ -975,13 +986,14 @@
 }
 
 .modal-footer {
-  padding: 18px 24px;
+  padding: 14px 24px;
   border-top: 1px solid rgba(67, 83, 104, 0.45);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   background: rgba(4, 11, 20, 0.4);
+  flex: 0 0 auto;
 }
 
 .verify-action-btn,
@@ -1029,4 +1041,61 @@
   border-color: #3b82f6;
   color: #60a5fa;
   background: rgba(59, 130, 246, 0.06);
+}
+
+@media (max-height: 760px) {
+  .modal-overlay {
+    align-items: stretch;
+  }
+
+  .verification-modal {
+    max-height: calc(100dvh - 20px);
+  }
+
+  .modal-header {
+    padding: 12px 20px;
+  }
+
+  .modal-body {
+    padding: 14px 20px;
+  }
+
+  .modal-body p,
+  .verify-tabs-nav {
+    margin-bottom: 14px;
+  }
+
+  .instruction-step {
+    margin-bottom: 12px;
+  }
+
+  .code-copy-box {
+    padding: 8px 12px;
+  }
+
+  .modal-footer {
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .verification-modal {
+    max-height: calc(100dvh - 20px);
+  }
+
+  .verify-tabs-nav,
+  .modal-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .verify-tab-btn,
+  .verify-action-btn,
+  .verify-bypass-btn {
+    width: 100%;
+  }
 }

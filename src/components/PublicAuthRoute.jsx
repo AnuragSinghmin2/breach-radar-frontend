@@ -14,7 +14,7 @@ export default function PublicAuthRoute({ children }) {
   }
 
   if (isAuthenticated && isSessionValid()) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

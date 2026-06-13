@@ -52,7 +52,7 @@ export default function Sidebar({ isOpen }) {
 
       <div className="menu">
         <NavLink
-          to="/"
+          to="/dashboard"
           end
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >

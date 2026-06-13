@@ -6,7 +6,7 @@ import {
   getStoredUser,
   isSessionValid,
 } from "../utils/auth";
-import { saveAuthSession } from "../utils/session";
+import { logAuthTrace, normalizeAuthUser, saveAuthSession } from "../utils/session";
 import { setAccessToken, clearAccessToken } from "../services/api/client";
 
 const AuthContext = createContext(null);
@@ -18,8 +18,11 @@ export function AuthProvider({ children }) {
   const isAuthenticated = Boolean(user && isSessionValid());
 
   const applySession = useCallback((sessionUser, token) => {
-    setUser(sessionUser);
-    saveAuthSession(token, sessionUser);
+    const normalizedUser = normalizeAuthUser(sessionUser, token);
+
+    logAuthTrace("AuthContext applySession user", normalizedUser);
+    setUser(normalizedUser);
+    saveAuthSession(token, normalizedUser);
     setAccessToken(token);
   }, []);
 
@@ -32,7 +35,10 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     function bootstrap() {
       if (isSessionValid()) {
-        setUser(getStoredUser());
+        const storedUser = getStoredUser();
+
+        logAuthTrace("AuthContext bootstrap user", storedUser);
+        setUser(storedUser);
         setAccessToken(getStoredAccessToken());
       } else {
         clearSession();
@@ -45,6 +51,10 @@ export function AuthProvider({ children }) {
   }, [clearSession]);
 
   useEffect(() => {
+    logAuthTrace("AuthContext user state", user);
+  }, [user]);
+
+  useEffect(() => {
     function handleLogout() {
       clearSession();
     }
@@ -55,6 +65,8 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const data = await authApi.login({ email, password });
+
+    logAuthTrace("login response", data);
     applySession(data.user, data.accessToken);
     return data;
   }, [applySession]);
