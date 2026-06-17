@@ -16,6 +16,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import BrandLogo from "./BrandLogo";
+import { getInitials, resolveAvatarUrl } from "../utils/profile";
 
 const settingsLinks = [
   ["Profile", "/dashboard/settings/profile"],
@@ -33,6 +34,8 @@ export default function Sidebar({ isOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const avatarUrl = resolveAvatarUrl(user?.profile?.avatar);
+  const initials = getInitials(user?.profile?.name, user?.email);
   const isSettingsRoute = location.pathname.startsWith("/dashboard/settings");
   const [settingsOpen, setSettingsOpen] = useState(isSettingsRoute);
 
@@ -168,9 +171,9 @@ export default function Sidebar({ isOpen }) {
       </div>
 
       <div className="user-profile">
-        <img src={user?.profile?.avatar || "https://i.pravatar.cc/40"} alt="user" />
+        {avatarUrl ? <img src={avatarUrl} alt="" /> : <span className="sidebar-user-initials">{initials}</span>}
         <div className="user-info">
-          <p className="user-name">{user?.profile?.name || "User"}</p>
+          <p className="user-name">{user?.profile?.name || user?.email || ""}</p>
           <span className="user-email">{user?.email || ""}</span>
         </div>
         <button className="sidebar-logout" type="button" onClick={handleLogout}>

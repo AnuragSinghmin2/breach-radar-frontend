@@ -406,7 +406,7 @@ export default function Domains() {
               {filteredDomains.length === 0 && (
                 <tr>
                   <td className="domains-empty" colSpan="6">
-                    No domains match your filters.
+                    No scan data available
                   </td>
                 </tr>
               )}

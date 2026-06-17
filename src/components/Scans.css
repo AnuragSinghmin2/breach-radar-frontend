@@ -490,6 +490,14 @@
   padding: 10px 12px;
 }
 
+.scans-empty {
+  color: #aeb8c7;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 18px 0;
+  text-align: center;
+}
+
 .scans-section-head {
   display: flex;
   align-items: center;

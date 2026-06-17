@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { resolveAvatarUrl } from "../utils/profile";
 import BrandLogo from "./BrandLogo";
 import Footer from "./Footer";
 import {
@@ -31,6 +32,7 @@ export default function SuperAdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const avatarUrl = resolveAvatarUrl(user?.profile?.avatar);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -190,7 +192,7 @@ export default function SuperAdminLayout() {
           </div>
 
           <div className="user-profile">
-            <img src={user?.profile?.avatar || "https://i.pravatar.cc/40"} alt="user" />
+            <img src={avatarUrl || "https://i.pravatar.cc/40"} alt="user" />
             <div className="user-info">
               <p className="user-name">{user?.profile?.name || "Super Admin"}</p>
               <span className="user-email">{user?.email}</span>

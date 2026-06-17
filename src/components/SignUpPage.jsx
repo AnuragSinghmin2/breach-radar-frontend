@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getErrorMessage } from "../services/api";
+import { getErrorMessage, teamApi } from "../services/api";
 import { validateRegisterForm } from "../utils/authValidation";
+
+const PENDING_INVITE_TOKEN_KEY = "pendingInviteToken";
+const TEAM_SETTINGS_PATH = "/dashboard/settings/team";
 
 function AuthErrorMessage({ message }) {
   if (!message) return null;
@@ -28,9 +31,10 @@ function AuthErrorMessage({ message }) {
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { register } = useAuth();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(location.state?.invitedEmail || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -64,6 +68,15 @@ export default function SignUpPage() {
 
     try {
       await register(email.trim(), password, name.trim());
+      const inviteToken = location.state?.inviteToken || sessionStorage.getItem(PENDING_INVITE_TOKEN_KEY);
+
+      if (inviteToken) {
+        await teamApi.acceptInvitation(inviteToken);
+        sessionStorage.removeItem(PENDING_INVITE_TOKEN_KEY);
+        navigate(TEAM_SETTINGS_PATH, { replace: true });
+        return;
+      }
+
       navigate("/", { replace: true });
     } catch (err) {
       setError(getErrorMessage(err, "Registration failed"));
@@ -167,7 +180,7 @@ export default function SignUpPage() {
 
       <p className="auth-switch">
         Already have an account?
-        <button type="button" onClick={() => navigate("/login")}>
+        <button type="button" onClick={() => navigate("/login", { state: location.state })}>
           Sign In
         </button>
       </p>

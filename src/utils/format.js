@@ -19,6 +19,13 @@ export function formatDate(date) {
   }).format(new Date(date));
 }
 
+export function formatDay(date) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+  }).format(new Date(date));
+}
+
 export function timeAgo(date) {
   if (!date) return "—";
   const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);

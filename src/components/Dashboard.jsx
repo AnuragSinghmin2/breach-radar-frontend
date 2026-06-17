@@ -1,34 +1,58 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Bell, Moon } from "lucide-react";
+import { useMemo } from "react";
+import { useDashboard } from "../context/DashboardContext";
+import { formatDay, formatScanTime, severityTone } from "../utils/format";
 import "./dashboard.css";
 
-const data = [
-  { day: "10 May", scans: 15 },
-  { day: "11 May", scans: 55 },
-  { day: "12 May", scans: 45 },
-  { day: "13 May", scans: 75 },
-  { day: "14 May", scans: 65 },
-  { day: "15 May", scans: 70 },
-  { day: "16 May", scans: 85 },
-];
+function buildActivityData(scans) {
+  const buckets = {};
 
-const scans = [
-  { name: "example.com", status: "Completed", score: 68 },
-  { name: "testsite.com", status: "Completed", score: 72 },
-  { name: "myapp.io", status: "Completed", score: 64 },
-  { name: "demo.org", status: "Completed", score: 80 },
-  { name: "vulnerable.net", status: "Failed", score: "-" },
-];
+  for (let index = 6; index >= 0; index -= 1) {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - index);
+    buckets[formatDay(date)] = 0;
+  }
 
-const vulnerabilities = [
-  { name: "Cross Site Scripting (XSS)", domain: "example.com", severity: "Critical" },
-  { name: "SQL Injection", domain: "api.example.com", severity: "High" },
-  { name: "Security Misconfiguration", domain: "test.example.com", severity: "Medium" },
-  { name: "Missing Security Headers", domain: "app.example.com", severity: "Low" },
-  { name: "CORS", domain: "demo.org", severity: "Low" },
-];
+  scans.forEach((scan) => {
+    const key = formatDay(new Date(scan.createdAt));
+    if (buckets[key] !== undefined) {
+      buckets[key] += 1;
+    }
+  });
+
+  return Object.entries(buckets).map(([day, count]) => ({ day, scans: count }));
+}
 
 export default function Dashboard() {
+  const { scans, recentVulnerabilities, notifications, loading } = useDashboard();
+
+  const data = useMemo(() => buildActivityData(scans), [scans]);
+  const recentScans = useMemo(
+    () =>
+      scans.slice(0, 5).map((scan) => ({
+        id: scan._id,
+        name: scan.domainId?.domain || "Unknown domain",
+        status: scan.status,
+        score: scan.domainId?.score ?? scan.riskScore ?? "-",
+      })),
+    [scans]
+  );
+
+  const vulnerabilities = useMemo(
+    () =>
+      recentVulnerabilities.map((item) => ({
+        id: item._id,
+        name: item.name,
+        domain: item.domainId?.domain || "Unknown domain",
+        severity: item.severity,
+        tone: severityTone(item.severity),
+        detected: formatScanTime(item.detectedAt),
+      })),
+    [recentVulnerabilities]
+  );
+
   return (
     <div className="dashboard">
       {/* Navbar */}
@@ -36,7 +60,7 @@ export default function Dashboard() {
         <Moon />
         <div className="notification">
           <Bell />
-          <span className="badge">3</span>
+          <span className="badge">{notifications.length}</span>
         </div>
       </div>
 
@@ -58,8 +82,12 @@ export default function Dashboard() {
         {/* Recent Scans */}
         <div className="card">
           <h2>Recent Scans</h2>
-          {scans.map((item, i) => (
-            <div key={i} className="scan-item">
+          {loading && <p className="dashboard-empty">Loading scans...</p>}
+          {!loading && recentScans.length === 0 && (
+            <p className="dashboard-empty">No scan data available</p>
+          )}
+          {recentScans.map((item) => (
+            <div key={item.id} className="scan-item">
               <div>
                 <p>{item.name}</p>
                 <span className={item.status === "Completed" ? "success" : "failed"}>
@@ -84,17 +112,24 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {vulnerabilities.map((v, i) => (
-              <tr key={i}>
+            {vulnerabilities.map((v) => (
+              <tr key={v.id}>
                 <td>{v.name}</td>
                 <td>{v.domain}</td>
                 <td>
-                  <span className={`severity ${v.severity.toLowerCase()}`}>
+                  <span className={`severity ${v.tone}`}>
                     {v.severity}
                   </span>
                 </td>
               </tr>
             ))}
+            {!loading && vulnerabilities.length === 0 && (
+              <tr>
+                <td colSpan="3" className="dashboard-empty">
+                  No scan data available
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

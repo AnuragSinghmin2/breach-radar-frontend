@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import "./Header.css";
 import { Bell, Download, FileText, Menu, Moon, Plus, Sun } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { getInitials, resolveAvatarUrl } from "../utils/profile";
 
 export default function Header({ toggleSidebar }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [theme, setTheme] = useState("dark");
   const currentPath = location.pathname.replace(/^\/dashboard/, "") || "/dashboard";
 
@@ -126,6 +129,8 @@ export default function Header({ toggleSidebar }) {
   }
 
   const ThemeIcon = theme === "dark" ? Moon : Sun;
+  const avatarUrl = resolveAvatarUrl(user?.profile?.avatar);
+  const initials = getInitials(user?.profile?.name, user?.email);
 
   return (
     <div className="header">
@@ -170,7 +175,7 @@ export default function Header({ toggleSidebar }) {
           aria-label="Open profile settings"
           onClick={() => navigate("/dashboard/settings/profile")}
         >
-          <img src="https://i.pravatar.cc/40" alt="user" />
+          {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initials}</span>}
         </button>
       </div>
     </div>

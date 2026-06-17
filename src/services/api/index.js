@@ -8,3 +8,14 @@ export * as reportApi from "./reportService";
 export * as adminApi from "./adminService";
 export * as monitoringApi from "./monitoringService";
 export * as superAdminApi from "./superAdminService";
+export * as userApi from "./userService";
+export * as teamApi from "./teamService";
+export * as billingApi from "./billingService";
+export * as notificationApi from "./notificationService";
+export * as settingsApi from "./settingsService";
+export * as securityApi from "./securityService";
+export * as apiAccessApi from "./apiAccessService";
+export * as integrationsApi from "./integrationsService";
+export * as activityLogApi from "./activityLogService";
+
+

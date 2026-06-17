@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useDashboard } from "../context/DashboardContext";
+import { vulnerabilityApi } from "../services/api";
+import { severityTone } from "../utils/format";
 import {
   ArrowDown,
   ArrowRight,
@@ -11,13 +14,10 @@ import {
   ChevronRight,
   ChevronsUp,
   Code2,
-  Database,
   FileCheck,
   Filter,
   Globe,
-  KeyRound,
   Link2,
-  Lock,
   MoreVertical,
   Search,
   Shield,
@@ -29,16 +29,6 @@ import {
   X,
 } from "lucide-react";
 import "./Remediation.css";
-
-const initialIssues = [
-  { title: "SQL Injection", text: "Unsanitized user input in login form", code: "CWE-89", severity: "Critical", asset: "example.com", path: "/login.php", status: "Open", priority: "High", icon: Database, tone: "critical", eta: "2-4 hours", effort: "Medium" },
-  { title: "Cross Site Scripting (XSS)", text: "Reflected XSS in search parameter", code: "CWE-79", severity: "High", asset: "testsite.com", path: "/search", status: "In Progress", priority: "High", icon: Code2, tone: "high", eta: "1-2 hours", effort: "Medium" },
-  { title: "Security Misconfiguration", text: "Directory listing is enabled", code: "CWE-200", severity: "High", asset: "myapp.io", path: "/assets/", status: "In Progress", priority: "Medium", icon: Lock, tone: "high", eta: "30-60 min", effort: "Low" },
-  { title: "Sensitive Data Exposure", text: "Server exposes sensitive headers", code: "CWE-532", severity: "Medium", asset: "demo.org", path: "/api/user", status: "Open", priority: "Medium", icon: ShieldCheck, tone: "medium", eta: "1 hour", effort: "Low" },
-  { title: "Insecure Direct Object Reference", text: "IDOR in user profile endpoint", code: "CWE-639", severity: "Medium", asset: "vulnerable.net", path: "/user/profile?id=123", status: "Open", priority: "Medium", icon: Link2, tone: "low", eta: "3-5 hours", effort: "High" },
-  { title: "Missing Security Headers", text: "Important security headers not set", code: "CWE-693", severity: "Low", asset: "example.com", path: "/", status: "Resolved", priority: "Low", icon: Globe, tone: "blue", eta: "15 min", effort: "Low" },
-  { title: "Weak Password Policy", text: "Password policy is too weak", code: "CWE-521", severity: "Low", asset: "testsite.com", path: "/register", status: "Resolved", priority: "Low", icon: KeyRound, tone: "blue", eta: "45 min", effort: "Low" },
-];
 
 const recommendedActions = [
   "Use parameterized queries",
@@ -53,6 +43,34 @@ const resources = [
   ["Secure Code Examples", "View secure code examples", Code2],
   ["OWASP Top 10", "Learn about OWASP Top 10", ShieldCheck],
 ];
+
+const severityMeta = {
+  Critical: { priority: "High", eta: "2-4 hours", effort: "High", icon: ShieldX },
+  High: { priority: "High", eta: "1-2 hours", effort: "Medium", icon: Code2 },
+  Medium: { priority: "Medium", eta: "1 hour", effort: "Medium", icon: ShieldCheck },
+  Low: { priority: "Low", eta: "30-60 min", effort: "Low", icon: Globe },
+};
+
+function mapVulnerabilityToIssue(item) {
+  const meta = severityMeta[item.severity] || severityMeta.Low;
+  return {
+    id: item._id,
+    title: item.name || "Untitled vulnerability",
+    text: item.desc || "No description available",
+    code: item.cwe || "CWE-N/A",
+    severity: item.severity || "Low",
+    asset: item.domainId?.domain || "",
+    path: item.path || "/",
+    status: item.status || "Open",
+    priority: meta.priority,
+    icon: item.name?.toLowerCase().includes("idor") ? Link2 : meta.icon,
+    tone: item.tone || severityTone(item.severity),
+    eta: meta.eta,
+    effort: meta.effort,
+    impact: item.impact || "Impact details are not available for this finding.",
+    fix: item.fix || "Follow secure coding guidance and verify the remediation with a new scan.",
+  };
+}
 
 function Pill({ tone, children }) {
   return <span className={`rem-pill ${tone}`}>{children}</span>;
@@ -79,11 +97,10 @@ function StatusSelect({ status, onClick }) {
 export default function Remediation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { vulnerabilities: contextVulnerabilities, loading: contextLoading, refreshDomains, refreshStats } =
+    useDashboard();
   const initialIssue = searchParams.get("issue");
-  const [issues, setIssues] = useState(initialIssues);
-  const [selected, setSelected] = useState(
-    initialIssues.find((issue) => issue.title === initialIssue) || initialIssues[0]
-  );
+  const [selectedId, setSelectedId] = useState("");
   const [tab, setTab] = useState("All Issues");
   const [severityFilter, setSeverityFilter] = useState("All Severity");
   const [query, setQuery] = useState("");
@@ -91,19 +108,39 @@ export default function Remediation() {
   const [activeMenu, setActiveMenu] = useState("");
   const [completedActions, setCompletedActions] = useState(["Use parameterized queries"]);
 
+  const contextIssues = useMemo(
+    () => contextVulnerabilities.map(mapVulnerabilityToIssue),
+    [contextVulnerabilities]
+  );
+  const issues = contextIssues;
+  const selected = useMemo(
+    () => {
+      if (selectedId === "__closed__") return null;
+
+      return (
+        issues.find((issue) => issue.id === selectedId) ||
+        issues.find((issue) => issue.title === initialIssue) ||
+        issues[0] ||
+        null
+      );
+    },
+    [initialIssue, issues, selectedId]
+  );
+  const loading = contextLoading;
+
   const stats = useMemo(() => {
     const total = issues.length;
     const progress = issues.filter((issue) => issue.status === "In Progress").length;
     const resolved = issues.filter((issue) => issue.status === "Resolved").length;
     const fixable = issues.filter((issue) => issue.status !== "Resolved").length;
-    const riskReduction = Math.round((resolved / total) * 100);
+    const riskReduction = total ? Math.round((resolved / total) * 100) : 0;
 
     return [
-      { label: "Total Vulnerabilities", value: total, detail: "6% from last scan", tone: "critical", icon: ShieldX, trend: "up", filter: "All Issues" },
-      { label: "Fixable", value: fixable, detail: `${Math.round((fixable / total) * 100)}% of total`, tone: "fixable", icon: Wrench, filter: "Fixable" },
-      { label: "In Progress", value: progress, detail: `${Math.round((progress / total) * 100)}% of total`, tone: "progress", icon: Target, filter: "In Progress" },
-      { label: "Resolved", value: resolved, detail: `${Math.round((resolved / total) * 100)}% of total`, tone: "resolved", icon: CheckCircle, filter: "Resolved" },
-      { label: "Risk Reduction", value: `${riskReduction}%`, detail: "12% improvement", tone: "risk", icon: Shield, filter: "Resolved" },
+      { label: "Total Vulnerabilities", value: total, detail: "from current scan data", tone: "critical", icon: ShieldX, trend: "up", filter: "All Issues" },
+      { label: "Fixable", value: fixable, detail: `${total ? Math.round((fixable / total) * 100) : 0}% of total`, tone: "fixable", icon: Wrench, filter: "Fixable" },
+      { label: "In Progress", value: progress, detail: `${total ? Math.round((progress / total) * 100) : 0}% of total`, tone: "progress", icon: Target, filter: "In Progress" },
+      { label: "Resolved", value: resolved, detail: `${riskReduction}% of total`, tone: "resolved", icon: CheckCircle, filter: "Resolved" },
+      { label: "Risk Reduction", value: `${riskReduction}%`, detail: "based on resolved findings", tone: "risk", icon: Shield, filter: "Resolved" },
     ];
   }, [issues]);
 
@@ -124,17 +161,15 @@ export default function Remediation() {
     });
   }, [issues, query, severityFilter, tab]);
 
-  function updateStatus(target, status) {
-    setIssues((current) =>
-      current.map((issue) =>
-        issue.title === target.title && issue.asset === target.asset ? { ...issue, status } : issue
-      )
-    );
-    setSelected((current) =>
-      current?.title === target.title && current?.asset === target.asset ? { ...current, status } : current
-    );
-    setActiveMenu("");
-    setMessage(`${target.title} marked as ${status}.`);
+  async function updateStatus(target, status) {
+    try {
+      await vulnerabilityApi.updateVulnerabilityStatus(target.id, status);
+      setActiveMenu("");
+      setMessage(`${target.title} marked as ${status}.`);
+      await Promise.all([refreshDomains(), refreshStats()]);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to update vulnerability status.");
+    }
   }
 
   function cycleSeverity() {
@@ -149,6 +184,8 @@ export default function Remediation() {
   }
 
   function exportPlan() {
+    if (!selected) return;
+
     const text = [
       "SecureScan Remediation Plan",
       `Selected Issue: ${selected.title}`,
@@ -193,6 +230,7 @@ export default function Remediation() {
       </div>
 
       {message && <div className="rem-message">{message}</div>}
+      {loading && <div className="rem-message">Loading remediation data...</div>}
 
       <div className="rem-layout-grid">
         <div className="rem-main-column">
@@ -224,8 +262,8 @@ export default function Remediation() {
                 </div>
 
                 {filteredIssues.map((issue) => (
-                  <div className="rem-issue-row" key={`${issue.title}-${issue.asset}`}>
-                    <button className="rem-vuln-cell" type="button" onClick={() => setSelected(issue)}>
+                  <div className="rem-issue-row" key={issue.id}>
+                    <button className="rem-vuln-cell" type="button" onClick={() => setSelectedId(issue.id)}>
                       <IssueIcon issue={issue} />
                       <strong>{issue.title}<small>{issue.text} <em>{issue.code}</em></small></strong>
                     </button>
@@ -242,11 +280,11 @@ export default function Remediation() {
                       {issue.priority}
                     </span>
                     <div className="rem-actions">
-                      <button type="button" onClick={() => setSelected(issue)}>View Details</button>
-                      <button aria-label="More actions" type="button" onClick={() => setActiveMenu(activeMenu === `${issue.title}-${issue.asset}` ? "" : `${issue.title}-${issue.asset}`)}>
+                      <button type="button" onClick={() => setSelectedId(issue.id)}>View Details</button>
+                      <button aria-label="More actions" type="button" onClick={() => setActiveMenu(activeMenu === issue.id ? "" : issue.id)}>
                         <MoreVertical size={16} />
                       </button>
-                      {activeMenu === `${issue.title}-${issue.asset}` && (
+                      {activeMenu === issue.id && (
                         <div className="rem-row-menu">
                           <button type="button" onClick={() => updateStatus(issue, "In Progress")}>Start Fix</button>
                           <button type="button" onClick={() => updateStatus(issue, "Resolved")}>Mark Resolved</button>
@@ -283,7 +321,7 @@ export default function Remediation() {
                   <button type="button" onClick={() => updateStatus(selected, "In Progress")}>Mark as In Progress</button>
                   <button type="button" onClick={() => updateStatus(selected, "Resolved")}>Mark as Resolved</button>
                   <button aria-label="Export plan" type="button" onClick={exportPlan}><ChevronsUp size={16} /></button>
-                  <button aria-label="Close" type="button" onClick={() => setSelected(null)}><X size={16} /></button>
+                  <button aria-label="Close" type="button" onClick={() => setSelectedId("__closed__")}><X size={16} /></button>
                 </div>
               </div>
 
@@ -298,7 +336,7 @@ export default function Remediation() {
               <div className="rem-solution-grid">
                 <div>
                   <h4>How to Fix</h4>
-                  <p>Follow the recommended secure coding pattern and verify the fix with a new scan.</p>
+                  <p>{selected.fix}</p>
                   <pre>{`// Vulnerable Code
 $sql = "SELECT * FROM users WHERE username = '" . $_POST['username'] . "'";
 
@@ -336,7 +374,7 @@ $stmt->execute();`}</pre>
               <div className="rem-legend">
                 {["Critical", "High", "Medium", "Low"].map((severity) => {
                   const count = issues.filter((issue) => issue.severity === severity).length;
-                  const percent = ((count / issues.length) * 100).toFixed(1);
+                  const percent = issues.length ? ((count / issues.length) * 100).toFixed(1) : "0.0";
                   return (
                     <button type="button" key={severity} onClick={() => setSeverityFilter(severity)}>
                       <i className={severity.toLowerCase()} /> {severity} <span>{count} ({percent}%)</span>

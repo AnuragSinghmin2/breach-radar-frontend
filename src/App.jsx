@@ -15,6 +15,7 @@ import VulnerabilitiesTable from "./components/VulnerabilitiesTable";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import RegisterPage from "./pages/RegisterPage";
+import InviteAcceptPage from "./pages/InviteAcceptPage";
 import SuperAdminLayout from "./components/SuperAdminLayout";
 import SuperAdminDashboard from "./components/SuperAdminDashboard";
 import SuperAdminUsers from "./components/SuperAdminUsers";
@@ -43,6 +44,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/invite/:token" element={<InviteAcceptPage />} />
 
       <Route
         path="/login"

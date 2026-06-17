@@ -1,0 +1,232 @@
+.invite-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(0, 214, 143, 0.14), transparent 28%),
+    linear-gradient(180deg, #06111f 0%, #020812 100%);
+  color: #e5e7eb;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+.invite-shell {
+  width: min(100%, 620px);
+}
+
+.invite-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #f8fafc;
+  font-weight: 900;
+  margin-bottom: 18px;
+}
+
+.invite-brand svg,
+.invite-icon svg {
+  color: #00d68f;
+}
+
+.invite-card {
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(5, 16, 29, 0.98), rgba(2, 12, 23, 0.98));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+  padding: 28px;
+}
+
+.invite-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  background: rgba(0, 214, 143, 0.14);
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+}
+
+.invite-icon.expired {
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.invite-icon.expired svg {
+  color: #f97316;
+}
+
+.invite-card h1 {
+  color: #f8fafc;
+  font-size: 28px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.invite-card p {
+  color: #aeb8c7;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 10px 0 0;
+}
+
+.invite-details {
+  border: 1px solid rgba(42, 69, 96, 0.62);
+  border-radius: 7px;
+  display: grid;
+  gap: 0;
+  margin: 22px 0;
+  overflow: hidden;
+}
+
+.invite-details div {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.52);
+}
+
+.invite-details div:last-child {
+  border-bottom: 0;
+}
+
+.invite-details dt {
+  color: #aeb8c7;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.invite-details dd {
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 900;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.invite-message {
+  border: 1px solid rgba(0, 214, 143, 0.34);
+  border-radius: 7px;
+  background: rgba(0, 214, 143, 0.1);
+  color: #9ae6b4;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.invite-message.error {
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+}
+
+.invite-actions,
+.invite-form {
+  display: grid;
+  gap: 12px;
+}
+
+.invite-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.invite-tabs button,
+.invite-form button,
+.invite-actions button,
+.invite-link-button {
+  min-height: 40px;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.78);
+  color: #dbe3ee;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.invite-tabs button.active,
+.invite-form button,
+.invite-actions button,
+.invite-link-button {
+  border-color: transparent;
+  background: linear-gradient(180deg, #16e095, #08bf7e);
+  color: #04120d;
+}
+
+.invite-form label span {
+  color: #aeb8c7;
+  display: block;
+  font-size: 11px;
+  font-weight: 900;
+  margin-bottom: 7px;
+}
+
+.invite-form input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.78);
+  color: #f8fafc;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 13px;
+  padding: 0 11px;
+}
+
+.invite-form input:read-only {
+  color: #aeb8c7;
+}
+
+.invite-form button:disabled,
+.invite-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.invite-skeleton {
+  height: 18px;
+  border-radius: 7px;
+  animation: inviteSkeleton 1.2s infinite;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+  margin-bottom: 14px;
+}
+
+.invite-title-skeleton {
+  width: 58%;
+  height: 34px;
+}
+
+.invite-button-skeleton {
+  height: 42px;
+  margin: 22px 0 0;
+}
+
+@keyframes inviteSkeleton {
+  0% { opacity: 0.45; }
+  50% { opacity: 1; }
+  100% { opacity: 0.45; }
+}
+
+@media (max-width: 640px) {
+  .invite-page {
+    padding: 18px;
+  }
+
+  .invite-card {
+    padding: 20px;
+  }
+
+  .invite-details div,
+  .invite-tabs {
+    grid-template-columns: 1fr;
+  }
+}

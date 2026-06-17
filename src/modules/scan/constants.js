@@ -48,10 +48,3 @@ export const SCAN_TYPE_META = {
   },
 };
 
-export const MOCK_DOMAINS = [
-  "example.com",
-  "testsite.com",
-  "myapp.io",
-  "demo.org",
-  "vulnerable.net",
-];

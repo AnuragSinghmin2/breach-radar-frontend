@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { authApi } from "../services/api";
+import { authApi, userApi } from "../services/api";
 import {
   clearAuthSession,
   getStoredAccessToken,
@@ -32,6 +32,17 @@ export function AuthProvider({ children }) {
     clearAccessToken();
     clearAuthSession();
   }, []);
+
+  const updateAuthenticatedUser = useCallback((nextUser) => {
+    setUser(nextUser);
+    saveAuthSession(getStoredAccessToken(), nextUser);
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    const profileUser = await userApi.getProfile();
+    updateAuthenticatedUser(profileUser);
+    return profileUser;
+  }, [updateAuthenticatedUser]);
 
   useEffect(() => {
     function bootstrap() {
@@ -94,8 +105,10 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      refreshProfile,
+      updateAuthenticatedUser,
     }),
-    [user, isAuthenticated, isLoading, login, register, logout]
+    [user, isAuthenticated, isLoading, login, register, logout, refreshProfile, updateAuthenticatedUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

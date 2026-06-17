@@ -303,7 +303,7 @@ export default function VulnerabilitiesTable() {
                 ))}
 
                 {filteredItems.length === 0 && (
-                  <div className="vuln-empty">No vulnerabilities match the selected filters.</div>
+                  <div className="vuln-empty">No scan data available</div>
                 )}
               </div>
             </div>
@@ -395,6 +395,9 @@ export default function VulnerabilitiesTable() {
                   <i><em className={tone} style={{ width }} /></i>
                 </button>
               ))}
+              {domainBars.length === 0 && (
+                <div className="vuln-empty">No scan data available</div>
+              )}
             </div>
           </section>
 

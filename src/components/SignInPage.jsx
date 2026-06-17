@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getErrorMessage } from "../services/api";
+import { getErrorMessage, teamApi } from "../services/api";
 import { validateLoginForm } from "../utils/authValidation";
 import { getUserHomePath, logAuthTrace } from "../utils/session";
 import AuthPageLayout from "./AuthPageLayout";
+
+const PENDING_INVITE_TOKEN_KEY = "pendingInviteToken";
+const TEAM_SETTINGS_PATH = "/dashboard/settings/team";
 
 function AuthErrorMessage({ message }) {
   if (!message) return null;
@@ -32,7 +35,7 @@ export default function SignInPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(location.state?.invitedEmail || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -53,7 +56,14 @@ export default function SignInPage() {
 
     try {
       const data = await login(email, password);
-      const destination = getUserHomePath(data.user);
+      const inviteToken = location.state?.inviteToken || sessionStorage.getItem(PENDING_INVITE_TOKEN_KEY);
+      let destination = getUserHomePath(data.user);
+
+      if (inviteToken) {
+        await teamApi.acceptInvitation(inviteToken);
+        sessionStorage.removeItem(PENDING_INVITE_TOKEN_KEY);
+        destination = TEAM_SETTINGS_PATH;
+      }
 
       logAuthTrace("SignInPage detected role", data.user?.role);
       logAuthTrace("SignInPage redirect destination", {
@@ -131,7 +141,7 @@ export default function SignInPage() {
 
         <p className="auth-switch">
           Don't have an account ?
-          <button type="button" onClick={() => navigate("/register")}>
+          <button type="button" onClick={() => navigate("/register", { state: location.state })}>
             Create Account
           </button>
         </p>

@@ -172,24 +172,8 @@ export function useScans() {
     return mapped;
   }, [refreshAll]);
 
-  const scheduleScan = useCallback(async ({ domain, scanType, checks }) => {
-    const scheduled = mapScan(
-      {
-        _id: `local-${Date.now()}`,
-        domainId: { domain },
-        scanType,
-        status: SCAN_STATUS.SCHEDULED,
-        checks,
-        createdAt: new Date(),
-        scheduledTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      },
-      true
-    );
-    setScans((current) => [scheduled, ...current.map((item) => ({ ...item, active: false }))]);
-    setActiveScanId(scheduled.id);
-    setStatusFilter(SCAN_STATUS.SCHEDULED);
-    setMessage(`${scanType} scheduled for ${domain}.`);
-    return scheduled;
+  const scheduleScan = useCallback(async () => {
+    throw new Error("Missing backend endpoint: POST /scans/schedule");
   }, []);
 
   const rerun = useCallback(async (scanId) => {

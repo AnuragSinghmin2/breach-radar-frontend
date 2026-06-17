@@ -268,7 +268,7 @@ export default function ChartSection() {
 
         {loading && <p className="scan-empty">Loading scans...</p>}
 
-        {!loading && recentScans.length === 0 && <p className="scan-empty">No scans yet.</p>}
+        {!loading && recentScans.length === 0 && <p className="scan-empty">No scan data available</p>}
 
 
 

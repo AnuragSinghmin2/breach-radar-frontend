@@ -67,6 +67,14 @@
   border-radius: 20px;
 }
 
+.dashboard-empty {
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 10px 0;
+  text-align: center;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

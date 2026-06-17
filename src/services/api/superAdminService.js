@@ -130,6 +130,21 @@ export async function getSystemHealth() {
   return data;
 }
 
+export async function getCustomerSubscriptions() {
+  const { data } = await apiClient.get("/super-admin/subscriptions/customers");
+  return data;
+}
+
+export async function changeCustomerPlan(id, planName) {
+  const { data } = await apiClient.put(`/super-admin/subscriptions/customers/${id}/plan`, { planName });
+  return data;
+}
+
+export async function updateCustomerSubscriptionStatus(id, status) {
+  const { data } = await apiClient.put(`/super-admin/subscriptions/customers/${id}/status`, { status });
+  return data;
+}
+
 export function getErrorMessage(error, fallback = "Something went wrong") {
   return error?.response?.data?.message || error?.message || fallback;
 }
@@ -160,5 +175,8 @@ export const superAdminApi = {
   resolveSupportTicket,
   getReports,
   getAuditLogs,
-  getSystemHealth
+  getSystemHealth,
+  getCustomerSubscriptions,
+  changeCustomerPlan,
+  updateCustomerSubscriptionStatus
 };

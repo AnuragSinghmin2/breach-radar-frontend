@@ -205,7 +205,7 @@ export default function Scans() {
     try {
       await scheduleScan({ domain: selectedDomain, scanType: selectedType, checks });
     } catch (err) {
-      setMessage(err.response?.data?.message || "Failed to schedule scan.");
+      setMessage(err.response?.data?.message || err.message || "Failed to schedule scan.");
     }
   }
 
@@ -424,6 +424,9 @@ export default function Scans() {
                   <span>{item.detectedAt}</span>
                 </button>
               ))}
+              {!loading && vulnerabilities.length === 0 && (
+                <div className="scans-empty">No scan data available</div>
+              )}
             </div>
 
             <button className="scans-muted-btn" type="button" onClick={() => navigate("/dashboard/vulnerabilities")}>
@@ -499,6 +502,9 @@ export default function Scans() {
                   <ChevronRight size={16} />
                 </button>
               ))}
+              {!loading && filteredHistory.length === 0 && (
+                <div className="scans-empty">No scan data available</div>
+              )}
             </div>
 
             <button className="scans-wide-link" type="button" onClick={handleRerunScan}>

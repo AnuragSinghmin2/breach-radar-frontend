@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BarChart3,
   Bell,
+  Camera,
   ChevronDown,
   Check,
   Clock3,
@@ -23,6 +24,8 @@ import {
   MoreVertical,
   ShieldCheck,
   Smartphone,
+  Trash2,
+  UploadCloud,
   UserPlus,
   UserRound,
   UsersRound,
@@ -30,7 +33,10 @@ import {
   Wrench,
 } from "lucide-react";
 import { Navigate, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { billingApi, getErrorMessage, teamApi, userApi, settingsApi, securityApi, apiAccessApi, integrationsApi, activityLogApi } from "../services/api";
+import { formatAccountDate, getInitials, resolveAvatarUrl } from "../utils/profile";
 import "./SettingsPage.css";
 
 const settingSections = {
@@ -120,60 +126,6 @@ const quickLinks = [
   ["Authentication Guide", "Learn how to authenticate requests", Wrench],
   ["Code Examples", "Check out integration examples", Code2],
   ["Postman Collection", "Import our API collection", FileText],
-];
-
-const profileDefaults = {
-  name: "Rahul Sharma",
-  email: "rahul@example.com",
-  role: "Security Administrator",
-  company: "SecureScan Enterprise",
-  phone: "+91 98765 43210",
-  timezone: "Asia/Kolkata",
-  bio: "Manages application security scans, remediation workflows, and monitoring alerts.",
-};
-
-const initialTeamMembers = [
-  { name: "Rahul Sharma", email: "rahul@example.com", role: "Owner", status: "Active", access: "Full access", lastActive: "Today, 11:20 AM", avatar: "RS" },
-  { name: "Ananya Verma", email: "ananya@example.com", role: "Admin", status: "Active", access: "Manage scans and reports", lastActive: "Today, 10:05 AM", avatar: "AV" },
-  { name: "Karan Mehta", email: "karan@example.com", role: "Analyst", status: "Active", access: "View findings and remediation", lastActive: "Yesterday, 06:40 PM", avatar: "KM" },
-  { name: "Neha Singh", email: "neha@example.com", role: "Viewer", status: "Pending", access: "Read-only access", lastActive: "Invitation sent", avatar: "NS" },
-];
-
-const billingPlans = [
-  {
-    name: "Starter",
-    monthly: 49,
-    yearly: 470,
-    desc: "Small teams validating core domains.",
-    limits: ["10 domains", "100 scans/month", "Basic reports", "Email support"],
-  },
-  {
-    name: "Growth",
-    monthly: 149,
-    yearly: 1430,
-    desc: "Security teams running regular scans.",
-    limits: ["50 domains", "1,000 scans/month", "Remediation workflow", "Slack alerts"],
-  },
-  {
-    name: "Enterprise",
-    monthly: 399,
-    yearly: 3830,
-    desc: "Advanced monitoring, compliance, and team governance.",
-    limits: ["Unlimited domains", "10,000 scans/month", "Priority support", "Custom reports"],
-  },
-];
-
-const billingUsage = [
-  { label: "Domains", used: 42, limit: 50, tone: "green" },
-  { label: "Scans", used: 728, limit: 1000, tone: "blue" },
-  { label: "Reports", used: 18, limit: 50, tone: "purple" },
-  { label: "API Requests", used: 128645, limit: 250000, tone: "orange" },
-];
-
-const invoiceHistory = [
-  { id: "INV-2024-0521", date: "21 May 2024", amount: "$399.00", status: "Paid" },
-  { id: "INV-2024-0421", date: "21 Apr 2024", amount: "$399.00", status: "Paid" },
-  { id: "INV-2024-0321", date: "21 Mar 2024", amount: "$399.00", status: "Paid" },
 ];
 
 const notificationEvents = [
@@ -278,216 +230,526 @@ function SimpleSettingsSection({ section }) {
   );
 }
 
+const emptyProfileForm = {
+  name: "",
+  email: "",
+  phoneNumber: "",
+  organization: "",
+  jobTitle: "",
+  country: "",
+  timezone: "",
+};
+
+const timeZoneOptions = [
+  "",
+  "UTC",
+  "Asia/Kolkata",
+  "America/New_York",
+  "America/Los_Angeles",
+  "Europe/London",
+  "Europe/Berlin",
+  "Asia/Singapore",
+  "Australia/Sydney",
+];
+
+function mapUserToProfileForm(user) {
+  return {
+    name: user?.profile?.name || "",
+    email: user?.email || "",
+    phoneNumber: user?.profile?.phoneNumber || "",
+    organization: user?.profile?.organization || "",
+    jobTitle: user?.profile?.jobTitle || "",
+    country: user?.profile?.country || "",
+    timezone: user?.preferences?.timezone || "",
+  };
+}
+
+function validateProfileForm(form) {
+  if (!form.name.trim()) return "Full name is required.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return "Enter a valid email address.";
+  if (form.phoneNumber.trim() && !/^[+]?[\d\s().-]{7,20}$/.test(form.phoneNumber.trim())) {
+    return "Enter a valid phone number.";
+  }
+  return "";
+}
+
+function validateAvatarFile(file) {
+  if (!file) return "Choose a profile picture first.";
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(file.type)) return "Profile picture must be JPG, JPEG, PNG, or WEBP.";
+  if (file.size > 5 * 1024 * 1024) return "Profile picture must be 5 MB or smaller.";
+  return "";
+}
+
 function ProfileSettings() {
-  const [profile, setProfile] = useState(profileDefaults);
-  const [preferences, setPreferences] = useState({
-    scanAlerts: true,
-    vulnerabilityDigest: true,
-    reportReady: true,
-    monitoringIncidents: true,
-  });
-  const [message, setMessage] = useState("");
+  const { user, refreshProfile, updateAuthenticatedUser } = useAuth();
+  const fileInputRef = useRef(null);
+  const [profile, setProfile] = useState(emptyProfileForm);
+  const [account, setAccount] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const [dragActive, setDragActive] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProfile() {
+      try {
+        const profileUser = await refreshProfile();
+        if (!active) return;
+        setProfile(mapUserToProfileForm(profileUser));
+        setAccount(profileUser);
+      } catch (error) {
+        if (active) setMessage({ type: "error", text: getErrorMessage(error, "Failed to load profile.") });
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadProfile();
+    return () => {
+      active = false;
+    };
+  }, [refreshProfile]);
+
+  useEffect(() => {
+    if (!user) return;
+    setProfile(mapUserToProfileForm(user));
+    setAccount(user);
+  }, [user]);
+
+  useEffect(() => {
+    if (!avatarFile) {
+      setAvatarPreview("");
+      return undefined;
+    }
+
+    const previewUrl = URL.createObjectURL(avatarFile);
+    setAvatarPreview(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [avatarFile]);
 
   function updateProfile(field, value) {
     setProfile((current) => ({ ...current, [field]: value }));
   }
 
-  function togglePreference(field) {
-    setPreferences((current) => ({ ...current, [field]: !current[field] }));
+  function selectAvatar(file) {
+    const error = validateAvatarFile(file);
+    if (error) {
+      setMessage({ type: "error", text: error });
+      return;
+    }
+
+    setAvatarFile(file);
+    setMessage(null);
   }
 
-  function saveProfile(event) {
-    event.preventDefault();
-    setMessage("Profile settings saved.");
+  function handleAvatarInput(event) {
+    selectAvatar(event.target.files?.[0]);
+    event.target.value = "";
   }
+
+  async function uploadAvatar() {
+    const error = validateAvatarFile(avatarFile);
+    if (error) {
+      setMessage({ type: "error", text: error });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const result = await userApi.uploadAvatar(avatarFile);
+      updateAuthenticatedUser(result.user);
+      setAccount(result.user);
+      setAvatarFile(null);
+      setMessage({ type: "success", text: result.message || "Profile picture updated." });
+      await refreshProfile();
+    } catch (uploadError) {
+      setMessage({ type: "error", text: getErrorMessage(uploadError, "Failed to upload profile picture.") });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function removeAvatar() {
+    setSaving(true);
+    try {
+      const result = await userApi.removeAvatar();
+      updateAuthenticatedUser(result.user);
+      setAccount(result.user);
+      setAvatarFile(null);
+      setMessage({ type: "success", text: result.message || "Profile picture removed." });
+      await refreshProfile();
+    } catch (error) {
+      setMessage({ type: "error", text: getErrorMessage(error, "Failed to remove profile picture.") });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveProfile(event) {
+    event.preventDefault();
+    const error = validateProfileForm(profile);
+    if (error) {
+      setMessage({ type: "error", text: error });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const result = await userApi.updateProfile({
+        name: profile.name,
+        email: profile.email,
+        phoneNumber: profile.phoneNumber,
+        organization: profile.organization,
+        jobTitle: profile.jobTitle,
+        country: profile.country,
+        timezone: profile.timezone,
+      });
+      updateAuthenticatedUser(result.user);
+      setProfile(mapUserToProfileForm(result.user));
+      setAccount(result.user);
+      setMessage({ type: "success", text: result.message || "Profile updated successfully." });
+      await refreshProfile();
+    } catch (error) {
+      setMessage({ type: "error", text: getErrorMessage(error, "Failed to save profile.") });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    setDragActive(false);
+    selectAvatar(event.dataTransfer.files?.[0]);
+  }
+
+  const avatarUrl = avatarPreview || resolveAvatarUrl(account?.profile?.avatar);
+  const initials = getInitials(profile.name, profile.email);
 
   return (
     <div className="profile-settings-layout">
-      {message && <div className="settings-message">{message}</div>}
-
-      <section className="settings-panel profile-hero-panel">
-        <div className="profile-avatar-wrap">
-          <img src="https://i.pravatar.cc/120" alt="Rahul Sharma" />
-          <button type="button" onClick={() => setMessage("Avatar upload ready.")}>
-            Change Avatar
-          </button>
-        </div>
-        <div className="profile-hero-copy">
-          <span className="profile-status">Enterprise Admin</span>
-          <h3>{profile.name}</h3>
-          <p>{profile.bio}</p>
-          <div className="profile-meta-row">
-            <span><ShieldCheck size={15} /> MFA Enabled</span>
-            <span><Activity size={15} /> Last active today</span>
-            <span><Clock3 size={15} /> {profile.timezone}</span>
-          </div>
-        </div>
-      </section>
+      {message && <div className={`settings-message ${message.type === "error" ? "error" : ""}`}>{message.text}</div>}
+      {loading && <div className="settings-message">Loading profile...</div>}
 
       <div className="profile-content-grid">
+        <aside className="profile-side-column">
+          <section className="settings-panel profile-card-panel profile-avatar-card">
+            <div className="settings-panel-title">
+              <h3>Profile Picture</h3>
+              <p>Upload a JPG, JPEG, PNG, or WEBP image up to 5 MB.</p>
+            </div>
+
+            <div className="profile-avatar-wrap">
+              <div className="profile-avatar-preview">
+                {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initials}</span>}
+              </div>
+            </div>
+
+            <div
+              className={dragActive ? "profile-dropzone active" : "profile-dropzone"}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                setDragActive(true);
+              }}
+              onDragOver={(event) => event.preventDefault()}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={handleDrop}
+            >
+              <UploadCloud size={22} />
+              <strong>Drop image here</strong>
+              <span>or choose a file from your device</span>
+              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarInput} />
+            </div>
+
+            <div className="profile-avatar-actions">
+              <button type="button" onClick={() => fileInputRef.current?.click()} disabled={saving}>
+                <Camera size={15} /> Change
+              </button>
+              <button type="button" onClick={uploadAvatar} disabled={!avatarFile || saving}>
+                <UploadCloud size={15} /> Upload
+              </button>
+              <button type="button" onClick={removeAvatar} disabled={saving || (!account?.profile?.avatar && !avatarFile)}>
+                <Trash2 size={15} /> Remove
+              </button>
+            </div>
+          </section>
+
+          <section className="settings-panel profile-card-panel">
+            <h3>Account Information</h3>
+            <div className="profile-account-list">
+              <span><b>User Role</b>{account?.role || ""}</span>
+              <span><b>Account Status</b>{account?.status || ""}</span>
+              <span><b>Account Created Date</b>{formatAccountDate(account?.createdAt)}</span>
+              <span><b>Last Login</b>{formatAccountDate(account?.lastLogin)}</span>
+            </div>
+          </section>
+        </aside>
+
         <section className="settings-panel profile-form-panel">
           <div className="settings-panel-title">
-            <h3>Profile Details</h3>
-            <p>Keep your account information aligned with security ownership and alert routing.</p>
+            <h3>Personal Information</h3>
+            <p>These details come from your authenticated Breach Radar account.</p>
           </div>
 
           <form className="profile-form" onSubmit={saveProfile}>
             <label>
               <span>Full Name</span>
-              <input value={profile.name} onChange={(event) => updateProfile("name", event.target.value)} />
+              <input value={profile.name} onChange={(event) => updateProfile("name", event.target.value)} required />
             </label>
             <label>
               <span>Email</span>
-              <input type="email" value={profile.email} onChange={(event) => updateProfile("email", event.target.value)} />
+              <input type="email" value={profile.email} onChange={(event) => updateProfile("email", event.target.value)} required />
             </label>
             <label>
-              <span>Role</span>
-              <select value={profile.role} onChange={(event) => updateProfile("role", event.target.value)}>
-                <option>Security Administrator</option>
-                <option>Security Analyst</option>
-                <option>DevOps Lead</option>
-                <option>Compliance Manager</option>
-              </select>
+              <span>Phone Number</span>
+              <input value={profile.phoneNumber} onChange={(event) => updateProfile("phoneNumber", event.target.value)} />
             </label>
             <label>
-              <span>Company</span>
-              <input value={profile.company} onChange={(event) => updateProfile("company", event.target.value)} />
+              <span>Organization</span>
+              <input value={profile.organization} onChange={(event) => updateProfile("organization", event.target.value)} />
             </label>
             <label>
-              <span>Phone</span>
-              <input value={profile.phone} onChange={(event) => updateProfile("phone", event.target.value)} />
+              <span>Job Title</span>
+              <input value={profile.jobTitle} onChange={(event) => updateProfile("jobTitle", event.target.value)} />
             </label>
             <label>
-              <span>Timezone</span>
-              <select value={profile.timezone} onChange={(event) => updateProfile("timezone", event.target.value)}>
-                <option>Asia/Kolkata</option>
-                <option>UTC</option>
-                <option>America/New_York</option>
-                <option>Europe/London</option>
-              </select>
+              <span>Country</span>
+              <input value={profile.country} onChange={(event) => updateProfile("country", event.target.value)} />
             </label>
             <label className="profile-wide-field">
-              <span>Bio</span>
-              <textarea value={profile.bio} onChange={(event) => updateProfile("bio", event.target.value)} />
+              <span>Time Zone</span>
+              <select value={profile.timezone} onChange={(event) => updateProfile("timezone", event.target.value)}>
+                {timeZoneOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
             </label>
             <div className="profile-actions">
-              <button type="button" onClick={() => setProfile(profileDefaults)}>Reset</button>
-              <button type="submit">Save Changes</button>
+              <button type="button" onClick={() => setProfile(mapUserToProfileForm(account))} disabled={saving}>Reset</button>
+              <button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
             </div>
           </form>
         </section>
-
-        <aside className="profile-side-column">
-          <section className="settings-panel profile-card-panel">
-            <h3>Account Security</h3>
-            <div className="profile-security-list">
-              <p><Lock size={16} /> Password updated <strong>12 days ago</strong></p>
-              <p><Smartphone size={16} /> Two-factor auth <strong>Enabled</strong></p>
-              <p><ShieldCheck size={16} /> Session policy <strong>Strict</strong></p>
-            </div>
-            <button className="profile-wide-button" type="button" onClick={() => setMessage("Security settings selected.")}>
-              Manage Security <ArrowRight size={15} />
-            </button>
-          </section>
-
-          <section className="settings-panel profile-card-panel">
-            <h3>Alert Preferences</h3>
-            <div className="profile-toggle-list">
-              {[
-                ["scanAlerts", "Scan alerts"],
-                ["vulnerabilityDigest", "Vulnerability digest"],
-                ["reportReady", "Report ready"],
-                ["monitoringIncidents", "Monitoring incidents"],
-              ].map(([key, label]) => (
-                <button type="button" key={key} onClick={() => togglePreference(key)}>
-                  <span>{label}</span>
-                  <i className={preferences[key] ? "active" : ""}>{preferences[key] ? "On" : "Off"}</i>
-                </button>
-              ))}
-            </div>
-          </section>
-        </aside>
       </div>
     </div>
   );
 }
 
 function TeamSettings() {
-  const [members, setMembers] = useState(initialTeamMembers);
-  const [invite, setInvite] = useState({ email: "", role: "Analyst" });
-  const [message, setMessage] = useState("");
+  const [members, setMembers] = useState([]);
+  const [organization, setOrganization] = useState(null);
+  const [orgForm, setOrgForm] = useState({
+    name: "",
+    logo: "",
+    companyWebsite: "",
+    industry: "",
+    timezone: "UTC",
+  });
+  const [stats, setStats] = useState({ members: 0, active: 0, pending: 0, admins: 0, seatsUsed: 0, maxSeats: 0 });
+  const [permissions, setPermissions] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [manageableRoles, setManageableRoles] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [currentUserRole, setCurrentUserRole] = useState("");
+  const [pagination, setPagination] = useState({ page: 1, limit: 8, total: 0, totalPages: 1 });
+  const [filters, setFilters] = useState({ search: "", role: "" });
+  const [invite, setInvite] = useState({ email: "", role: "ANALYST" });
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState(null);
+  const [viewMember, setViewMember] = useState(null);
+  const [copiedInviteId, setCopiedInviteId] = useState(null);
 
-  const activeCount = members.filter((member) => member.status === "Active").length;
-  const pendingCount = members.filter((member) => member.status === "Pending").length;
+  const canManageTeam = ["OWNER", "ADMIN"].includes(currentUserRole);
+  const isOwner = currentUserRole === "OWNER";
 
-  function inviteMember(event) {
+  function showMessage(type, text) {
+    setMessage({ type, text });
+  }
+
+  function roleLabel(role) {
+    return String(role || "").toLowerCase().replace(/^\w/, (letter) => letter.toUpperCase());
+  }
+
+  function statusLabel(status) {
+    return roleLabel(status);
+  }
+
+  function formatTeamDate(value, fallback = "-") {
+    return value ? formatAccountDate(value) : fallback;
+  }
+
+  function canEditMember(member) {
+    if (!canManageTeam || member.type !== "member") return false;
+    if (member.role === "OWNER") return false;
+    if (member.role === "ADMIN" || currentUserRole === "ADMIN") return isOwner && member.role !== "OWNER";
+    return true;
+  }
+
+  async function loadTeam(next = {}) {
+    setLoading(true);
+    try {
+      const params = {
+        page: next.page || pagination.page,
+        limit: pagination.limit,
+        search: next.search ?? filters.search,
+        role: next.role ?? filters.role,
+      };
+      const data = await teamApi.getTeam(params);
+      setMembers(data.members || []);
+      setOrganization(data.organization || null);
+      setOrgForm({
+        name: data.organization?.name || "",
+        logo: data.organization?.logo || "",
+        companyWebsite: data.organization?.companyWebsite || "",
+        industry: data.organization?.industry || "",
+        timezone: data.organization?.timezone || "UTC",
+      });
+      setStats(data.stats || {});
+      setPermissions(data.permissions || []);
+      setRoles(data.roles || []);
+      setManageableRoles(data.manageableRoles || []);
+      setActivities(data.activities || []);
+      setCurrentUserRole(data.currentUserRole || "");
+      setPagination(data.pagination || { page: 1, limit: 8, total: 0, totalPages: 1 });
+    } catch (error) {
+      showMessage("error", getErrorMessage(error, "Failed to load team."));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadTeam({ page: 1 });
+  }, []);
+
+  async function inviteMember(event) {
     event.preventDefault();
     const email = invite.email.trim().toLowerCase();
 
-    if (!email) {
-      setMessage("Email required to send invitation.");
+    if (!email || !invite.role) {
+      showMessage("error", "Email and role are required to send invitation.");
       return;
     }
 
-    if (members.some((member) => member.email === email)) {
-      setMessage(`${email} is already in the team list.`);
+    setSaving(true);
+    try {
+      const result = await teamApi.inviteMember({ email, role: invite.role });
+      setInvite({ email: "", role: "ANALYST" });
+      showMessage(result.emailDelivery?.success === false ? "error" : "success", result.message || `Invitation sent to ${email}.`);
+      await loadTeam({ page: 1 });
+    } catch (error) {
+      showMessage("error", getErrorMessage(error, "Failed to send invitation."));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function resendInvite(member) {
+    setSaving(true);
+    try {
+      const result = await teamApi.resendInvitation(member.id);
+      showMessage(result.emailDelivery?.success === false ? "error" : "success", result.message || `Invitation resent to ${member.email}.`);
+      await loadTeam();
+    } catch (error) {
+      showMessage("error", getErrorMessage(error, "Failed to resend invitation."));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function copyInviteLink(member) {
+    if (!member.inviteLink) {
+      showMessage("error", "Invite link is not available.");
       return;
     }
 
-    const name = email.split("@")[0].replace(/[._-]/g, " ");
-    const initials = name
-      .split(" ")
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-
-    setMembers((current) => [
-      ...current,
-      {
-        name: name.replace(/\b\w/g, (letter) => letter.toUpperCase()),
-        email,
-        role: invite.role,
-        status: "Pending",
-        access: invite.role === "Viewer" ? "Read-only access" : "Standard workspace access",
-        lastActive: "Invitation sent",
-        avatar: initials || "TM",
-      },
-    ]);
-    setInvite({ email: "", role: "Analyst" });
-    setMessage(`Invitation sent to ${email}.`);
+    try {
+      await navigator.clipboard.writeText(member.inviteLink);
+      setCopiedInviteId(member.id);
+      showMessage("success", "Invite link copied.");
+      window.setTimeout(() => setCopiedInviteId(null), 1800);
+    } catch (error) {
+      showMessage("error", "Could not copy invite link.");
+    }
   }
 
-  function updateRole(email, role) {
-    setMembers((current) =>
-      current.map((member) =>
-        member.email === email
-          ? {
-              ...member,
-              role,
-              access: role === "Owner" ? "Full access" : role === "Viewer" ? "Read-only access" : "Manage scans and reports",
-            }
-          : member
-      )
-    );
-    setMessage(`Role updated to ${role}.`);
+  async function updateRole(member, role) {
+    setSaving(true);
+    try {
+      const result = await teamApi.updateMemberRole(member.id, role);
+      showMessage("success", result.message || "Role updated.");
+      await loadTeam();
+    } catch (error) {
+      showMessage("error", getErrorMessage(error, "Failed to update role."));
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function removeMember(email) {
-    setMembers((current) => current.filter((member) => member.email !== email));
-    setMessage(`${email} removed from team.`);
+  async function updateStatus(member, status) {
+    setSaving(true);
+    try {
+      const result = await teamApi.updateMemberStatus(member.id, status);
+      showMessage("success", result.message || "Member status updated.");
+      await loadTeam();
+    } catch (error) {
+      showMessage("error", getErrorMessage(error, "Failed to update member status."));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function confirmRemoveMember() {
+    if (!removeTarget) return;
+    setSaving(true);
+    try {
+      const result = await teamApi.removeMember(removeTarget.id);
+      showMessage("success", result.message || `${removeTarget.email} removed from team.`);
+      setRemoveTarget(null);
+      await loadTeam({ page: 1 });
+    } catch (error) {
+      showMessage("error", getErrorMessage(error, "Failed to remove member."));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveOrganization(event) {
+    event.preventDefault();
+    setSaving(true);
+    try {
+      const result = await teamApi.updateOrganization(orgForm);
+      showMessage("success", result.message || "Organization settings saved.");
+      await loadTeam();
+    } catch (error) {
+      showMessage("error", getErrorMessage(error, "Failed to save organization settings."));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function updateFilter(field, value) {
+    const next = { ...filters, [field]: value };
+    setFilters(next);
+    loadTeam({ ...next, page: 1 });
   }
 
   return (
     <div className="team-settings-layout">
-      {message && <div className="settings-message">{message}</div>}
+      {message && <div className={`settings-message ${message.type === "error" ? "error" : ""}`}>{message.text}</div>}
 
       <div className="team-stats-grid">
         {[
-          ["Members", members.length, "Total seats used", UsersRound, "green"],
-          ["Active", activeCount, "Currently active", ShieldCheck, "blue"],
-          ["Pending", pendingCount, "Invitations sent", Clock3, "orange"],
-          ["Admins", members.filter((member) => ["Owner", "Admin"].includes(member.role)).length, "Privileged users", Crown, "purple"],
+          ["Members", stats.members || 0, `${stats.seatsUsed || 0}/${stats.maxSeats || "Unlimited"} seats`, UsersRound, "green"],
+          ["Active", stats.active || 0, "Currently active", ShieldCheck, "blue"],
+          ["Pending", stats.pending || 0, "Invitations sent", Clock3, "orange"],
+          ["Admins", stats.admins || 0, "Privileged users", Crown, "purple"],
         ].map(([label, value, detail, Icon, tone]) => (
           <article className="api-overview-card" key={label}>
             <span className={`api-card-icon ${tone}`}>
@@ -509,37 +771,106 @@ function TeamSettings() {
             <p>Manage who can scan domains, review vulnerabilities, and approve remediation work.</p>
           </div>
 
+          <div className="team-table-toolbar">
+            <input
+              placeholder="Search members"
+              value={filters.search}
+              onChange={(event) => updateFilter("search", event.target.value)}
+            />
+            <select value={filters.role} onChange={(event) => updateFilter("role", event.target.value)}>
+              <option value="">All Roles</option>
+              {roles.map((role) => <option key={role} value={role}>{roleLabel(role)}</option>)}
+            </select>
+          </div>
+
           <div className="team-member-list">
-            {members.map((member) => (
-              <article className="team-member-row" key={member.email}>
-                <span className="team-avatar">{member.avatar}</span>
-                <div className="team-member-copy">
-                  <strong>{member.name}</strong>
-                  <small>{member.email}</small>
-                </div>
-                <select value={member.role} onChange={(event) => updateRole(member.email, event.target.value)}>
-                  <option>Owner</option>
-                  <option>Admin</option>
-                  <option>Analyst</option>
-                  <option>Viewer</option>
-                </select>
-                <span className={member.status === "Pending" ? "team-status pending" : "team-status active"}>{member.status}</span>
-                <div className="team-access">
-                  <strong>{member.access}</strong>
-                  <small>{member.lastActive}</small>
-                </div>
-                <button type="button" onClick={() => removeMember(member.email)} disabled={member.role === "Owner"}>
-                  Remove
-                </button>
-              </article>
-            ))}
+            {loading ? (
+              Array.from({ length: 4 }).map((_, index) => <div className="team-skeleton-row" key={index} />)
+            ) : members.length === 0 ? (
+              <div className="team-empty-state">No team members match the current filters.</div>
+            ) : (
+              <div className="team-table-wrap">
+                <table className="team-members-table">
+                  <thead>
+                    <tr>
+                      <th>Avatar</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Joined Date</th>
+                      <th>Last Login</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {members.map((member) => {
+                      const avatarUrl = resolveAvatarUrl(member.avatar);
+                      const displayName = member.name || member.email;
+                      const editable = canEditMember(member);
+                      return (
+                        <tr key={`${member.type}-${member.id}`}>
+                          <td>
+                            <span className="team-avatar">
+                              {avatarUrl ? <img src={avatarUrl} alt="" /> : getInitials(displayName, member.email)}
+                            </span>
+                          </td>
+                          <td>{displayName}</td>
+                          <td>{member.email}</td>
+                          <td>
+                            <select value={member.role} onChange={(event) => updateRole(member, event.target.value)} disabled={!editable || saving}>
+                              {roles.map((role) => <option key={role} value={role}>{roleLabel(role)}</option>)}
+                            </select>
+                          </td>
+                          <td><span className={`team-status ${member.status === "PENDING" ? "pending" : member.status === "SUSPENDED" ? "suspended" : "active"}`}>{statusLabel(member.status)}</span></td>
+                          <td>{formatTeamDate(member.joinedAt, member.type === "invitation" ? "Invitation pending" : "-")}</td>
+                          <td>{formatTeamDate(member.lastLogin, "Never")}</td>
+                          <td>
+                            <div className="team-table-actions">
+                              <button type="button" onClick={() => setViewMember(member)}>View</button>
+                              {member.type === "invitation" ? (
+                                <>
+                                  <button type="button" onClick={() => resendInvite(member)} disabled={!canManageTeam || saving || member.status !== "PENDING"}>
+                                    <Mail size={14} /> Resend Invite
+                                  </button>
+                                  <button type="button" onClick={() => copyInviteLink(member)} disabled={!canManageTeam || !member.inviteLink}>
+                                    {copiedInviteId === member.id ? <Check size={14} /> : <Copy size={14} />} Copy Invite Link
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  {member.status === "SUSPENDED" ? (
+                                    <button type="button" onClick={() => updateStatus(member, "ACTIVE")} disabled={!editable || saving}>Activate</button>
+                                  ) : (
+                                    <button type="button" onClick={() => updateStatus(member, "SUSPENDED")} disabled={!editable || saving}>Suspend</button>
+                                  )}
+                                  <button type="button" onClick={() => setRemoveTarget(member)} disabled={!editable || saving}>Remove</button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div className="team-pagination">
+            <span>Page {pagination.page} of {pagination.totalPages}</span>
+            <div>
+              <button type="button" disabled={pagination.page <= 1 || loading} onClick={() => loadTeam({ page: pagination.page - 1 })}>Previous</button>
+              <button type="button" disabled={pagination.page >= pagination.totalPages || loading} onClick={() => loadTeam({ page: pagination.page + 1 })}>Next</button>
+            </div>
           </div>
         </section>
 
         <aside className="team-side-column">
           <section className="settings-panel team-invite-panel">
             <h3>Invite Member</h3>
-            <p>Add teammates and assign security access before they join.</p>
+            <p>{canManageTeam ? "Add teammates and assign security access before they join." : "Owner or Admin access is required to invite teammates."}</p>
             <form onSubmit={inviteMember}>
               <label>
                 <span>Email</span>
@@ -547,118 +878,407 @@ function TeamSettings() {
                   type="email"
                   placeholder="member@example.com"
                   value={invite.email}
+                  disabled={!canManageTeam || saving}
                   onChange={(event) => setInvite((current) => ({ ...current, email: event.target.value }))}
                 />
               </label>
               <label>
                 <span>Role</span>
-                <select value={invite.role} onChange={(event) => setInvite((current) => ({ ...current, role: event.target.value }))}>
-                  <option>Admin</option>
-                  <option>Analyst</option>
-                  <option>Viewer</option>
+                <select value={invite.role} disabled={!canManageTeam || saving} onChange={(event) => setInvite((current) => ({ ...current, role: event.target.value }))}>
+                  {manageableRoles.map((role) => (
+                    <option key={role} value={role} disabled={role === "ADMIN" && !isOwner}>{roleLabel(role)}</option>
+                  ))}
                 </select>
               </label>
-              <button type="submit">
-                <UserPlus size={16} /> Send Invite
+              <button type="submit" disabled={!canManageTeam || saving}>
+                <UserPlus size={16} /> {saving ? "Sending..." : "Send Invite"}
               </button>
             </form>
           </section>
 
           <section className="settings-panel team-permissions-panel">
             <h3>Role Permissions</h3>
-            <div>
-              <article>
-                <Crown size={16} />
-                <strong>Owner</strong>
-                <span>Full workspace control, billing, team management, scans, reports, and API access.</span>
-              </article>
-              <article>
-                <ShieldCheck size={16} />
-                <strong>Admin</strong>
-                <span>Manage domains, scans, vulnerabilities, remediation tasks, and monitoring rules.</span>
-              </article>
-              <article>
-                <Activity size={16} />
-                <strong>Analyst</strong>
-                <span>Review findings, generate reports, monitor alerts, and update remediation status.</span>
-              </article>
-              <article>
-                <Eye size={16} />
-                <strong>Viewer</strong>
-                <span>Read-only access to dashboards, reports, findings, and activity history.</span>
-              </article>
+            <div className="team-permission-table-wrap">
+              <table className="team-permission-table">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    {roles.map((role) => <th key={role}>{roleLabel(role)}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {permissions.map((permission) => (
+                    <tr key={permission.feature}>
+                      <td>{permission.feature}</td>
+                      {roles.map((role) => (
+                        <td key={role}>{permission[role] ? <Check size={15} /> : "-"}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </section>
         </aside>
       </div>
+
+      <div className="team-bottom-grid">
+        <section className="settings-panel team-org-panel">
+          <div className="settings-panel-title">
+            <h3>Organization Settings</h3>
+            <p>{isOwner ? "Update company profile information for this organization." : "Only the Owner can edit organization settings."}</p>
+          </div>
+          <form className="team-org-form" onSubmit={saveOrganization}>
+            <label>
+              <span>Organization Name</span>
+              <input value={orgForm.name} disabled={!isOwner || saving} onChange={(event) => setOrgForm((current) => ({ ...current, name: event.target.value }))} />
+            </label>
+            <label>
+              <span>Organization Logo</span>
+              <input placeholder="https://example.com/logo.png" value={orgForm.logo} disabled={!isOwner || saving} onChange={(event) => setOrgForm((current) => ({ ...current, logo: event.target.value }))} />
+            </label>
+            <label>
+              <span>Company Website</span>
+              <input placeholder="https://example.com" value={orgForm.companyWebsite} disabled={!isOwner || saving} onChange={(event) => setOrgForm((current) => ({ ...current, companyWebsite: event.target.value }))} />
+            </label>
+            <label>
+              <span>Industry</span>
+              <input value={orgForm.industry} disabled={!isOwner || saving} onChange={(event) => setOrgForm((current) => ({ ...current, industry: event.target.value }))} />
+            </label>
+            <label>
+              <span>Timezone</span>
+              <select value={orgForm.timezone} disabled={!isOwner || saving} onChange={(event) => setOrgForm((current) => ({ ...current, timezone: event.target.value }))}>
+                {timeZoneOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </label>
+            <button type="submit" disabled={!isOwner || saving}>{saving ? "Saving..." : "Save Organization"}</button>
+          </form>
+        </section>
+
+        <section className="settings-panel team-activity-panel">
+          <div className="settings-panel-title">
+            <h3>Team Activity</h3>
+            <p>Recent login, scan, domain, report, vulnerability, role, and invitation events.</p>
+          </div>
+          <div className="team-activity-list">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, index) => <div className="team-skeleton-row" key={index} />)
+            ) : activities.length === 0 ? (
+              <div className="team-empty-state">No team activity has been recorded yet.</div>
+            ) : activities.map((activity) => (
+              <article className="team-activity-row" key={activity.id}>
+                <span className="team-avatar">
+                  {resolveAvatarUrl(activity.user?.avatar) ? <img src={resolveAvatarUrl(activity.user.avatar)} alt="" /> : getInitials(activity.user?.name, activity.user?.email)}
+                </span>
+                <strong>{activity.user?.name || activity.user?.email || "System"}<small>{activity.action}{activity.target ? ` • ${activity.target}` : ""}</small></strong>
+                <span>{formatTeamDate(activity.timestamp)}</span>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {removeTarget && (
+        <div className="team-modal-backdrop">
+          <div className="team-confirm-modal">
+            <h3>Remove Team Member</h3>
+            <p>Remove {removeTarget.email} from {organization?.name || "this organization"}?</p>
+            <strong>This action cannot be undone.</strong>
+            <div>
+              <button type="button" onClick={() => setRemoveTarget(null)} disabled={saving}>Cancel</button>
+              <button type="button" onClick={confirmRemoveMember} disabled={saving}>{saving ? "Removing..." : "Remove"}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewMember && (
+        <div className="team-modal-backdrop">
+          <div className="team-confirm-modal">
+            <h3>{viewMember.name || viewMember.email}</h3>
+            <p>{viewMember.email}</p>
+            <span className={`team-status ${viewMember.status === "PENDING" ? "pending" : viewMember.status === "SUSPENDED" ? "suspended" : "active"}`}>{roleLabel(viewMember.role)} • {statusLabel(viewMember.status)}</span>
+            <p>Joined: {formatTeamDate(viewMember.joinedAt, viewMember.type === "invitation" ? "Invitation pending" : "-")}</p>
+            <p>Last Login: {formatTeamDate(viewMember.lastLogin, "Never")}</p>
+            <div>
+              <button type="button" onClick={() => setViewMember(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function PlanBillingSettings() {
   const [billingCycle, setBillingCycle] = useState("monthly");
-  const [currentPlan, setCurrentPlan] = useState("Enterprise");
-  const [message, setMessage] = useState("");
-  const [payment, setPayment] = useState({
-    cardName: "Rahul Sharma",
-    last4: "4242",
-    contact: "billing@example.com",
-  });
+  const [billing, setBilling] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [savingPlan, setSavingPlan] = useState("");
 
-  const activePlan = billingPlans.find((plan) => plan.name === currentPlan) || billingPlans[2];
+  // Modal states
+  const [modalType, setModalType] = useState(null); // 'upgrade', 'downgrade'
+  const [selectedPlanForModal, setSelectedPlanForModal] = useState(null);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [billingCycleSelection, setBillingCycleSelection] = useState("monthly");
+  const [downgradeError, setDowngradeError] = useState("");
+  const [downgradeViolations, setDowngradeViolations] = useState([]);
 
-  function selectPlan(planName) {
-    setCurrentPlan(planName);
-    setMessage(`${planName} plan selected for the workspace.`);
+  const loadBilling = async () => {
+    try {
+      setLoading(true);
+      const data = await billingApi.getBilling();
+      setBilling(data);
+      setBillingCycle(data.subscription?.billingCycle === "yearly" ? "yearly" : "monthly");
+    } catch (error) {
+      setMessage({ type: "error", text: getErrorMessage(error, "Failed to load billing.") });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBilling();
+  }, []);
+
+  const currentPlan = billing?.subscription?.currentPlan || billing?.organization?.subscriptionPlan || "Starter";
+  const activePlan = billing?.activePlan || billing?.plans?.find((plan) => plan.name === currentPlan) || null;
+  const isOwner = billing?.role === "OWNER";
+  const currency = activePlan?.currency || "INR";
+
+  function formatMoney(amount, planCurrency = currency) {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: planCurrency,
+      maximumFractionDigits: 0,
+    }).format(Number(amount) || 0);
   }
 
-  function updatePayment(field, value) {
-    setPayment((current) => ({ ...current, [field]: value }));
+  function formatBillingDate(value) {
+    if (!value) return "Not scheduled";
+    return new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
   }
 
-  function saveBilling(event) {
-    event.preventDefault();
-    setMessage("Billing details saved.");
+  function planDescription(plan) {
+    if (!plan) return "Your billing details are loading.";
+    if (plan.name === "Starter") return "Core scanning and reporting for small teams.";
+    if (plan.name === "Professional") return "Higher scan volume, API access, and team workflows.";
+    if (plan.name === "Business") return "Advanced monitoring, compliance reports, and larger teams.";
+    return "Custom security operations with enterprise governance.";
   }
 
-  function downloadInvoice(invoice) {
-    const invoiceText = [
-      "SecureScan Invoice",
-      `Invoice: ${invoice.id}`,
-      `Date: ${invoice.date}`,
-      `Amount: ${invoice.amount}`,
-      `Status: ${invoice.status}`,
-      `Plan: ${currentPlan}`,
-    ].join("\n");
-    const blob = new Blob([invoiceText], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+  function planLimits(plan) {
+    const displayVal = (val) => (val >= 999999 ? "Unlimited" : `${val.toLocaleString()}`);
+    const seats = plan.seatLimit >= 999999 ? "Unlimited seats" : `${plan.seatLimit} seats`;
+    return [
+      `${displayVal(plan.domainLimit)} domains`,
+      `${displayVal(plan.scanLimit)} scans/month`,
+      seats,
+      ...(plan.features || []),
+    ];
+  }
 
-    link.href = url;
-    link.download = `${invoice.id}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
-    setMessage(`${invoice.id} downloaded.`);
+  const handleSelectPlan = (plan) => {
+    if (!isOwner) {
+      setMessage({ type: "error", text: "Only the organization owner can change the plan." });
+      return;
+    }
+
+    const planOrder = ["Starter", "Professional", "Business", "Enterprise"];
+    const currentIdx = planOrder.indexOf(currentPlan);
+    const targetIdx = planOrder.indexOf(plan.name);
+
+    if (plan.name === currentPlan) return;
+
+    if (targetIdx < currentIdx) {
+      // Downgrade check
+      const violations = [];
+      const usage = billing?.usage || [];
+      
+      const domainUsage = usage.find(u => u.key === 'domains');
+      if (domainUsage && domainUsage.used > plan.domainLimit) {
+        violations.push(`You are currently using ${domainUsage.used} domains, but the ${plan.displayName || plan.name} plan only allows ${plan.domainLimit} domains.`);
+      }
+
+      const seatUsage = usage.find(u => u.key === 'seats');
+      const maxTargetSeats = plan.seatLimit;
+      if (seatUsage && seatUsage.used > maxTargetSeats) {
+        violations.push(`You have active/pending ${seatUsage.used} seats, but the ${plan.displayName || plan.name} plan only allows ${maxTargetSeats} seats.`);
+      }
+
+      const scanUsage = usage.find(u => u.key === 'scans');
+      if (scanUsage && scanUsage.used > plan.scanLimit) {
+        violations.push(`You have run ${scanUsage.used} scans this cycle, but the ${plan.displayName || plan.name} plan only allows ${plan.scanLimit} scans.`);
+      }
+
+      if (violations.length > 0) {
+        setDowngradeViolations(violations);
+        setDowngradeError("Cannot Downgrade: Your current usage exceeds the target plan limits.");
+      } else {
+        setDowngradeViolations([]);
+        setDowngradeError("");
+      }
+      setSelectedPlanForModal(plan);
+      setModalType("downgrade");
+    } else {
+      // Upgrade
+      setSelectedPlanForModal(plan);
+      setBillingCycleSelection(billingCycle);
+      setModalType("upgrade");
+    }
+  };
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  async function executeUpgrade(e) {
+    e.preventDefault();
+    setSavingPlan(selectedPlanForModal.name);
+    setMessage(null);
+    try {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error("Failed to load Razorpay SDK. Please check your internet connection.");
+      }
+
+      const response = await billingApi.createRazorpayOrder({
+        planId: selectedPlanForModal.id || selectedPlanForModal.name,
+        billingCycle: billingCycleSelection
+      });
+
+      const options = {
+        key: response.key,
+        amount: response.amount,
+        currency: response.currency,
+        name: "SecureScan",
+        description: `Upgrade to ${selectedPlanForModal.displayName || selectedPlanForModal.name}`,
+        order_id: response.orderId,
+        handler: async function (paymentRes) {
+          setSavingPlan(selectedPlanForModal.name);
+          try {
+            await billingApi.verifyRazorpayPayment({
+              razorpay_payment_id: paymentRes.razorpay_payment_id,
+              razorpay_order_id: paymentRes.razorpay_order_id,
+              razorpay_signature: paymentRes.razorpay_signature
+            });
+
+            const nextBilling = await billingApi.getBilling();
+            setBilling(nextBilling);
+            setModalType(null);
+            setMessage({ type: "success", text: `${selectedPlanForModal.displayName || selectedPlanForModal.name} plan activated successfully!` });
+          } catch (verifyErr) {
+            setMessage({ type: "error", text: getErrorMessage(verifyErr, "Payment verification failed.") });
+          } finally {
+            setSavingPlan("");
+          }
+        },
+        prefill: {
+          email: billing?.paymentMethod?.billingEmail || ""
+        },
+        theme: {
+          color: "#3b82f6"
+        },
+        modal: {
+          ondismiss: function () {
+            setSavingPlan("");
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      setMessage({ type: "error", text: getErrorMessage(err, "Failed to initiate payment flow.") });
+      setSavingPlan("");
+    }
+  }
+
+  async function executeDowngrade() {
+    setSavingPlan(selectedPlanForModal.name);
+    setMessage(null);
+    try {
+      const data = await billingApi.downgradePlan({
+        planName: selectedPlanForModal.name,
+        billingCycle
+      });
+      setBilling(data.overview || data);
+      setModalType(null);
+      setMessage({ type: "success", text: `${selectedPlanForModal.name} plan activated (Downgraded successfully).` });
+      await loadBilling();
+    } catch (err) {
+      setMessage({ type: "error", text: getErrorMessage(err, "Failed to downgrade plan.") });
+    } finally {
+      setSavingPlan("");
+    }
+  }
+
+  async function executeCancelSubscription() {
+    setSavingPlan("cancel");
+    setMessage(null);
+    try {
+      const data = await billingApi.cancelSubscription();
+      setBilling(data.overview || data);
+      setCancelModalOpen(false);
+      setMessage({ type: "success", text: "Subscription cancelled successfully." });
+      await loadBilling();
+    } catch (error) {
+      setMessage({ type: "error", text: getErrorMessage(error, "Failed to cancel plan.") });
+    } finally {
+      setSavingPlan("");
+    }
+  }
+
+  async function downloadInvoice(invoice) {
+    try {
+      setMessage({ type: "info", text: `Compiling PDF for ${invoice.invoiceNumber}...` });
+      const blob = await billingApi.downloadInvoicePdf(invoice.id);
+      
+      const fileUrl = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      link.download = `${invoice.invoiceNumber}.pdf`;
+      link.click();
+      URL.revokeObjectURL(fileUrl);
+      
+      setMessage({ type: "success", text: `Invoice ${invoice.invoiceNumber} PDF downloaded successfully.` });
+    } catch (err) {
+      setMessage({ type: "error", text: getErrorMessage(err, "Failed to download invoice PDF.") });
+    }
   }
 
   return (
     <div className="billing-settings-layout">
-      {message && <div className="settings-message">{message}</div>}
+      {message && <div className={`settings-message ${message.type === "error" ? "error" : message.type === "info" ? "" : "success"}`}>{message.text}</div>}
+      {loading && <div className="settings-message">Loading billing...</div>}
 
       <section className="settings-panel billing-hero-panel">
         <div>
-          <span className="profile-status">Active Subscription</span>
+          <span className="profile-status" style={{ background: billing?.subscription?.status === "cancelled" ? "rgba(239, 68, 68, 0.16)" : "rgba(0, 214, 143, 0.14)", color: billing?.subscription?.status === "cancelled" ? "#ff6b6b" : "#00d68f" }}>
+            {billing?.subscription?.status === "cancelled" ? "Cancelled / Expires Soon" : billing?.subscription?.status === "suspended" ? "Suspended" : "Active Subscription"}
+          </span>
           <h3>{currentPlan} Plan</h3>
-          <p>{activePlan.desc}</p>
+          <p>{planDescription(activePlan)}</p>
           <div className="profile-meta-row">
-            <span><CreditCard size={15} /> Visa ending {payment.last4}</span>
-            <span><Clock3 size={15} /> Renews 21 Jun 2024</span>
-            <span><ShieldCheck size={15} /> Compliance reports included</span>
+            <span><CreditCard size={15} /> {billing?.paymentMethod?.provider || "manual"} billing</span>
+            <span><Clock3 size={15} /> Renews {formatBillingDate(billing?.subscription?.nextBillingDate)}</span>
+            <span><ShieldCheck size={15} /> {billing?.organization?.name || "Workspace"} billing</span>
           </div>
         </div>
         <div className="billing-price-card">
           <small>{billingCycle === "monthly" ? "Monthly billing" : "Annual billing"}</small>
-          <strong>${activePlan[billingCycle]}</strong>
+          <strong>{formatMoney(activePlan?.[billingCycle] || 0)}</strong>
           <span>{billingCycle === "monthly" ? "per month" : "per year"}</span>
           <div className="billing-cycle-toggle">
             <button className={billingCycle === "monthly" ? "active" : ""} type="button" onClick={() => setBillingCycle("monthly")}>
@@ -675,54 +1295,46 @@ function PlanBillingSettings() {
         <section className="settings-panel billing-usage-panel">
           <div className="settings-panel-title">
             <h3>Plan Usage</h3>
-            <p>Track domain, scan, report, and API consumption against your current limits.</p>
+            <p>Track domain, scan, report, and API team limits in real-time.</p>
           </div>
           <div className="billing-usage-list">
-            {billingUsage.map((item) => {
-              const percent = Math.min(Math.round((item.used / item.limit) * 100), 100);
+            {(billing?.usage || []).map((item) => {
+              const numericLimit = Number(item.rawLimit) || 0;
+              const percent = numericLimit ? Math.min(Math.round((item.used / numericLimit) * 100), 100) : 0;
 
               return (
                 <div className={`billing-usage-row ${item.tone}`} key={item.label}>
                   <div>
                     <strong>{item.label}</strong>
-                    <span>{item.used.toLocaleString()} / {item.limit.toLocaleString()}</span>
+                    <span>{item.used.toLocaleString()} / {item.limit}</span>
                   </div>
                   <i><em style={{ width: `${percent}%` }} /></i>
                   <small>{percent}% used</small>
                 </div>
               );
             })}
+            {!loading && !billing?.usage?.length && <p>No usage data available yet.</p>}
           </div>
         </section>
 
         <aside className="billing-side-column">
           <section className="settings-panel billing-card-panel">
             <h3>Payment Method</h3>
-            <form onSubmit={saveBilling}>
-              <label>
-                <span>Cardholder</span>
-                <input value={payment.cardName} onChange={(event) => updatePayment("cardName", event.target.value)} />
-              </label>
-              <label>
-                <span>Card ending</span>
-                <input maxLength="4" value={payment.last4} onChange={(event) => updatePayment("last4", event.target.value.replace(/\D/g, ""))} />
-              </label>
-              <label>
-                <span>Billing email</span>
-                <input type="email" value={payment.contact} onChange={(event) => updatePayment("contact", event.target.value)} />
-              </label>
-              <button type="submit">
-                <CreditCard size={16} /> Save Billing
-              </button>
-            </form>
+            <div className="profile-account-list">
+              <span><b>Provider</b>{billing?.paymentMethod?.provider || "manual"}</span>
+              <span><b>Billing Email</b>{billing?.paymentMethod?.billingEmail || "-"}</span>
+              <span><b>Status</b>{billing?.subscription?.paymentStatus || "-"}</span>
+            </div>
           </section>
 
           <section className="settings-panel billing-card-panel">
             <h3>Billing Controls</h3>
             <div className="billing-control-list">
-              <button type="button" onClick={() => setMessage("Usage alert set at 85%.")}>Set usage alert</button>
-              <button type="button" onClick={() => setMessage("Tax details review opened.")}>Tax details</button>
-              <button type="button" onClick={() => setMessage("Cancellation flow prepared.")}>Cancel plan</button>
+              <button type="button" onClick={() => setMessage({ type: "success", text: "Usage alert set at 85%." })}>Set usage alert</button>
+              <button type="button" onClick={() => setMessage({ type: "success", text: "Tax details are attached to generated invoices." })}>Tax details</button>
+              <button type="button" onClick={() => setCancelModalOpen(true)} disabled={!isOwner || currentPlan === "Starter" || billing?.subscription?.status === "cancelled"}>
+                Cancel plan
+              </button>
             </div>
           </section>
         </aside>
@@ -734,24 +1346,25 @@ function PlanBillingSettings() {
           <p>Switch plans as your monitored domains, scan volume, and reporting needs grow.</p>
         </div>
         <div className="billing-plan-grid">
-          {billingPlans.map((plan) => (
+          {(billing?.plans || []).map((plan) => (
             <article className={plan.name === currentPlan ? "billing-plan-card active" : "billing-plan-card"} key={plan.name}>
               <div className="billing-plan-head">
-                <h4>{plan.name}</h4>
+                <h4>{plan.displayName || plan.name}</h4>
                 {plan.name === currentPlan && <span>Current</span>}
               </div>
-              <strong>${plan[billingCycle]}<small>/{billingCycle === "monthly" ? "mo" : "yr"}</small></strong>
-              <p>{plan.desc}</p>
+              <strong>{formatMoney(plan[billingCycle], plan.currency)}<small>/{billingCycle === "monthly" ? "mo" : "yr"}</small></strong>
+              <p>{planDescription(plan)}</p>
               <ul>
-                {plan.limits.map((limit) => (
+                {planLimits(plan).map((limit) => (
                   <li key={limit}><Check size={14} /> {limit}</li>
                 ))}
               </ul>
-              <button type="button" onClick={() => selectPlan(plan.name)}>
+              <button type="button" onClick={() => handleSelectPlan(plan)} disabled={!isOwner || plan.name === currentPlan || (plan.name === "Enterprise" && currentPlan === "Enterprise")}>
                 {plan.name === currentPlan ? "Selected" : "Choose Plan"}
               </button>
             </article>
           ))}
+          {!loading && !billing?.plans?.length && <p>No active plans are configured.</p>}
         </div>
       </section>
 
@@ -761,74 +1374,252 @@ function PlanBillingSettings() {
           <p>Download paid invoices for finance and compliance records.</p>
         </div>
         <div className="billing-invoice-list">
-          {invoiceHistory.map((invoice) => (
-            <article className="billing-invoice-row" key={invoice.id}>
+          {(billing?.invoices || []).map((invoice) => (
+            <article className="billing-invoice-row" key={invoice.id || invoice.invoiceNumber}>
               <FileText size={18} />
-              <strong>{invoice.id}<small>{invoice.date}</small></strong>
-              <span>{invoice.amount}</span>
+              <strong>{invoice.invoiceNumber}<small>{formatBillingDate(invoice.date)}</small></strong>
+              <span>{invoice.amountLabel || formatMoney(invoice.amount + invoice.tax, invoice.currency)}</span>
               <b>{invoice.status}</b>
               <button type="button" onClick={() => downloadInvoice(invoice)}>
-                <Download size={15} /> Download
+                <Download size={15} /> Download PDF
               </button>
             </article>
           ))}
+          {!loading && !billing?.invoices?.length && <p>No invoices generated yet.</p>}
         </div>
       </section>
+
+      {/* 1. UPGRADE CHECKOUT MODAL */}
+      {modalType === "upgrade" && selectedPlanForModal && (
+        <div className="team-modal-backdrop">
+          <div className="team-confirm-modal billing-modal">
+            <h3>Upgrade Plan: {selectedPlanForModal.displayName}</h3>
+            <p>Complete payment details below to subscribe to the {selectedPlanForModal.displayName} plan.</p>
+            
+            <div className="billing-modal-features">
+              <h4>Limits included:</h4>
+              <ul>
+                <li><Check size={12} /> {selectedPlanForModal.domainLimit >= 999999 ? "Unlimited" : selectedPlanForModal.domainLimit} Domains</li>
+                <li><Check size={12} /> {selectedPlanForModal.scanLimit >= 999999 ? "Unlimited" : selectedPlanForModal.scanLimit} Scans/month</li>
+                <li><Check size={12} /> {selectedPlanForModal.seatLimit >= 999999 ? "Unlimited" : selectedPlanForModal.seatLimit} Team seats</li>
+                {(selectedPlanForModal.features || []).slice(0, 3).map((f) => (
+                  <li key={f}><Check size={12} /> {f}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="billing-cycle-toggle" style={{ marginTop: 0, marginBottom: "16px" }}>
+              <button className={billingCycleSelection === "monthly" ? "active" : ""} type="button" onClick={() => setBillingCycleSelection("monthly")}>
+                Monthly
+              </button>
+              <button className={billingCycleSelection === "yearly" ? "active" : ""} type="button" onClick={() => setBillingCycleSelection("yearly")}>
+                Yearly
+              </button>
+            </div>
+
+            <div style={{ background: "rgba(0, 214, 143, 0.05)", border: "1px solid rgba(0, 214, 143, 0.2)", padding: "12px", borderRadius: "6px", marginBottom: "16px" }}>
+              <span style={{ fontSize: "11px", color: "#aeb8c7" }}>Amount to Pay:</span>
+              <h4 style={{ margin: "4px 0 0 0", color: "#00d68f", fontSize: "20px" }}>
+                {formatMoney(billingCycleSelection === "monthly" ? selectedPlanForModal.monthly : selectedPlanForModal.yearly)}
+                <small style={{ fontSize: "11px", color: "#aeb8c7", fontWeight: "normal" }}>
+                  /{billingCycleSelection === "monthly" ? "mo" : "yr"}
+                </small>
+              </h4>
+            </div>
+
+             <form onSubmit={executeUpgrade} style={{ display: "grid", gap: "12px" }}>
+               <div style={{ color: "#aeb8c7", fontSize: "13px", lineHeight: "1.5", margin: "5px 0 15px 0" }}>
+                 Secure transactions are processed directly via Razorpay. Click "Proceed to Pay" to launch the payment screen and complete your transaction.
+               </div>
+
+               <div className="billing-modal-actions">
+                 <button className="secondary" type="button" onClick={() => setModalType(null)} disabled={savingPlan}>Cancel</button>
+                 <button className="primary" type="submit" disabled={savingPlan}>
+                   {savingPlan ? "Loading Checkout..." : "Proceed to Pay"}
+                 </button>
+               </div>
+             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 2. DOWNGRADE WARNING & BLOCKED MODAL */}
+      {modalType === "downgrade" && selectedPlanForModal && (
+        <div className="team-modal-backdrop">
+          <div className="team-confirm-modal billing-modal">
+            <h3 style={{ color: downgradeError ? "#ef4444" : "#eab308" }}>
+              {downgradeError ? "Downgrade Blocked" : "Downgrade Subscription"}
+            </h3>
+            <p>You are requesting a downgrade to the {selectedPlanForModal.displayName} plan.</p>
+
+            {downgradeError ? (
+              <div className="billing-modal-alert">
+                <div className="billing-modal-alert-title">
+                  <Info size={16} /> Asset Usage Exceeded
+                </div>
+                <p style={{ fontSize: "12px", color: "#fca5a5", margin: "0 0 8px 0" }}>
+                  Your current workspace or seat counts exceed the limits of the {selectedPlanForModal.name} tier. Please remove assets before downgrading.
+                </p>
+                <ul className="billing-modal-alert-list">
+                  {downgradeViolations.map((v, idx) => (
+                    <li key={idx}>{v}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div style={{ background: "rgba(234, 179, 8, 0.05)", border: "1px solid rgba(234, 179, 8, 0.2)", padding: "12px", borderRadius: "6px", marginBottom: "16px" }}>
+                <span style={{ fontSize: "11px", color: "#eab308", fontWeight: "bold" }}>Warning:</span>
+                <p style={{ fontSize: "12px", color: "#fef08a", margin: "4px 0 0 0", lineHeight: 1.4 }}>
+                  Downgrading will immediately reduce your workspace capacities to {selectedPlanForModal.domainLimit} domains and {selectedPlanForModal.seatLimit} team seats.
+                </p>
+              </div>
+            )}
+
+            <div className="billing-modal-actions">
+              <button className="secondary" type="button" onClick={() => setModalType(null)} disabled={savingPlan}>Cancel</button>
+              <button 
+                className="primary" 
+                style={{ 
+                  background: downgradeError ? "#1e293b" : "linear-gradient(180deg, #f87171, #ef4444)", 
+                  color: downgradeError ? "#64748b" : "#fff",
+                  cursor: downgradeError ? "not-allowed" : "pointer" 
+                }}
+                disabled={!!downgradeError || savingPlan}
+                onClick={executeDowngrade}
+              >
+                {savingPlan ? "Downgrading..." : "Confirm Downgrade"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. CANCEL SUBSCRIPTION MODAL */}
+      {cancelModalOpen && (
+        <div className="team-modal-backdrop">
+          <div className="team-confirm-modal">
+            <h3>Cancel Subscription?</h3>
+            <p>We're sorry to see you go. If you cancel, your current billing tier will remain active until the end of your billing cycle.</p>
+            <p style={{ fontSize: "12px", color: "#aeb8c7" }}>
+              On <strong>{formatBillingDate(billing?.subscription?.nextBillingDate)}</strong>, your organization limits will drop to the free Starter tier.
+            </p>
+            <div className="billing-modal-actions">
+              <button className="secondary" type="button" onClick={() => setCancelModalOpen(false)} disabled={savingPlan}>Keep Subscription</button>
+              <button 
+                className="primary" 
+                style={{ background: "linear-gradient(180deg, #f87171, #ef4444)", color: "#fff" }}
+                disabled={savingPlan}
+                onClick={executeCancelSubscription}
+              >
+                {savingPlan ? "Processing..." : "Confirm Cancellation"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function NotificationSettings() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [channels, setChannels] = useState({
-    email: true,
-    sms: false,
-    slack: true,
-    dashboard: true,
-  });
-  const [events, setEvents] = useState({
-    criticalVulnerabilities: true,
+  const [logs, setLogs] = useState([]);
+  const [prefs, setPrefs] = useState({
+    emailAlerts: true,
     scanCompleted: true,
-    monitorDown: true,
-    reportReady: true,
-    remediationDue: false,
-  });
-  const [digest, setDigest] = useState({
-    frequency: "Daily",
-    time: "08:00",
-    recipient: "security-team@example.com",
+    vulnerabilityDetected: true,
+    weeklyReports: true,
+    billingAlerts: true,
+    teamInvitations: true,
+    marketingEmails: false,
   });
 
-  const enabledEvents = Object.values(events).filter(Boolean).length;
-  const enabledChannels = Object.values(channels).filter(Boolean).length;
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [settingsData, logsData] = await Promise.all([
+          settingsApi.getNotifications(),
+          notificationApi.getNotifications()
+        ]);
+        if (settingsData) setPrefs(settingsData);
+        if (logsData) setLogs(logsData);
+      } catch (err) {
+        setError(getErrorMessage(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
-  function toggleChannel(key) {
-    setChannels((current) => ({ ...current, [key]: !current[key] }));
+  const triggerToast = (text) => {
+    setMessage(text);
+    setTimeout(() => setMessage(""), 4000);
+  };
+
+  const handleToggle = async (key) => {
+    try {
+      const updated = { ...prefs, [key]: !prefs[key] };
+      setPrefs(updated);
+      await settingsApi.updateNotifications(updated);
+      triggerToast("Preference updated and saved successfully.");
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const sendTest = async () => {
+    try {
+      const res = await notificationApi.sendTestNotification();
+      triggerToast(res.message || "Test notification sent successfully.");
+      // Reload logs
+      const logsData = await notificationApi.getNotifications();
+      setLogs(logsData);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const formatLogDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `Sent ${diffMins} min ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `Sent ${diffHours} hours ago`;
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
+
+  if (loading) {
+    return <div style={{ padding: "40px", textRendering: "optimizeLegibility", textAlign: "center", color: "#94a3b8" }}>Loading preferences...</div>;
   }
 
-  function toggleEvent(key) {
-    setEvents((current) => ({ ...current, [key]: !current[key] }));
-  }
+  const enabledRulesCount = Object.keys(prefs).filter(k => k !== "emailAlerts" && prefs[k]).length;
 
-  function updateDigest(field, value) {
-    setDigest((current) => ({ ...current, [field]: value }));
-  }
-
-  function saveDigest(event) {
-    event.preventDefault();
-    setMessage(`${digest.frequency} digest scheduled at ${digest.time}.`);
-  }
+  const ruleItems = [
+    { key: "vulnerabilityDetected", title: "Vulnerability detected", desc: "Instant alert when a vulnerability is found in any domain." },
+    { key: "scanCompleted", title: "Scan completed", desc: "Notify when a domain crawl or vulnerability scan completes." },
+    { key: "weeklyReports", title: "Weekly digest reports", desc: "Receive weekly PDF executive status summaries." },
+    { key: "billingAlerts", title: "Billing & subscription alerts", desc: "Receive renewal receipt invoices and limit warning updates." },
+    { key: "teamInvitations", title: "Team invitations", desc: "Get alerted when invited to join a new organization." },
+    { key: "marketingEmails", title: "Marketing & updates", desc: "Hear about newly released scanner versions and feature releases." }
+  ];
 
   return (
     <div className="notification-settings-layout">
+      {error && <div className="settings-error-banner" style={{ background: "rgba(239, 68, 68, 0.1)", borderLeft: "4px solid #ef4444", padding: "12px", borderRadius: "6px", color: "#fca5a5", marginBottom: "20px" }}>{error}</div>}
       {message && <div className="settings-message">{message}</div>}
 
       <div className="notification-stats-grid">
         {[
-          ["Enabled Events", enabledEvents, "Active alert rules", Bell, "green"],
-          ["Channels", enabledChannels, "Delivery paths", MessageSquare, "blue"],
-          ["Digest", digest.frequency, `${digest.time} schedule`, Mail, "purple"],
-          ["Escalation SLA", "15 min", "Critical alert window", Clock3, "orange"],
+          ["Enabled Toggles", enabledRulesCount, "Active alert preference rules", Bell, "green"],
+          ["Delivery Mode", prefs.emailAlerts ? "Email Enabled" : "Email Disabled", prefs.emailAlerts ? "Primary inbox active" : "Global inbox muted", Mail, prefs.emailAlerts ? "blue" : "orange"],
+          ["Notification Log", logs.length, "Recent log events", Activity, "purple"],
+          ["Delivery SLA", "Instant", "Real-time alerts", Clock3, "orange"],
         ].map(([label, value, detail, Icon, tone]) => (
           <article className="api-overview-card" key={label}>
             <span className={`api-card-icon ${tone}`}>
@@ -847,15 +1638,15 @@ function NotificationSettings() {
         <section className="settings-panel notification-events-panel">
           <div className="settings-panel-title">
             <h3>Notification Rules</h3>
-            <p>Choose which security events should trigger team alerts across scans, reports, monitoring, and remediation.</p>
+            <p>Choose which security events should trigger alerts for your account.</p>
           </div>
 
           <div className="notification-rule-list">
-            {notificationEvents.map((item) => (
-              <button className="notification-rule-row" type="button" key={item.key} onClick={() => toggleEvent(item.key)}>
-                <span className={events[item.key] ? "notification-toggle active" : "notification-toggle"}>{events[item.key] ? "On" : "Off"}</span>
+            {ruleItems.map((item) => (
+              <button className="notification-rule-row" type="button" key={item.key} onClick={() => handleToggle(item.key)}>
+                <span className={prefs[item.key] ? "notification-toggle active" : "notification-toggle"}>{prefs[item.key] ? "On" : "Off"}</span>
                 <strong>{item.title}<small>{item.desc}</small></strong>
-                <b>{item.channel}</b>
+                <b>Email</b>
               </button>
             ))}
           </div>
@@ -865,45 +1656,15 @@ function NotificationSettings() {
           <section className="settings-panel notification-channel-panel">
             <h3>Delivery Channels</h3>
             <div className="notification-channel-list">
-              {[
-                ["email", "Email", "Primary team inbox", Mail],
-                ["slack", "Slack", "#security-alerts", MessageSquare],
-                ["dashboard", "Dashboard", "In-app activity feed", Bell],
-                ["sms", "SMS", "Critical-only escalation", Smartphone],
-              ].map(([key, title, desc, Icon]) => (
-                <button type="button" key={key} onClick={() => toggleChannel(key)}>
-                  <Icon size={17} />
-                  <span>{title}<small>{desc}</small></span>
-                  <i className={channels[key] ? "active" : ""}>{channels[key] ? "On" : "Off"}</i>
-                </button>
-              ))}
+              <button type="button" onClick={() => handleToggle("emailAlerts")}>
+                <Mail size={17} />
+                <span>Email Notifications<small>Global toggle to enable email delivery</small></span>
+                <i className={prefs.emailAlerts ? "active" : ""}>{prefs.emailAlerts ? "On" : "Off"}</i>
+              </button>
             </div>
-            <button className="notification-test-button" type="button" onClick={() => setMessage("Test notification sent to enabled channels.")}>
+            <button className="notification-test-button" type="button" onClick={sendTest} style={{ cursor: "pointer" }}>
               Send Test Notification
             </button>
-          </section>
-
-          <section className="settings-panel notification-digest-panel">
-            <h3>Digest Schedule</h3>
-            <form onSubmit={saveDigest}>
-              <label>
-                <span>Frequency</span>
-                <select value={digest.frequency} onChange={(event) => updateDigest("frequency", event.target.value)}>
-                  <option>Daily</option>
-                  <option>Weekly</option>
-                  <option>Monthly</option>
-                </select>
-              </label>
-              <label>
-                <span>Send time</span>
-                <input type="time" value={digest.time} onChange={(event) => updateDigest("time", event.target.value)} />
-              </label>
-              <label>
-                <span>Recipient</span>
-                <input type="email" value={digest.recipient} onChange={(event) => updateDigest("recipient", event.target.value)} />
-              </label>
-              <button type="submit">Save Digest</button>
-            </form>
           </section>
         </aside>
       </div>
@@ -911,17 +1672,21 @@ function NotificationSettings() {
       <section className="settings-panel notification-activity-panel">
         <div className="settings-panel-title">
           <h3>Recent Notifications</h3>
-          <p>Latest alerts delivered from SecureScan workflows.</p>
+          <p>Latest alerts delivered to your account.</p>
         </div>
         <div className="notification-activity-list">
-          {notificationActivity.map(([title, target, time, status]) => (
-            <article className="notification-activity-row" key={`${title}-${time}`}>
-              <Bell size={18} />
-              <strong>{title}<small>{target}</small></strong>
-              <span>{time}</span>
-              <b>{status}</b>
-            </article>
-          ))}
+          {logs.length === 0 ? (
+            <div style={{ padding: "30px", textRendering: "optimizeLegibility", textAlign: "center", color: "#64748b" }}>No recent notifications. Click "Send Test Notification" to trigger one.</div>
+          ) : (
+            logs.map((item) => (
+              <article className="notification-activity-row" key={item._id}>
+                <Bell size={18} />
+                <strong>{item.title}<small>{item.message}</small></strong>
+                <span>{formatLogDate(item.createdAt)}</span>
+                <b className={item.type === "TEST_ALERT" ? "resolved" : "critical"}>{item.type.replace("_", " ")}</b>
+              </article>
+            ))
+          )}
         </div>
       </section>
     </div>
@@ -929,71 +1694,94 @@ function NotificationSettings() {
 }
 
 function ScanPreferencesSettings() {
-  const defaults = {
-    profile: "Standard Scan",
-    depth: 3,
-    concurrency: 8,
-    timeout: 30,
-    schedule: "Weekly",
-    window: "02:00",
-    authScan: true,
-    passiveMode: false,
-    autoRetest: true,
-    safeChecks: true,
-  };
-  const [prefs, setPrefs] = useState(defaults);
-  const [exclusions, setExclusions] = useState(defaultExclusions);
-  const [newExclusion, setNewExclusion] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [prefs, setPrefs] = useState({
+    scanDepth: 3,
+    concurrencyLimit: 2,
+    timeout: 15,
+    followRedirects: true,
+    scanSchedule: "weekly",
+    includeSubdomains: true,
+    portScanEnabled: true,
+    technologyFingerprinting: true,
+  });
 
-  function updatePref(field, value) {
+  useEffect(() => {
+    async function loadPrefs() {
+      try {
+        const data = await settingsApi.getScanPreferences();
+        if (data) {
+          setPrefs(data);
+        }
+      } catch (err) {
+        setError(getErrorMessage(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPrefs();
+  }, []);
+
+  const triggerToast = (text) => {
+    setMessage(text);
+    setTimeout(() => setMessage(""), 4000);
+  };
+
+  const updatePref = (field, value) => {
     setPrefs((current) => ({ ...current, [field]: value }));
-  }
+  };
 
-  function togglePref(field) {
+  const togglePref = (field) => {
     setPrefs((current) => ({ ...current, [field]: !current[field] }));
-  }
+  };
 
-  function addExclusion(event) {
+  const savePreferences = async (event) => {
     event.preventDefault();
-    const value = newExclusion.trim();
-
-    if (!value) {
-      setMessage("Add a path, pattern, or host to exclude.");
-      return;
+    try {
+      await settingsApi.updateScanPreferences(prefs);
+      triggerToast("Scan preferences saved successfully.");
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
+  };
 
-    if (exclusions.includes(value)) {
-      setMessage(`${value} is already excluded.`);
-      return;
+  const resetPreferences = async () => {
+    try {
+      const defaults = {
+        scanDepth: 3,
+        concurrencyLimit: 2,
+        timeout: 15,
+        followRedirects: true,
+        scanSchedule: "weekly",
+        includeSubdomains: true,
+        portScanEnabled: true,
+        technologyFingerprinting: true,
+      };
+      setPrefs(defaults);
+      await settingsApi.updateScanPreferences(defaults);
+      triggerToast("Scan preferences reset to defaults.");
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
+  };
 
-    setExclusions((current) => [...current, value]);
-    setNewExclusion("");
-    setMessage(`${value} added to exclusions.`);
-  }
-
-  function savePreferences(event) {
-    event.preventDefault();
-    setMessage(`${prefs.profile} preferences saved.`);
-  }
-
-  function resetPreferences() {
-    setPrefs(defaults);
-    setExclusions(defaultExclusions);
-    setMessage("Scan preferences reset to recommended defaults.");
+  if (loading) {
+    return <div style={{ padding: "40px", textRendering: "optimizeLegibility", textAlign: "center", color: "#94a3b8" }}>Loading scan preferences...</div>;
   }
 
   return (
     <div className="scan-preferences-layout">
+      {error && <div className="settings-error-banner" style={{ background: "rgba(239, 68, 68, 0.1)", borderLeft: "4px solid #ef4444", padding: "12px", borderRadius: "6px", color: "#fca5a5", marginBottom: "20px" }}>{error}</div>}
       {message && <div className="settings-message">{message}</div>}
 
       <div className="scan-pref-stats-grid">
         {[
-          ["Default Profile", prefs.profile, "Applied to new scans", ShieldCheck, "green"],
-          ["Crawl Depth", prefs.depth, "Levels per domain", Activity, "blue"],
-          ["Concurrency", prefs.concurrency, "Parallel checks", BarChart3, "purple"],
-          ["Schedule", prefs.schedule, `${prefs.window} window`, Clock3, "orange"],
+          ["Crawl Depth", `${prefs.scanDepth} levels`, "Domain link crawling depth", ShieldCheck, "green"],
+          ["Concurrency", `${prefs.concurrencyLimit} checks`, "Parallel vulnerability scanning checks", Activity, "blue"],
+          ["Schedule", prefs.scanSchedule.toUpperCase(), "Scan schedule frequency trigger", BarChart3, "purple"],
+          ["SLA Timeout", `${prefs.timeout} min`, "Maximum scan execution timeout limit", Clock3, "orange"],
         ].map(([label, value, detail, Icon, tone]) => (
           <article className="api-overview-card" key={label}>
             <span className={`api-card-icon ${tone}`}>
@@ -1015,51 +1803,32 @@ function ScanPreferencesSettings() {
             <p>Set the scan behavior used when a new domain scan is started from dashboard, domains, or monitoring workflows.</p>
           </div>
 
-          <div className="scan-profile-grid">
-            {scanProfiles.map((profile) => (
-              <button
-                className={prefs.profile === profile.name ? `scan-profile-card active ${profile.tone}` : `scan-profile-card ${profile.tone}`}
-                type="button"
-                key={profile.name}
-                onClick={() => updatePref("profile", profile.name)}
-              >
-                <strong>{profile.name}</strong>
-                <span>{profile.time}</span>
-                <small>{profile.coverage}</small>
-              </button>
-            ))}
-          </div>
-
           <form className="scan-pref-form" onSubmit={savePreferences}>
             <label>
               <span>Crawl Depth</span>
-              <input type="range" min="1" max="6" value={prefs.depth} onChange={(event) => updatePref("depth", Number(event.target.value))} />
-              <b>{prefs.depth} levels</b>
+              <input type="range" min="1" max="6" value={prefs.scanDepth} onChange={(event) => updatePref("scanDepth", Number(event.target.value))} />
+              <b>{prefs.scanDepth} levels</b>
             </label>
             <label>
               <span>Concurrency</span>
-              <input type="range" min="2" max="16" value={prefs.concurrency} onChange={(event) => updatePref("concurrency", Number(event.target.value))} />
-              <b>{prefs.concurrency} checks</b>
+              <input type="range" min="2" max="16" value={prefs.concurrencyLimit} onChange={(event) => updatePref("concurrencyLimit", Number(event.target.value))} />
+              <b>{prefs.concurrencyLimit} checks</b>
             </label>
             <label>
-              <span>Request Timeout</span>
+              <span>Request Timeout (minutes)</span>
               <input type="number" min="10" max="120" value={prefs.timeout} onChange={(event) => updatePref("timeout", Number(event.target.value))} />
             </label>
             <label>
               <span>Schedule</span>
-              <select value={prefs.schedule} onChange={(event) => updatePref("schedule", event.target.value)}>
-                <option>Manual</option>
-                <option>Daily</option>
-                <option>Weekly</option>
-                <option>Monthly</option>
+              <select value={prefs.scanSchedule} onChange={(event) => updatePref("scanSchedule", event.target.value)}>
+                <option value="manual">Manual</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
               </select>
             </label>
-            <label>
-              <span>Scan Window</span>
-              <input type="time" value={prefs.window} onChange={(event) => updatePref("window", event.target.value)} />
-            </label>
             <div className="scan-pref-actions">
-              <button type="button" onClick={resetPreferences}>Reset</button>
+              <button type="button" onClick={resetPreferences}>Reset Defaults</button>
               <button type="submit">Save Preferences</button>
             </div>
           </form>
@@ -1070,34 +1839,15 @@ function ScanPreferencesSettings() {
             <h3>Scan Behavior</h3>
             <div className="scan-pref-toggle-list">
               {[
-                ["authScan", "Authenticated scanning", "Use saved login context when available."],
-                ["safeChecks", "Safe exploit checks", "Validate exposure without destructive payloads."],
-                ["autoRetest", "Auto retest after remediation", "Queue follow-up scans after fixes."],
-                ["passiveMode", "Passive mode", "Avoid active probes on sensitive domains."],
+                ["followRedirects", "Follow redirects", "Instruct crawlers to follow HTTP redirects automatically."],
+                ["includeSubdomains", "Include subdomains", "Auto-discover and crawl subdomains of specified targets."],
+                ["portScanEnabled", "Port scan enabled", "Scan for active, exposed ports beyond standard web ports."],
+                ["technologyFingerprinting", "Technology fingerprinting", "Detect versions of frameworks and server technologies."],
               ].map(([key, title, desc]) => (
                 <button type="button" key={key} onClick={() => togglePref(key)}>
                   <span>{title}<small>{desc}</small></span>
                   <i className={prefs[key] ? "active" : ""}>{prefs[key] ? "On" : "Off"}</i>
                 </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="settings-panel scan-pref-exclusions-panel">
-            <h3>Exclusions</h3>
-            <p>Skip sensitive paths, files, hosts, or patterns during scans.</p>
-            <form onSubmit={addExclusion}>
-              <input placeholder="/private or *.pdf" value={newExclusion} onChange={(event) => setNewExclusion(event.target.value)} />
-              <button type="submit">Add</button>
-            </form>
-            <div className="scan-pref-exclusion-list">
-              {exclusions.map((item) => (
-                <span key={item}>
-                  {item}
-                  <button type="button" onClick={() => setExclusions((current) => current.filter((entry) => entry !== item))}>
-                    Remove
-                  </button>
-                </span>
               ))}
             </div>
           </section>
@@ -1111,8 +1861,8 @@ function ScanPreferencesSettings() {
         </div>
         <div className="scan-pref-policy-grid">
           <article><ShieldCheck size={18} /><strong>OWASP baseline</strong><span>Injection, XSS, auth, headers, SSL, and exposure checks.</span></article>
-          <article><Clock3 size={18} /><strong>Quiet window</strong><span>Scheduled scans run around {prefs.window} to reduce production impact.</span></article>
-          <article><Wrench size={18} /><strong>Retest workflow</strong><span>{prefs.autoRetest ? "Enabled" : "Disabled"} for remediation verification.</span></article>
+          <article><Clock3 size={18} /><strong>Quiet window</strong><span>Scheduled scans run during low traffic periods to reduce production impact.</span></article>
+          <article><Wrench size={18} /><strong>Fingerprinting</strong><span>{prefs.technologyFingerprinting ? "Enabled" : "Disabled"} for technologies and CVE cross-referencing.</span></article>
         </div>
       </section>
     </div>
@@ -1120,77 +1870,131 @@ function ScanPreferencesSettings() {
 }
 
 function SecuritySettings() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [policy, setPolicy] = useState({
-    mfa: true,
-    sso: false,
-    sessionTimeout: "30 minutes",
-    passwordAge: "90 days",
-    loginAlerts: true,
-    apiKeyApproval: true,
-  });
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [mfaSecret, setMfaSecret] = useState("");
   const [password, setPassword] = useState({ current: "", next: "", confirm: "" });
-  const [trustedIps, setTrustedIps] = useState(["103.21.244.0/24", "203.0.113.24"]);
-  const [newIp, setNewIp] = useState("");
+  const [sessions, setSessions] = useState([]);
+  const [events, setEvents] = useState([]);
 
-  function togglePolicy(field) {
-    setPolicy((current) => ({ ...current, [field]: !current[field] }));
-  }
+  const loadData = async () => {
+    try {
+      const [sessionsData, eventsData, profileData] = await Promise.all([
+        securityApi.getSessions(),
+        activityLogApi.getLogs({ limit: 5, type: 'Security' }),
+        userApi.getProfile()
+      ]);
+      setSessions(sessionsData || []);
+      setEvents(eventsData.logs || []);
+      if (profileData && profileData.security) {
+        setMfaEnabled(profileData.security.mfaEnabled);
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  function updatePolicy(field, value) {
-    setPolicy((current) => ({ ...current, [field]: value }));
-  }
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  function updatePassword(field, value) {
+  const triggerToast = (text) => {
+    setMessage(text);
+    setTimeout(() => setMessage(""), 4000);
+  };
+
+  const updatePassword = (field, value) => {
     setPassword((current) => ({ ...current, [field]: value }));
-  }
+  };
 
-  function savePassword(event) {
+  const savePassword = async (event) => {
     event.preventDefault();
+    setError("");
 
     if (!password.current || !password.next || !password.confirm) {
-      setMessage("Fill all password fields before updating.");
+      setError("Please fill in all password fields.");
       return;
     }
 
     if (password.next !== password.confirm) {
-      setMessage("New password and confirmation do not match.");
+      setError("New password and confirmation do not match.");
       return;
     }
 
-    setPassword({ current: "", next: "", confirm: "" });
-    setMessage("Password updated successfully.");
-  }
-
-  function addTrustedIp(event) {
-    event.preventDefault();
-    const value = newIp.trim();
-
-    if (!value) {
-      setMessage("Add an IP address or CIDR range.");
-      return;
+    try {
+      await securityApi.changePassword({ oldPassword: password.current, newPassword: password.next });
+      setPassword({ current: "", next: "", confirm: "" });
+      triggerToast("Password updated successfully.");
+      
+      const eventsData = await activityLogApi.getLogs({ limit: 5, type: 'Security' });
+      setEvents(eventsData.logs || []);
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
+  };
 
-    if (trustedIps.includes(value)) {
-      setMessage(`${value} is already trusted.`);
-      return;
+  const toggleMFA = async () => {
+    try {
+      setError("");
+      if (mfaEnabled) {
+        await securityApi.disable2FA();
+        setMfaEnabled(false);
+        setMfaSecret("");
+        triggerToast("Two-factor authentication disabled.");
+      } else {
+        const res = await securityApi.enable2FA();
+        setMfaEnabled(true);
+        if (res.mfaSecret) {
+          setMfaSecret(res.mfaSecret);
+        }
+        triggerToast("Two-factor authentication enabled successfully.");
+      }
+      const eventsData = await activityLogApi.getLogs({ limit: 5, type: 'Security' });
+      setEvents(eventsData.logs || []);
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
+  };
 
-    setTrustedIps((current) => [...current, value]);
-    setNewIp("");
-    setMessage(`${value} added to trusted network list.`);
+  const handleRevoke = async (id) => {
+    try {
+      await securityApi.revokeSession(id);
+      triggerToast(id === "all" ? "All other device sessions terminated." : "Session terminated successfully.");
+      const [sessionsData, eventsData] = await Promise.all([
+        securityApi.getSessions(),
+        activityLogApi.getLogs({ limit: 5, type: 'Security' })
+      ]);
+      setSessions(sessionsData || []);
+      setEvents(eventsData.logs || []);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const formatSessionTime = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  };
+
+  if (loading) {
+    return <div style={{ padding: "40px", textRendering: "optimizeLegibility", textAlign: "center", color: "#94a3b8" }}>Loading security preferences...</div>;
   }
 
   return (
     <div className="security-settings-layout">
+      {error && <div className="settings-error-banner" style={{ background: "rgba(239, 68, 68, 0.1)", borderLeft: "4px solid #ef4444", padding: "12px", borderRadius: "6px", color: "#fca5a5", marginBottom: "20px" }}>{error}</div>}
       {message && <div className="settings-message">{message}</div>}
 
       <div className="security-stats-grid">
         {[
-          ["MFA", policy.mfa ? "Enabled" : "Off", "Account protection", Smartphone, "green"],
-          ["Session Timeout", policy.sessionTimeout, "Idle logout", Clock3, "blue"],
-          ["Password Policy", policy.passwordAge, "Rotation cycle", KeyRound, "purple"],
-          ["Trusted Networks", trustedIps.length, "Allowed ranges", Monitor, "orange"],
+          ["2FA Protection", mfaEnabled ? "ACTIVE" : "DISABLED", "Account verification", Smartphone, mfaEnabled ? "green" : "orange"],
+          ["Active Devices", sessions.length, "Connected sessions", Monitor, "blue"],
+          ["Audit Actions", events.length, "Security logs recorded", ShieldAlert, "purple"],
+          ["Timeout Policy", "60 mins", "Default active window", Clock3, "orange"],
         ].map(([label, value, detail, Icon, tone]) => (
           <article className="api-overview-card" key={label}>
             <span className={`api-card-icon ${tone}`}>
@@ -1231,58 +2035,27 @@ function SecuritySettings() {
           </form>
 
           <div className="security-policy-grid">
-            {[
-              ["mfa", "Multi-factor authentication", "Require a second factor for every login."],
-              ["sso", "Single sign-on", "Route workspace access through identity provider."],
-              ["loginAlerts", "Login alerts", "Notify owners when new devices sign in."],
-              ["apiKeyApproval", "API key approval", "Require owner approval before production keys activate."],
-            ].map(([key, title, desc]) => (
-              <button type="button" key={key} onClick={() => togglePolicy(key)}>
-                <span>{title}<small>{desc}</small></span>
-                <i className={policy[key] ? "active" : ""}>{policy[key] ? "On" : "Off"}</i>
-              </button>
-            ))}
+            <button type="button" onClick={toggleMFA}>
+              <span>Multi-factor authentication (2FA)<small>Require an authenticator app code for every sign-in attempt.</small></span>
+              <i className={mfaEnabled ? "active" : ""}>{mfaEnabled ? "On" : "Off"}</i>
+            </button>
           </div>
+
+          {mfaEnabled && mfaSecret && (
+            <div style={{ background: "rgba(59, 130, 246, 0.1)", borderLeft: "4px solid #3b82f6", padding: "12px", borderRadius: "6px", color: "#93c5fd", marginTop: "20px" }}>
+              <strong>MFA Setup Secret:</strong> <code style={{ letterSpacing: "1px", color: "#fff" }}>{mfaSecret}</code>
+              <p style={{ margin: "5px 0 0 0", fontSize: "12px", color: "#94a3b8" }}>Add this secret key to Google Authenticator or Authy to generate login tokens.</p>
+            </div>
+          )}
         </section>
 
         <aside className="security-side-column">
           <section className="settings-panel security-session-policy-panel">
-            <h3>Session Policy</h3>
-            <label>
-              <span>Idle timeout</span>
-              <select value={policy.sessionTimeout} onChange={(event) => updatePolicy("sessionTimeout", event.target.value)}>
-                <option>15 minutes</option>
-                <option>30 minutes</option>
-                <option>1 hour</option>
-                <option>4 hours</option>
-              </select>
-            </label>
-            <label>
-              <span>Password rotation</span>
-              <select value={policy.passwordAge} onChange={(event) => updatePolicy("passwordAge", event.target.value)}>
-                <option>30 days</option>
-                <option>60 days</option>
-                <option>90 days</option>
-                <option>Never</option>
-              </select>
-            </label>
-            <button type="button" onClick={() => setMessage("Session policy saved.")}>Save Policy</button>
-          </section>
-
-          <section className="settings-panel security-trusted-panel">
-            <h3>Trusted Networks</h3>
-            <form onSubmit={addTrustedIp}>
-              <input placeholder="192.168.1.0/24" value={newIp} onChange={(event) => setNewIp(event.target.value)} />
-              <button type="submit">Add</button>
-            </form>
-            <div className="security-ip-list">
-              {trustedIps.map((ip) => (
-                <span key={ip}>
-                  {ip}
-                  <button type="button" onClick={() => setTrustedIps((current) => current.filter((item) => item !== ip))}>Remove</button>
-                </span>
-              ))}
-            </div>
+            <h3>Session Management</h3>
+            <p style={{ fontSize: "13px", color: "#64748b", margin: "0 0 15px 0" }}>Revoke all other active logins on windows, browsers, or mobile devices instantly.</p>
+            <button type="button" onClick={() => handleRevoke("all")} style={{ background: "#ef4444", color: "#fff", padding: "10px", borderRadius: "6px", width: "100%", fontWeight: "bold", border: "none", cursor: "pointer" }}>
+              Logout Other Devices
+            </button>
           </section>
         </aside>
       </div>
@@ -1294,13 +2067,13 @@ function SecuritySettings() {
             <p>Review signed-in devices and revoke access when needed.</p>
           </div>
           <div className="security-session-list">
-            {securitySessions.map(([device, location, time, status]) => (
-              <article className="security-session-row" key={`${device}-${time}`}>
+            {sessions.map((item) => (
+              <article className="security-session-row" key={item.id}>
                 <Monitor size={18} />
-                <strong>{device}<small>{location}</small></strong>
-                <span>{time}</span>
-                <b className={status === "Expired" ? "expired" : ""}>{status}</b>
-                <button type="button" onClick={() => setMessage(`${device} session revoked.`)} disabled={time === "Current session"}>
+                <strong>{item.device}<small>{item.location} ({item.ipAddress})</small></strong>
+                <span>{item.isCurrent ? "Current session" : formatSessionTime(item.lastActivity)}</span>
+                <b className={item.isCurrent ? "active" : "expired"}>{item.isCurrent ? "Active" : "Expired"}</b>
+                <button type="button" onClick={() => handleRevoke(item.id)} disabled={item.isCurrent}>
                   Revoke
                 </button>
               </article>
@@ -1314,14 +2087,18 @@ function SecuritySettings() {
             <p>Recent authentication and access control activity.</p>
           </div>
           <div className="security-event-list">
-            {securityEvents.map(([event, actor, time, status]) => (
-              <article className="security-event-row" key={`${event}-${time}`}>
-                <Lock size={17} />
-                <strong>{event}<small>{actor}</small></strong>
-                <span>{time}</span>
-                <b>{status}</b>
-              </article>
-            ))}
+            {events.length === 0 ? (
+              <div style={{ padding: "30px", textRendering: "optimizeLegibility", textAlign: "center", color: "#64748b" }}>No recent security events.</div>
+            ) : (
+              events.map((event) => (
+                <article className="security-event-row" key={event.id}>
+                  <Lock size={17} />
+                  <strong>{event.title}<small>{event.actor}</small></strong>
+                  <span>{formatSessionTime(event.time)}</span>
+                  <b className={event.status === "Success" ? "resolved" : "critical"}>{event.status}</b>
+                </article>
+              ))
+            )}
           </div>
         </section>
       </div>
@@ -1647,13 +2424,173 @@ function ActivityLogSettings() {
 }
 
 function ApiAccessPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [keys, setKeys] = useState([]);
+  const [stats, setStats] = useState({
+    totalKeys: 0,
+    totalRequests: 0,
+    successRate: "99.8%",
+    avgResponseTime: "245ms",
+  });
+  
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [keyName, setKeyName] = useState("");
+  const [keyDesc, setKeyDesc] = useState("");
+  const [generatedKey, setGeneratedKey] = useState(null);
+
+  const loadData = async () => {
+    try {
+      const res = await apiAccessApi.getApiAccess();
+      setKeys(res.keys || []);
+      if (res.stats) {
+        setStats(res.stats);
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const triggerToast = (text) => {
+    setMessage(text);
+    setTimeout(() => setMessage(""), 4000);
+  };
+
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!keyName) {
+      setError("Please provide a name for the API key.");
+      return;
+    }
+    try {
+      const res = await apiAccessApi.generateApiKey({ name: keyName, desc: keyDesc });
+      setGeneratedKey(res.key);
+      setKeyName("");
+      setKeyDesc("");
+      setShowGenerateModal(false);
+      loadData();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const handleRegenerate = async (id) => {
+    setError("");
+    if (!window.confirm("Are you sure you want to regenerate this key? Any tools using the old key will break immediately.")) {
+      return;
+    }
+    try {
+      const res = await apiAccessApi.regenerateApiKey(id);
+      setGeneratedKey(res.key);
+      loadData();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const handleRevoke = async (id) => {
+    setError("");
+    if (!window.confirm("Are you sure you want to revoke this key?")) {
+      return;
+    }
+    try {
+      await apiAccessApi.revokeApiKey(id);
+      triggerToast("API key revoked successfully.");
+      loadData();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  };
+
+  const formatKeyDate = (dateStr) => {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  };
+
+  if (loading) {
+    return <div style={{ padding: "40px", textRendering: "optimizeLegibility", textAlign: "center", color: "#94a3b8" }}>Loading API configurations...</div>;
+  }
+
+  const overviewStats = [
+    { label: "Total API Keys", value: stats.totalKeys, detail: "Active keys", icon: Wrench, tone: "green" },
+    { label: "Total Requests", value: stats.totalRequests.toLocaleString(), detail: "This month", icon: CreditCard, tone: "blue" },
+    { label: "Success Rate", value: stats.successRate, detail: "This month", icon: Activity, tone: "purple" },
+    { label: "Avg. Response Time", value: stats.avgResponseTime, detail: "This month", icon: Clock3, tone: "orange" },
+  ];
+
   return (
     <div className="api-access-layout">
+      {error && <div className="settings-error-banner" style={{ background: "rgba(239, 68, 68, 0.1)", borderLeft: "4px solid #ef4444", padding: "12px", borderRadius: "6px", color: "#fca5a5", marginBottom: "20px" }}>{error}</div>}
+      {message && <div className="settings-message">{message}</div>}
+
+      {generatedKey && (
+        <div style={{ background: "rgba(16, 185, 129, 0.08)", border: "1px solid #10b981", borderRadius: "8px", padding: "20px", marginBottom: "20px" }}>
+          <h3 style={{ color: "#34d399", marginTop: 0 }}>API Key Generated Successfully!</h3>
+          <p style={{ color: "#a7f3d0", fontSize: "14px", margin: "5px 0 15px 0" }}>
+            Make sure to copy your API key now. You will not be able to see this key again!
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "15px 0" }}>
+            <code style={{ background: "#1e293b", padding: "10px 15px", borderRadius: "6px", color: "#fff", flex: 1, fontSize: "14px", overflowX: "auto", border: "1px solid #334155" }}>
+              {generatedKey.key}
+            </code>
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(generatedKey.key);
+                triggerToast("API Key copied to clipboard.");
+              }} 
+              style={{ background: "#10b981", color: "#fff", padding: "10px 15px", borderRadius: "6px", border: "none", cursor: "pointer", fontWeight: "bold" }}
+            >
+              Copy Key
+            </button>
+          </div>
+          <button 
+            onClick={() => setGeneratedKey(null)} 
+            style={{ background: "transparent", color: "#94a3b8", border: "1px solid #475569", padding: "8px 15px", borderRadius: "6px", cursor: "pointer" }}
+          >
+            I have saved the key securely
+          </button>
+        </div>
+      )}
+
+      {showGenerateModal && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <form onSubmit={handleGenerate} style={{ background: "#0f172a", border: "1px solid #334155", padding: "25px", borderRadius: "10px", width: "400px", display: "flex", flexDirection: "column", gap: "15px" }}>
+            <h3 style={{ color: "#fff", margin: 0 }}>Create API Key</h3>
+            <label style={{ display: "flex", flexDirection: "column", gap: "5px", color: "#94a3b8" }}>
+              <span>Key Name</span>
+              <input type="text" placeholder="e.g. Production Scanner" value={keyName} onChange={(e) => setKeyName(e.target.value)} style={{ padding: "8px", borderRadius: "4px", border: "1px solid #334155", background: "#1e293b", color: "#fff" }} />
+            </label>
+            <label style={{ display: "flex", flexDirection: "column", gap: "5px", color: "#94a3b8" }}>
+              <span>Description</span>
+              <input type="text" placeholder="e.g. CI/CD integration key" value={keyDesc} onChange={(e) => setKeyDesc(e.target.value)} style={{ padding: "8px", borderRadius: "4px", border: "1px solid #334155", background: "#1e293b", color: "#fff" }} />
+            </label>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
+              <button type="button" onClick={() => setShowGenerateModal(false)} style={{ background: "transparent", color: "#94a3b8", border: "1px solid #334155", padding: "8px 15px", borderRadius: "4px", cursor: "pointer" }}>Cancel</button>
+              <button type="submit" style={{ background: "#3b82f6", color: "#fff", border: "none", padding: "8px 15px", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}>Generate</button>
+            </div>
+          </form>
+        </div>
+      )}
+
       <div className="api-main-column">
         <section className="settings-panel api-overview">
-          <div className="settings-panel-title">
-            <h3>API Overview</h3>
-            <p>Integrate SecureScan into your workflows, CI/CD pipelines, and custom tools using our RESTful API.</p>
+          <div className="settings-panel-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h3>API Overview</h3>
+              <p>Integrate SecureScan into your workflows, CI/CD pipelines, and custom tools using our RESTful API.</p>
+            </div>
+            <button type="button" onClick={() => setShowGenerateModal(true)} style={{ background: "#3b82f6", color: "#fff", border: "none", padding: "10px 15px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
+              Create API Key
+            </button>
           </div>
           <div className="api-overview-grid">
             {overviewStats.map((item) => (
@@ -1677,49 +2614,54 @@ function ApiAccessPage() {
                 </tr>
               </thead>
               <tbody>
-                {apiKeys.map((item) => (
-                  <tr key={item.name}>
-                    <td>
-                      <div className="api-key-name">
-                        <strong>{item.name}</strong>
-                        <small>{item.desc}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="api-key-value">
-                        <span className="masked-key">{item.key}</span>
-                        <span className="key-tools">
-                          <button aria-label={`Reveal ${item.name}`} type="button">
-                            <Eye size={19} />
-                          </button>
-                          <button aria-label={`Copy ${item.name}`} type="button">
-                            <Copy size={19} />
-                          </button>
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="api-date-cell">
-                        <span>{item.created[0]}</span>
-                        <small>{item.created[1]}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="api-date-cell">
-                        <span>{item.used[0]}</span>
-                        <small>{item.used[1]}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <b className="api-status">Active</b>
-                    </td>
-                    <td>
-                      <button className="api-more" type="button">
-                        <MoreVertical size={18} />
-                      </button>
-                    </td>
+                {keys.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" style={{ padding: "30px", textRendering: "optimizeLegibility", textAlign: "center", color: "#64748b" }}>No active API keys found. Click "Create API Key" to generate one.</td>
                   </tr>
-                ))}
+                ) : (
+                  keys.map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className="api-key-name">
+                          <strong>{item.name}</strong>
+                          <small>{item.desc || "No description provided"}</small>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="api-key-value">
+                          <span className="masked-key">{item.key}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="api-date-cell">
+                          <span>{formatKeyDate(item.createdAt)}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="api-date-cell">
+                          <span>{item.lastUsedAt ? formatKeyDate(item.lastUsedAt) : "Never used"}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <b className={`api-status ${item.status === 'active' ? 'active' : 'revoked'}`} style={{ color: item.status === 'active' ? '#10b981' : '#ef4444' }}>
+                          {item.status.toUpperCase()}
+                        </b>
+                      </td>
+                      <td>
+                        {item.status === 'active' && (
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            <button type="button" onClick={() => handleRegenerate(item.id)} style={{ background: "transparent", border: "1px solid #475569", color: "#94a3b8", fontSize: "11px", padding: "4px 8px", borderRadius: "4px", cursor: "pointer" }}>
+                              Regenerate
+                            </button>
+                            <button type="button" onClick={() => handleRevoke(item.id)} style={{ background: "transparent", border: "1px solid #ef4444", color: "#fca5a5", fontSize: "11px", padding: "4px 8px", borderRadius: "4px", cursor: "pointer" }}>
+                              Revoke
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -1764,17 +2706,17 @@ function ApiAccessPage() {
           <div className="usage-head">
             <h3>API Usage <span>(This Month)</span></h3>
             <button type="button">
-              May 2024 <ChevronDown size={14} />
+              June 2026 <ChevronDown size={14} />
             </button>
           </div>
           <div className="usage-content">
             <div className="usage-ring">
-              <strong>128,645</strong>
+              <strong>{stats.totalRequests.toLocaleString()}</strong>
               <span>Total Requests</span>
             </div>
             <div className="usage-legend">
-              <p><i className="success" /> Successful <span>128,198 (99.65%)</span></p>
-              <p><i className="failed" /> Failed <span>447 (0.35%)</span></p>
+              <p><i className="success" /> Successful <span>{(stats.totalRequests * 0.998).toLocaleString(undefined, { maximumFractionDigits: 0 })} (99.8%)</span></p>
+              <p><i className="failed" /> Failed <span>{(stats.totalRequests * 0.002).toLocaleString(undefined, { maximumFractionDigits: 0 })} (0.2%)</span></p>
               <p><i className="limited" /> Rate Limited <span>0 (0.00%)</span></p>
             </div>
           </div>
@@ -1804,16 +2746,12 @@ function ApiAccessPage() {
           <h3>Rate Limits</h3>
           <p>Your current rate limit usage</p>
           <div className="limit-row">
-            <span>Requests per minute</span><b>60 / 120</b>
-            <i><em style={{ width: "50%" }} /></i>
+            <span>Requests per minute</span><b>0 / 120</b>
+            <i><em style={{ width: "0%" }} /></i>
           </div>
           <div className="limit-row purple">
-            <span>Requests per hour</span><b>1,250 / 5,000</b>
-            <i><em style={{ width: "25%" }} /></i>
-          </div>
-          <div className="limit-row purple">
-            <span>Requests per day</span><b>12,840 / 100,000</b>
-            <i><em style={{ width: "13%" }} /></i>
+            <span>Requests per hour</span><b>{stats.totalRequests > 5000 ? 5000 : stats.totalRequests} / 5,000</b>
+            <i><em style={{ width: `${Math.min(100, (stats.totalRequests / 5000) * 100)}%` }} /></i>
           </div>
           <p className="api-note">
             <Info size={16} /> Rate limits are applied per API key.
