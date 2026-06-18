@@ -54,3 +54,13 @@ export async function verifyRazorpayPayment(payload) {
   const { data } = await apiClient.post("/payment/verify", payload);
   return data;
 }
+
+export async function updateUsageAlerts(payload) {
+  const { data } = await apiClient.put("/billing/usage-alerts", payload);
+  return data;
+}
+
+export async function getTimeline() {
+  const { data } = await apiClient.get("/billing/timeline");
+  return data;
+}

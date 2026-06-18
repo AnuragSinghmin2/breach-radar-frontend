@@ -1025,12 +1025,37 @@ function PlanBillingSettings() {
   const [downgradeError, setDowngradeError] = useState("");
   const [downgradeViolations, setDowngradeViolations] = useState([]);
 
+  // Phase 2 states
+  const [alerts, setAlerts] = useState({ domainsThreshold: 90, scansThreshold: 90, seatsThreshold: 90 });
+  const [savingAlerts, setSavingAlerts] = useState(false);
+  const [timeline, setTimeline] = useState([]);
+  const [loadingTimeline, setLoadingTimeline] = useState(true);
+
+  const loadTimeline = async () => {
+    try {
+      setLoadingTimeline(true);
+      const data = await billingApi.getTimeline();
+      setTimeline(data);
+    } catch (err) {
+      console.error("Failed to load billing timeline", err);
+    } finally {
+      setLoadingTimeline(false);
+    }
+  };
+
   const loadBilling = async () => {
     try {
       setLoading(true);
       const data = await billingApi.getBilling();
       setBilling(data);
       setBillingCycle(data.subscription?.billingCycle === "yearly" ? "yearly" : "monthly");
+      if (data.subscription?.usageAlerts) {
+        setAlerts({
+          domainsThreshold: data.subscription.usageAlerts.domainsThreshold || 90,
+          scansThreshold: data.subscription.usageAlerts.scansThreshold || 90,
+          seatsThreshold: data.subscription.usageAlerts.seatsThreshold || 90
+        });
+      }
     } catch (error) {
       setMessage({ type: "error", text: getErrorMessage(error, "Failed to load billing.") });
     } finally {
@@ -1040,12 +1065,35 @@ function PlanBillingSettings() {
 
   useEffect(() => {
     loadBilling();
+    loadTimeline();
   }, []);
+
+  async function saveAlertSettings(e) {
+    e.preventDefault();
+    setSavingAlerts(true);
+    setMessage(null);
+    try {
+      const result = await billingApi.updateUsageAlerts(alerts);
+      setMessage({ type: "success", text: "Usage alert thresholds saved successfully!" });
+      setBilling(prev => ({
+        ...prev,
+        subscription: {
+          ...prev.subscription,
+          usageAlerts: result.usageAlerts
+        }
+      }));
+    } catch (err) {
+      setMessage({ type: "error", text: getErrorMessage(err, "Failed to save alert settings.") });
+    } finally {
+      setSavingAlerts(false);
+    }
+  }
 
   const currentPlan = billing?.subscription?.currentPlan || billing?.organization?.subscriptionPlan || "Starter";
   const activePlan = billing?.activePlan || billing?.plans?.find((plan) => plan.name === currentPlan) || null;
   const isOwner = billing?.role === "OWNER";
   const currency = activePlan?.currency || "INR";
+  const totalPaid = billing?.invoices?.filter(i => i.status === 'paid').reduce((sum, i) => sum + i.amount, 0) || 0;
 
   function formatMoney(amount, planCurrency = currency) {
     return new Intl.NumberFormat("en-IN", {
@@ -1319,6 +1367,18 @@ function PlanBillingSettings() {
 
         <aside className="billing-side-column">
           <section className="settings-panel billing-card-panel">
+            <h3>Subscription Summary</h3>
+            <div className="profile-account-list">
+              <span><b>Current Plan</b>{currentPlan}</span>
+              <span><b>Subscription Status</b><span style={{ color: billing?.subscription?.status === 'active' ? '#00d68f' : '#ff6b6b', fontWeight: 'bold' }}>{billing?.subscription?.status || "-"}</span></span>
+              <span><b>Payment Status</b>{billing?.subscription?.paymentStatus || "-"}</span>
+              <span><b>Next Billing Date</b>{formatBillingDate(billing?.subscription?.nextBillingDate)}</span>
+              <span><b>Amount Paid</b>{formatMoney(totalPaid)}</span>
+              <span><b>Invoices Count</b>{billing?.invoices?.length || 0}</span>
+            </div>
+          </section>
+
+          <section className="settings-panel billing-card-panel">
             <h3>Payment Method</h3>
             <div className="profile-account-list">
               <span><b>Provider</b>{billing?.paymentMethod?.provider || "manual"}</span>
@@ -1330,8 +1390,6 @@ function PlanBillingSettings() {
           <section className="settings-panel billing-card-panel">
             <h3>Billing Controls</h3>
             <div className="billing-control-list">
-              <button type="button" onClick={() => setMessage({ type: "success", text: "Usage alert set at 85%." })}>Set usage alert</button>
-              <button type="button" onClick={() => setMessage({ type: "success", text: "Tax details are attached to generated invoices." })}>Tax details</button>
               <button type="button" onClick={() => setCancelModalOpen(true)} disabled={!isOwner || currentPlan === "Starter" || billing?.subscription?.status === "cancelled"}>
                 Cancel plan
               </button>
@@ -1517,6 +1575,139 @@ function PlanBillingSettings() {
           </div>
         </div>
       )}
+      {/* 2. TRANSACTIONS TABLE */}
+      <section className="settings-panel billing-invoices-panel" style={{ marginTop: '24px' }}>
+        <div className="settings-panel-title">
+          <h3>Recent Transactions</h3>
+          <p>A ledger of all processed or pending billing events for this workspace.</p>
+        </div>
+        <div className="team-table-wrap">
+          <table className="team-members-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Plan</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Invoice</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(billing?.transactions || []).map((txn) => {
+                const matchingInvoice = billing?.invoices?.find(inv => inv.transactionId === txn.transactionId);
+                return (
+                  <tr key={txn.id || txn.transactionId}>
+                    <td>{formatBillingDate(txn.createdAt)}</td>
+                    <td>{txn.metadata?.planName || activePlan?.name || "Professional"}</td>
+                    <td>{txn.amountLabel || formatMoney(txn.amount, txn.currency)}</td>
+                    <td>
+                      <span className={`team-status ${txn.status === 'succeeded' ? 'active' : txn.status === 'pending' ? 'pending' : 'suspended'}`}>
+                        {txn.status}
+                      </span>
+                    </td>
+                    <td>
+                      {matchingInvoice ? (
+                        <button type="button" className="sa-btn sa-btn-secondary" style={{ padding: '4px 8px', fontSize: '12px' }} onClick={() => downloadInvoice(matchingInvoice)}>
+                          Download
+                        </button>
+                      ) : (
+                        <span style={{ color: '#64748b' }}>-</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {!billing?.transactions?.length && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', color: '#64748b' }}>No transaction history found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* 3. ALERTS SETTINGS PANEL */}
+      <section className="settings-panel billing-invoices-panel" style={{ marginTop: '24px' }}>
+        <div className="settings-panel-title">
+          <h3>Usage Alert Thresholds</h3>
+          <p>Configure notification alerts for domain counts, monthly scans, and seat limits.</p>
+        </div>
+        <form onSubmit={saveAlertSettings} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', alignItems: 'end', marginTop: '16px' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <span style={{ fontSize: '13px', color: '#94a3b8' }}>Domain Usage Alert</span>
+            <select 
+              value={alerts.domainsThreshold} 
+              onChange={(e) => setAlerts(prev => ({ ...prev, domainsThreshold: Number(e.target.value) }))}
+              style={{ background: '#091421', border: '1px solid #20324a', color: '#f8fafc', padding: '8px', borderRadius: '6px' }}
+            >
+              <option value={50}>50% Usage</option>
+              <option value={75}>75% Usage</option>
+              <option value={90}>90% Usage</option>
+              <option value={100}>100% Usage</option>
+            </select>
+          </label>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <span style={{ fontSize: '13px', color: '#94a3b8' }}>Scan Usage Alert</span>
+            <select 
+              value={alerts.scansThreshold} 
+              onChange={(e) => setAlerts(prev => ({ ...prev, scansThreshold: Number(e.target.value) }))}
+              style={{ background: '#091421', border: '1px solid #20324a', color: '#f8fafc', padding: '8px', borderRadius: '6px' }}
+            >
+              <option value={50}>50% Usage</option>
+              <option value={75}>75% Usage</option>
+              <option value={90}>90% Usage</option>
+              <option value={100}>100% Usage</option>
+            </select>
+          </label>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <span style={{ fontSize: '13px', color: '#94a3b8' }}>Seat Usage Alert</span>
+            <select 
+              value={alerts.seatsThreshold} 
+              onChange={(e) => setAlerts(prev => ({ ...prev, seatsThreshold: Number(e.target.value) }))}
+              style={{ background: '#091421', border: '1px solid #20324a', color: '#f8fafc', padding: '8px', borderRadius: '6px' }}
+            >
+              <option value={50}>50% Usage</option>
+              <option value={75}>75% Usage</option>
+              <option value={90}>90% Usage</option>
+              <option value={100}>100% Usage</option>
+            </select>
+          </label>
+          <button type="submit" className="sa-btn" style={{ height: '38px' }} disabled={savingAlerts}>
+            {savingAlerts ? 'Saving...' : 'Save Thresholds'}
+          </button>
+        </form>
+      </section>
+
+      {/* 4. SUBSCRIPTION LIFECYCLE TIMELINE */}
+      <section className="settings-panel billing-invoices-panel" style={{ marginTop: '24px' }}>
+        <div className="settings-panel-title">
+          <h3>Subscription Lifecycle Timeline</h3>
+          <p>A chronological record of subscription changes, payments, and invoice occurrences.</p>
+        </div>
+        <div className="billing-timeline-list" style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', paddingLeft: '24px', borderLeft: '2px solid #20324a', marginTop: '20px', marginLeft: '8px' }}>
+          {timeline.map((event, index) => (
+            <article key={event.id || index} style={{ position: 'relative' }}>
+              <span style={{
+                position: 'absolute',
+                left: '-31px',
+                top: '2px',
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                background: event.action === 'Payment Success' || event.action === 'Plan Upgrade' ? '#00d68f' : event.status === 'Failure' ? '#ef4444' : '#3b82f6',
+                border: '3px solid #07111f'
+              }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <strong style={{ color: '#f8fafc', fontSize: '14px' }}>{event.action}</strong>
+                <small style={{ color: '#64748b' }}>{formatBillingDate(event.timestamp)}</small>
+              </div>
+              <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '13px', lineHeight: '1.4' }}>{event.description}</p>
+            </article>
+          ))}
+          {!timeline.length && !loadingTimeline && <p style={{ color: '#64748b' }}>No timeline events recorded.</p>}
+        </div>
+      </section>
     </div>
   );
 }
