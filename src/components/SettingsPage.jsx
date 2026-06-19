@@ -39,6 +39,33 @@ import { billingApi, getErrorMessage, teamApi, userApi, settingsApi, securityApi
 import { formatAccountDate, getInitials, resolveAvatarUrl } from "../utils/profile";
 import "./SettingsPage.css";
 
+let razorpayScriptPromise = null;
+
+const maskRazorpayKey = (key = "") => {
+  if (!key) return "missing";
+  return `${key.slice(0, 8)}...${key.slice(-4)}`;
+};
+
+const getRazorpayKeyMode = (key = "") => {
+  if (key.startsWith("rzp_test_")) return "test";
+  if (key.startsWith("rzp_live_")) return "live";
+  return "unknown";
+};
+
+const buildRazorpayDebugOptions = (options) => ({
+  key: maskRazorpayKey(options.key),
+  keyMode: getRazorpayKeyMode(options.key),
+  amount: options.amount,
+  currency: options.currency,
+  order_id: options.order_id,
+  name: options.name,
+  description: options.description,
+  prefill: options.prefill,
+  hasHandler: typeof options.handler === "function",
+  paymentMethodsRestrictedByFrontend: Boolean(options.method || options.config?.display),
+  method: options.method || "razorpay-dashboard-defaults"
+});
+
 const settingSections = {
   profile: {
     title: "Profile",
@@ -1031,6 +1058,10 @@ function PlanBillingSettings() {
   const [timeline, setTimeline] = useState([]);
   const [loadingTimeline, setLoadingTimeline] = useState(true);
 
+  function notifyBillingSummaryRefresh() {
+    window.dispatchEvent(new CustomEvent("billing:refresh"));
+  }
+
   const loadTimeline = async () => {
     try {
       setLoadingTimeline(true);
@@ -1178,55 +1209,170 @@ function PlanBillingSettings() {
   };
 
   const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
+    if (window.Razorpay) {
+      console.log("Razorpay checkout initialized", { source: "existing-window-object" });
+      return Promise.resolve(true);
+    }
+
+    if (razorpayScriptPromise) {
+      return razorpayScriptPromise;
+    }
+
+    razorpayScriptPromise = new Promise((resolve) => {
+      let settled = false;
+      const finish = (loaded, meta = {}) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
+        if (!loaded) {
+          razorpayScriptPromise = null;
+        }
+        resolve(loaded);
+        if (loaded) {
+          console.log("Razorpay checkout initialized", meta);
+        }
+      };
+      const timeoutId = window.setTimeout(() => {
+        console.error("Payment failed", { step: "checkout.js load timeout" });
+        finish(false);
+      }, 10000);
+
       if (window.Razorpay) {
-        resolve(true);
+        finish(true, { source: "existing-window-object" });
         return;
       }
+
+      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      if (existingScript) {
+        if (window.Razorpay) {
+          finish(true, { source: "existing-script-already-loaded" });
+          return;
+        }
+        existingScript.addEventListener("load", () => {
+          const loaded = Boolean(window.Razorpay);
+          finish(loaded, { source: "existing-script", loaded });
+        }, { once: true });
+        existingScript.addEventListener("error", (event) => {
+          console.error("Payment failed", { step: "checkout.js existing script load", event });
+          finish(false);
+        }, { once: true });
+        return;
+      }
+
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
+      script.async = true;
+      script.onload = () => {
+        const loaded = Boolean(window.Razorpay);
+        finish(loaded, { source: "new-script", loaded });
+      };
+      script.onerror = (event) => {
+        console.error("Payment failed", { step: "checkout.js load", event });
+        finish(false);
+      };
       document.body.appendChild(script);
     });
+
+    return razorpayScriptPromise;
   };
 
   async function executeUpgrade(e) {
     e.preventDefault();
+    console.log("Payment button clicked", {
+      planId: selectedPlanForModal?.id || selectedPlanForModal?.name,
+      billingCycle: billingCycleSelection,
+      pageProtocol: window.location.protocol,
+      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "/api/v1"
+    });
+    if (window.location.protocol === "https:" && String(import.meta.env.VITE_API_BASE_URL || "").startsWith("http://")) {
+      console.error("Payment failed", { step: "mixed-content-risk", message: "HTTPS frontend cannot call an HTTP API in production browsers." });
+    }
+    if (window.location.hostname.includes("vercel.app") && !import.meta.env.VITE_API_BASE_URL) {
+      console.error("Payment failed", { step: "vercel-api-base-missing", message: "Set VITE_API_BASE_URL to the deployed backend URL on Vercel." });
+    }
     setSavingPlan(selectedPlanForModal.name);
     setMessage(null);
     try {
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        throw new Error("Failed to load Razorpay SDK. Please check your internet connection.");
-      }
-
-      const response = await billingApi.createRazorpayOrder({
+      const orderPayload = {
         planId: selectedPlanForModal.id || selectedPlanForModal.name,
         billingCycle: billingCycleSelection
+      };
+
+      console.log("Order API called", orderPayload);
+      const response = await billingApi.createRazorpayOrder(orderPayload);
+      console.log("Order created", {
+        ...response,
+        key: maskRazorpayKey(response?.key),
+        keyMode: response?.keyMode || getRazorpayKeyMode(response?.key)
       });
+
+      if (!response?.key) {
+        throw new Error("Razorpay key is missing in the order response.");
+      }
+
+      if (!response?.orderId) {
+        throw new Error("Razorpay order_id is missing in the order response.");
+      }
+
+      if (!response?.amount || Number(response.amount) <= 0) {
+        throw new Error("Razorpay amount is missing or invalid in the order response.");
+      }
+
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded || !window.Razorpay) {
+        throw new Error("Failed to load Razorpay checkout.js. Check ad blockers, network access, and browser console errors.");
+      }
+
+      const keyMode = getRazorpayKeyMode(response.key);
+      if (response.keyMode && response.keyMode !== keyMode) {
+        console.error("Payment failed", {
+          step: "razorpay-key-mode-mismatch",
+          backendKeyMode: response.keyMode,
+          frontendDetectedKeyMode: keyMode
+        });
+      }
+      if (keyMode === "live") {
+        console.error("Payment failed", {
+          step: "razorpay-live-key-active",
+          message: "Live Razorpay key returned by backend. Test payments require rzp_test_ credentials."
+        });
+      }
 
       const options = {
         key: response.key,
         amount: response.amount,
-        currency: response.currency,
+        currency: response.currency || "INR",
         name: "SecureScan",
         description: `Upgrade to ${selectedPlanForModal.displayName || selectedPlanForModal.name}`,
         order_id: response.orderId,
         handler: async function (paymentRes) {
+          console.log("Payment success response", paymentRes);
+          if (paymentRes.razorpay_order_id !== response.orderId) {
+            console.error("Payment failed", {
+              step: "order-id-mismatch",
+              backendOrderId: response.orderId,
+              paymentOrderId: paymentRes.razorpay_order_id
+            });
+            setMessage({ type: "error", text: "Payment order mismatch. Please retry the checkout." });
+            setSavingPlan("");
+            return;
+          }
           setSavingPlan(selectedPlanForModal.name);
           try {
-            await billingApi.verifyRazorpayPayment({
+            const verificationResponse = await billingApi.verifyRazorpayPayment({
               razorpay_payment_id: paymentRes.razorpay_payment_id,
               razorpay_order_id: paymentRes.razorpay_order_id,
               razorpay_signature: paymentRes.razorpay_signature
             });
+            console.log("Payment verification response", verificationResponse);
 
             const nextBilling = await billingApi.getBilling();
             setBilling(nextBilling);
+            notifyBillingSummaryRefresh();
             setModalType(null);
             setMessage({ type: "success", text: `${selectedPlanForModal.displayName || selectedPlanForModal.name} plan activated successfully!` });
           } catch (verifyErr) {
+            console.error("Payment failed", { step: "verify", error: verifyErr, response: verifyErr.response?.data });
             setMessage({ type: "error", text: getErrorMessage(verifyErr, "Payment verification failed.") });
           } finally {
             setSavingPlan("");
@@ -1240,14 +1386,32 @@ function PlanBillingSettings() {
         },
         modal: {
           ondismiss: function () {
+            console.log("Payment failed", { step: "checkout dismissed" });
             setSavingPlan("");
           }
         }
       };
 
+      console.log("Razorpay options object", buildRazorpayDebugOptions(options));
       const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (failureResponse) {
+        console.error("Payment failure response", {
+          ...failureResponse,
+          backendOrderId: response.orderId,
+          checkoutOrderId: failureResponse?.error?.metadata?.order_id
+        });
+        setSavingPlan("");
+        setMessage({ type: "error", text: failureResponse?.error?.description || "Payment failed in Razorpay checkout." });
+      });
       rzp.open();
+      console.log("Checkout open event", {
+        order_id: options.order_id,
+        amount: options.amount,
+        currency: options.currency,
+        keyMode
+      });
     } catch (err) {
+      console.error("Payment failed", { step: "initiate", error: err, response: err.response?.data });
       setMessage({ type: "error", text: getErrorMessage(err, "Failed to initiate payment flow.") });
       setSavingPlan("");
     }
@@ -1265,6 +1429,7 @@ function PlanBillingSettings() {
       setModalType(null);
       setMessage({ type: "success", text: `${selectedPlanForModal.name} plan activated (Downgraded successfully).` });
       await loadBilling();
+      notifyBillingSummaryRefresh();
     } catch (err) {
       setMessage({ type: "error", text: getErrorMessage(err, "Failed to downgrade plan.") });
     } finally {
@@ -1281,6 +1446,7 @@ function PlanBillingSettings() {
       setCancelModalOpen(false);
       setMessage({ type: "success", text: "Subscription cancelled successfully." });
       await loadBilling();
+      notifyBillingSummaryRefresh();
     } catch (error) {
       setMessage({ type: "error", text: getErrorMessage(error, "Failed to cancel plan.") });
     } finally {

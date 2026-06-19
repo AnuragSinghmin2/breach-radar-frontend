@@ -1,6 +1,15 @@
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+const isPaymentEndpoint = (url = "") => url.includes("/payment") || url.includes("/billing");
+
+if (window.location.protocol === "https:" && API_BASE_URL.startsWith("http://")) {
+  console.error("[api] HTTPS frontend cannot call an HTTP backend. Set VITE_API_BASE_URL to an HTTPS backend URL.");
+}
+
+if (window.location.hostname.includes("vercel.app") && !import.meta.env.VITE_API_BASE_URL) {
+  console.error("[api] Vercel deployment is using relative /api/v1. Set VITE_API_BASE_URL to the deployed backend API URL.");
+}
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -29,6 +38,14 @@ export function clearAccessToken() {
 }
 
 apiClient.interceptors.request.use((config) => {
+  if (isPaymentEndpoint(config.url)) {
+    console.log("[api] Payment/Billing request", {
+      method: config.method,
+      baseURL: config.baseURL,
+      url: config.url
+    });
+  }
+
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -36,11 +53,30 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (isPaymentEndpoint(response.config?.url)) {
+      console.log("[api] Payment/Billing response", {
+        status: response.status,
+        url: response.config?.url,
+        data: response.data
+      });
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
     const code = error.response?.data?.code;
+
+    if (isPaymentEndpoint(originalRequest?.url)) {
+      console.error("[api] Payment/Billing API error", {
+        status,
+        code,
+        url: originalRequest?.url,
+        data: error.response?.data,
+        message: error.message
+      });
+    }
 
     if (
       !originalRequest ||

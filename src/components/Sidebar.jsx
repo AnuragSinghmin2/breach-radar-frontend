@@ -13,9 +13,10 @@ import {
   Wrench,
 } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import BrandLogo from "./BrandLogo";
+import { billingApi, getErrorMessage } from "../services/api";
 import { getInitials, resolveAvatarUrl } from "../utils/profile";
 
 const settingsLinks = [
@@ -30,6 +31,39 @@ const settingsLinks = [
   ["Activity Log", "/dashboard/settings/activity-log"],
 ];
 
+const PLAN_NAMES_WITH_UPGRADE = new Set(["Starter", "Professional", "Business"]);
+
+const statusMeta = {
+  ACTIVE: { label: "ACTIVE", className: "active" },
+  CANCELLED: { label: "CANCELLED", className: "cancelled" },
+  EXPIRED: { label: "EXPIRED", className: "expired" },
+  PAST_DUE: { label: "PAST_DUE", className: "past-due" },
+};
+
+function formatPlanDate(value) {
+  if (!value) return "Not scheduled";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not scheduled";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatBillingCycle(value) {
+  if (!value) return "-";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function getUsageMetric(usage, key) {
+  return usage.find((item) => item.key === key) || { key, label: key, used: 0, limit: "-", rawLimit: 0 };
+}
+
+function formatUsageValue(metric) {
+  return `${Number(metric.used || 0).toLocaleString()}/${metric.limit}`;
+}
+
 export default function Sidebar({ isOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,11 +72,68 @@ export default function Sidebar({ isOpen }) {
   const initials = getInitials(user?.profile?.name, user?.email);
   const isSettingsRoute = location.pathname.startsWith("/dashboard/settings");
   const [settingsOpen, setSettingsOpen] = useState(isSettingsRoute);
+  const [planData, setPlanData] = useState(null);
+  const [planUsage, setPlanUsage] = useState([]);
+  const [planLoading, setPlanLoading] = useState(true);
+  const [planError, setPlanError] = useState("");
+
+  const loadPlanSummary = useCallback(async () => {
+    if (!user) {
+      setPlanData(null);
+      setPlanUsage([]);
+      setPlanLoading(false);
+      setPlanError("");
+      return;
+    }
+
+    setPlanLoading(true);
+    setPlanError("");
+    try {
+      const [currentPlanData, usageData] = await Promise.all([
+        billingApi.getCurrentPlan(),
+        billingApi.getUsage(),
+      ]);
+
+      const organizationPlan = currentPlanData.organization?.subscriptionPlan;
+      const subscriptionPlan = currentPlanData.subscription?.planName || currentPlanData.subscription?.currentPlan;
+      if (organizationPlan && subscriptionPlan && organizationPlan !== subscriptionPlan) {
+        console.warn(
+          `[Billing Summary] Plan mismatch: Organization.subscriptionPlan=${organizationPlan}, Subscription.planName=${subscriptionPlan}`
+        );
+      }
+
+      setPlanData(currentPlanData);
+      setPlanUsage(usageData.usage || []);
+    } catch (error) {
+      setPlanError(getErrorMessage(error, "Unable to load subscription information"));
+    } finally {
+      setPlanLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    loadPlanSummary();
+  }, [loadPlanSummary]);
+
+  useEffect(() => {
+    window.addEventListener("billing:refresh", loadPlanSummary);
+    return () => window.removeEventListener("billing:refresh", loadPlanSummary);
+  }, [loadPlanSummary]);
 
   async function handleLogout() {
     await logout();
     navigate("/login", { replace: true });
   }
+
+  const subscription = planData?.subscription || {};
+  const planName = subscription.planName || subscription.currentPlan || planData?.currentPlan || "-";
+  const statusKey = String(subscription.status || "").replace(/-/g, "_").toUpperCase();
+  const badge = statusMeta[statusKey] || { label: statusKey || "-", className: "unknown" };
+  const usageRows = [
+    getUsageMetric(planUsage, "domains"),
+    getUsageMetric(planUsage, "scans"),
+    getUsageMetric(planUsage, "seats"),
+  ];
 
   return (
     <div className={`sidebar ${isOpen ? "show" : "hide"}`}>
@@ -135,26 +226,46 @@ export default function Sidebar({ isOpen }) {
 
       <div className="plan-card">
         <p className="plan-title">Your Plan</p>
-
-        <div className="plan-header">
-          <h3>Enterprise</h3>
-          <span className="plan-badge">Active</span>
-        </div>
-
-        <p className="plan-date">Valid until 16 May 2025</p>
-
-        <div className="plan-stats">
-          <div className="row">
-            <span>Domains</span>
-            <span>5 / 10</span>
+        {planLoading ? (
+          <p className="plan-date">Loading subscription...</p>
+        ) : planError ? (
+          <div className="plan-error">
+            <p>Unable to load subscription information</p>
+            <button type="button" onClick={loadPlanSummary}>Retry</button>
           </div>
-          <div className="row">
-            <span>Scans</span>
-            <span>24 / 100</span>
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="plan-header">
+              <h3>{planName}</h3>
+              <span className={`plan-badge ${badge.className}`}>{badge.label}</span>
+            </div>
 
-        <button className="upgrade-btn">Upgrade Plan</button>
+            <div className="plan-details">
+              <span><b>Billing Cycle</b>{formatBillingCycle(subscription.billingCycle)}</span>
+              <span><b>Next Billing Date</b>{formatPlanDate(subscription.nextBillingDate)}</span>
+            </div>
+
+            <p className="plan-date">Valid until {formatPlanDate(subscription.nextBillingDate)}</p>
+
+            <div className="plan-stats compact">
+              {usageRows.map((item) => (
+                <span className="plan-usage-pill" key={item.key}>
+                  <b>{item.label}</b>{formatUsageValue(item)}
+                </span>
+              ))}
+            </div>
+
+            {PLAN_NAMES_WITH_UPGRADE.has(planName) ? (
+              <button className="upgrade-btn" type="button" onClick={() => navigate("/dashboard/settings/plan-billing")}>
+                Upgrade Plan
+              </button>
+            ) : (
+              <button className="support-btn" type="button" disabled>
+                Highest Plan Active
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       <div className="help-card">

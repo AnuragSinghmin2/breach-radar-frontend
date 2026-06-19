@@ -94,10 +94,10 @@ const pricingPlans = [
     cta: "Get Started",
   },
   {
-    name: "Pro",
+    name: "Professional",
     desc: "Great for growing businesses",
-    price: "499",
-    suffix: "/10 scans",
+    price: "1",
+    suffix: "/mo",
     features: ["10 Domain Scans", "Detailed Reports", "Priority Support", "API Access"],
     cta: "Get Started",
   },
