@@ -129,7 +129,7 @@ export default function SignInPage() {
             <span></span>
             Remember me
           </label>
-          <a href="#">Forgot Password?</a>
+          <a href="#" onClick={(e) => { e.preventDefault(); navigate("/forgot-password"); }} style={{ color: "#20ef94", fontSize: 15, fontWeight: 800, textDecoration: "none" }}>Forgot Password?</a>
         </div>
 
         <AuthErrorMessage message={error} />
@@ -153,13 +153,13 @@ export default function SignInPage() {
         </div>
 
         <div className="social-login">
-          <button type="button">
+          <button type="button" onClick={() => window.location.href = '/api/v1/auth/google'}>
             <span className="google">G</span>Google
           </button>
-          <button type="button">
+          <button type="button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
             <span className="github">GH</span>GitHub
           </button>
-          <button type="button">
+          <button type="button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
             <span className="microsoft"></span>Microsoft
           </button>
         </div>

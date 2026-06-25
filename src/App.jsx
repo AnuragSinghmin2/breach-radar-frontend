@@ -5,6 +5,9 @@ import UserRoute from "./components/UserRoute";
 import SuperAdminRoute from "./components/SuperAdminRoute";
 import PublicAuthRoute from "./components/PublicAuthRoute";
 import SignInPage from "./components/SignInPage";
+import ForgotPasswordPage from "./components/ForgotPasswordPage";
+import ResetPasswordPage from "./components/ResetPasswordPage";
+import GoogleAuthSuccessPage from "./pages/GoogleAuthSuccessPage";
 import Domains from "./components/Domains";
 import Scans from "./components/Scans";
 import SettingsPage from "./components/SettingsPage";
@@ -61,6 +64,19 @@ function App() {
             <RegisterPage />
           </PublicAuthRoute>
         }
+      />
+
+      {/* NEW — Google OAuth Success Handler */}
+      <Route path="/auth/google/success" element={<GoogleAuthSuccessPage />} />
+
+      {/* NEW — Password Reset Routes */}
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage />}
+      />
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
       />
 
       <Route

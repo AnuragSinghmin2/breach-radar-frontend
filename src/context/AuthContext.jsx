@@ -83,6 +83,18 @@ export function AuthProvider({ children }) {
     return data;
   }, [applySession]);
 
+  // Google OAuth — called from GoogleAuthSuccessPage after redirect
+  const loginWithToken = useCallback(async (accessToken) => {
+    // Fetch user profile using the token from Google OAuth callback
+    const res = await fetch('/api/v1/users/profile', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!res.ok) throw new Error('Failed to fetch user profile');
+    const data = await res.json();
+    applySession(data.user || data, accessToken);
+    return data;
+  }, [applySession]);
+
   const register = useCallback(async (email, password, name) => {
     const data = await authApi.register({ email, password, name });
     applySession(data.user, data.accessToken);
@@ -103,12 +115,13 @@ export function AuthProvider({ children }) {
       isAuthenticated,
       isLoading,
       login,
+      loginWithToken,
       register,
       logout,
       refreshProfile,
       updateAuthenticatedUser,
     }),
-    [user, isAuthenticated, isLoading, login, register, logout, refreshProfile, updateAuthenticatedUser]
+    [user, isAuthenticated, isLoading, login, loginWithToken, register, logout, refreshProfile, updateAuthenticatedUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

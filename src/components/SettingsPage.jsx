@@ -66,6 +66,22 @@ const buildRazorpayDebugOptions = (options) => ({
   method: options.method || "razorpay-dashboard-defaults"
 });
 
+const getRazorpayFailureDetails = (failureResponse = {}) => {
+  const error = failureResponse.error || {};
+  const metadata = error.metadata || {};
+
+  return {
+    code: error.code,
+    description: error.description,
+    reason: error.reason,
+    source: error.source,
+    step: error.step,
+    field: error.field,
+    orderId: metadata.order_id,
+    paymentId: metadata.payment_id
+  };
+};
+
 const settingSections = {
   profile: {
     title: "Profile",
@@ -1276,6 +1292,18 @@ function PlanBillingSettings() {
     return razorpayScriptPromise;
   };
 
+  const logRazorpayEvent = (payload) => {
+    billingApi.logRazorpayClientEvent(payload).catch((eventLogErr) => {
+      console.error("Razorpay client event log failed", {
+        event: payload?.event,
+        orderId: payload?.orderId,
+        status: eventLogErr.response?.status,
+        response: eventLogErr.response?.data,
+        message: eventLogErr.message
+      });
+    });
+  };
+
   async function executeUpgrade(e) {
     e.preventDefault();
     console.log("Payment button clicked", {
@@ -1346,12 +1374,40 @@ function PlanBillingSettings() {
         description: `Upgrade to ${selectedPlanForModal.displayName || selectedPlanForModal.name}`,
         order_id: response.orderId,
         handler: async function (paymentRes) {
-          console.log("Payment success response", paymentRes);
+          console.log("Payment success", {
+            orderId: paymentRes.razorpay_order_id,
+            paymentId: paymentRes.razorpay_payment_id,
+            hasSignature: Boolean(paymentRes.razorpay_signature)
+          });
+          logRazorpayEvent({
+            event: "payment.success",
+            orderId: paymentRes.razorpay_order_id,
+            paymentId: paymentRes.razorpay_payment_id,
+            amount: response.amount,
+            currency: response.currency || "INR",
+            keyMode,
+            details: {
+              hasSignature: Boolean(paymentRes.razorpay_signature)
+            }
+          });
           if (paymentRes.razorpay_order_id !== response.orderId) {
             console.error("Payment failed", {
               step: "order-id-mismatch",
               backendOrderId: response.orderId,
               paymentOrderId: paymentRes.razorpay_order_id
+            });
+            logRazorpayEvent({
+              event: "handler.callback.failure",
+              orderId: response.orderId,
+              paymentId: paymentRes.razorpay_payment_id,
+              amount: response.amount,
+              currency: response.currency || "INR",
+              keyMode,
+              step: "order-id-mismatch",
+              details: {
+                backendOrderId: response.orderId,
+                paymentOrderId: paymentRes.razorpay_order_id
+              }
             });
             setMessage({ type: "error", text: "Payment order mismatch. Please retry the checkout." });
             setSavingPlan("");
@@ -1359,12 +1415,18 @@ function PlanBillingSettings() {
           }
           setSavingPlan(selectedPlanForModal.name);
           try {
-            const verificationResponse = await billingApi.verifyRazorpayPayment({
+            const verifyPayload = {
               razorpay_payment_id: paymentRes.razorpay_payment_id,
               razorpay_order_id: paymentRes.razorpay_order_id,
               razorpay_signature: paymentRes.razorpay_signature
+            };
+            console.log("Verify API request", {
+              orderId: verifyPayload.razorpay_order_id,
+              paymentId: verifyPayload.razorpay_payment_id,
+              hasSignature: Boolean(verifyPayload.razorpay_signature)
             });
-            console.log("Payment verification response", verificationResponse);
+            const verificationResponse = await billingApi.verifyRazorpayPayment(verifyPayload);
+            console.log("Verify API response", verificationResponse);
 
             const nextBilling = await billingApi.getBilling();
             setBilling(nextBilling);
@@ -1372,7 +1434,26 @@ function PlanBillingSettings() {
             setModalType(null);
             setMessage({ type: "success", text: `${selectedPlanForModal.displayName || selectedPlanForModal.name} plan activated successfully!` });
           } catch (verifyErr) {
-            console.error("Payment failed", { step: "verify", error: verifyErr, response: verifyErr.response?.data });
+            console.error("Handler callback failure", {
+              step: "verify",
+              message: verifyErr.message,
+              response: verifyErr.response?.data,
+              status: verifyErr.response?.status
+            });
+            logRazorpayEvent({
+              event: "handler.callback.failure",
+              orderId: paymentRes.razorpay_order_id,
+              paymentId: paymentRes.razorpay_payment_id,
+              amount: response.amount,
+              currency: response.currency || "INR",
+              keyMode,
+              step: "verify",
+              description: verifyErr.message,
+              details: {
+                response: verifyErr.response?.data,
+                status: verifyErr.response?.status
+              }
+            });
             setMessage({ type: "error", text: getErrorMessage(verifyErr, "Payment verification failed.") });
           } finally {
             setSavingPlan("");
@@ -1386,7 +1467,19 @@ function PlanBillingSettings() {
         },
         modal: {
           ondismiss: function () {
-            console.log("Payment failed", { step: "checkout dismissed" });
+            console.warn("Razorpay modal dismissed", {
+              orderId: response.orderId,
+              amount: response.amount,
+              currency: response.currency || "INR",
+              keyMode
+            });
+            logRazorpayEvent({
+              event: "modal.dismiss",
+              orderId: response.orderId,
+              amount: response.amount,
+              currency: response.currency || "INR",
+              keyMode
+            });
             setSavingPlan("");
           }
         }
@@ -1395,10 +1488,33 @@ function PlanBillingSettings() {
       console.log("Razorpay options object", buildRazorpayDebugOptions(options));
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", function (failureResponse) {
-        console.error("Payment failure response", {
-          ...failureResponse,
+        const failureDetails = getRazorpayFailureDetails(failureResponse);
+        console.error("Razorpay checkout failure", {
+          ...failureDetails,
           backendOrderId: response.orderId,
-          checkoutOrderId: failureResponse?.error?.metadata?.order_id
+          checkoutOrderId: failureDetails.orderId,
+          keyMode,
+          amount: response.amount,
+          currency: response.currency || "INR"
+        });
+        logRazorpayEvent({
+          event: "payment.failed",
+          orderId: failureDetails.orderId || response.orderId,
+          paymentId: failureDetails.paymentId,
+          amount: response.amount,
+          currency: response.currency || "INR",
+          keyMode,
+          code: failureDetails.code,
+          description: failureDetails.description,
+          reason: failureDetails.reason,
+          source: failureDetails.source,
+          step: failureDetails.step,
+          field: failureDetails.field,
+          details: {
+            ...failureDetails,
+            backendOrderId: response.orderId,
+            checkoutOrderId: failureDetails.orderId
+          }
         });
         setSavingPlan("");
         setMessage({ type: "error", text: failureResponse?.error?.description || "Payment failed in Razorpay checkout." });
@@ -1409,6 +1525,14 @@ function PlanBillingSettings() {
         amount: options.amount,
         currency: options.currency,
         keyMode
+      });
+      logRazorpayEvent({
+        event: "checkout.open",
+        orderId: options.order_id,
+        amount: options.amount,
+        currency: options.currency,
+        keyMode,
+        details: buildRazorpayDebugOptions(options)
       });
     } catch (err) {
       console.error("Payment failed", { step: "initiate", error: err, response: err.response?.data });
