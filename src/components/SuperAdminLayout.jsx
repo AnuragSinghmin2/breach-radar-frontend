@@ -89,96 +89,108 @@ export default function SuperAdminLayout() {
         {/* SUPER ADMIN SIDEBAR */}
         <div className={`sidebar ${sidebarOpen ? "show" : "hide"}`}>
           <div className="logo">
-            <div>
+            <NavLink to="/super-admin" end className="logo-link" aria-label="Go to dashboard">
               <BrandLogo className="sidebar-brand-logo" iconSize={30} />
               <p>SUPER ADMIN PANEL</p>
-            </div>
+            </NavLink>
           </div>
 
           <div className="menu">
             <NavLink
               to="/super-admin"
               end
+              title="Dashboard"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <Activity size={18} /> Dashboard
+              <Activity size={18} /> <span className="menu-label">Dashboard</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/users"
+              title="Users"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <Users size={18} /> Users
+              <Users size={18} /> <span className="menu-label">Users</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/domains"
+              title="Domains"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <Globe size={18} /> Domains
+              <Globe size={18} /> <span className="menu-label">Domains</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/scans"
+              title="Scans"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <Scan size={18} /> Scans
+              <Scan size={18} /> <span className="menu-label">Scans</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/vulnerabilities"
+              title="Vulnerabilities"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <ShieldAlert size={18} /> Vulnerabilities
+              <ShieldAlert size={18} /> <span className="menu-label">Vulnerabilities</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/reports"
+              title="Reports"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <FileText size={18} /> Reports
+              <FileText size={18} /> <span className="menu-label">Reports</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/subscriptions"
+              title="Subscriptions"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <Layers size={18} /> Subscriptions
+              <Layers size={18} /> <span className="menu-label">Subscriptions</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/payments"
+              title="Payments"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <DollarSign size={18} /> Payments
+              <DollarSign size={18} /> <span className="menu-label">Payments</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/tickets"
+              title="Support Tickets"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <MessageSquare size={18} /> Support Tickets
+              <MessageSquare size={18} /> <span className="menu-label">Support Tickets</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/audit-logs"
+              title="Audit Logs"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <History size={18} /> Audit Logs
+              <History size={18} /> <span className="menu-label">Audit Logs</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/system-health"
+              title="System Health"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <HeartPulse size={18} /> System Health
+              <HeartPulse size={18} /> <span className="menu-label">System Health</span>
             </NavLink>
 
             <NavLink
               to="/super-admin/settings"
+              title="Settings"
               className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
             >
-              <Settings size={18} /> Settings
+              <Settings size={18} /> <span className="menu-label">Settings</span>
             </NavLink>
           </div>
 

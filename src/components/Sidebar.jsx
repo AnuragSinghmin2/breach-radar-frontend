@@ -138,62 +138,70 @@ export default function Sidebar({ isOpen }) {
   return (
     <div className={`sidebar ${isOpen ? "show" : "hide"}`}>
       <div className="logo">
-        <div>
+        <NavLink to="/dashboard" end className="logo-link" aria-label="Go to dashboard">
           <BrandLogo className="sidebar-brand-logo" iconSize={30} />
           <p>Security Platform</p>
-        </div>
+        </NavLink>
       </div>
 
       <div className="menu">
         <NavLink
           to="/dashboard"
           end
+          title="Dashboard"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
-          <Home size={18} /> Dashboard
+          <Home size={18} /> <span className="menu-label">Dashboard</span>
         </NavLink>
 
         <NavLink
           to="/dashboard/domains"
+          title="Domains"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
-          <Globe size={18} /> Domains
+          <Globe size={18} /> <span className="menu-label">Domains</span>
         </NavLink>
 
         <NavLink
           to="/dashboard/scans"
+          title="Scans"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
-          <Scan size={18} /> Scans
+          <Scan size={18} /> <span className="menu-label">Scans</span>
         </NavLink>
 
         <NavLink
           to="/dashboard/vulnerabilities"
+          title="Vulnerabilities"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
-          <ShieldAlert size={18} /> Vulnerabilities
+          <ShieldAlert size={18} /> <span className="menu-label">Vulnerabilities</span>
         </NavLink>
         <NavLink
           to="/dashboard/reports"
+          title="Reports"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
-          <FileText size={18} /> Reports
+          <FileText size={18} /> <span className="menu-label">Reports</span>
         </NavLink>
         <NavLink
           to="/dashboard/monitoring"
+          title="Monitoring"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
-          <Activity size={18} /> Monitoring
+          <Activity size={18} /> <span className="menu-label">Monitoring</span>
         </NavLink>
         <NavLink
           to="/dashboard/remediation"
+          title="Remediation"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
         >
-          <Wrench size={18} /> Remediation
+          <Wrench size={18} /> <span className="menu-label">Remediation</span>
         </NavLink>
 
         <button
           type="button"
+          title="Settings"
           onClick={() => setSettingsOpen((open) => !open)}
           className={
             isSettingsRoute
@@ -202,7 +210,7 @@ export default function Sidebar({ isOpen }) {
           }
         >
           <span>
-            <Settings size={18} /> Settings
+            <Settings size={18} /> <span className="menu-label">Settings</span>
           </span>
           <ChevronDown size={16} />
         </button>
@@ -213,6 +221,7 @@ export default function Sidebar({ isOpen }) {
               <NavLink
                 key={path}
                 to={path}
+                title={label}
                 className={({ isActive }) =>
                   isActive ? "settings-subitem active" : "settings-subitem"
                 }
