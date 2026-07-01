@@ -3,9 +3,9 @@ import "./BrandLogo.css";
 
 export default function BrandLogo({ className = "", iconSize = 24 }) {
   return (
-    <span className={`brand-logo ${className}`.trim()} aria-label="SecureScan">
+    <span className={`brand-logo ${className}`.trim()} aria-label="Breach Radar">
       <ShieldCheck size={iconSize} strokeWidth={2.2} />
-      <strong>SecureScan</strong>
+      <strong>Breach Radar</strong>
     </span>
   );
 }

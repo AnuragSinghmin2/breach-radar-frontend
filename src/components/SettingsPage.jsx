@@ -22,6 +22,7 @@ import {
   MessageSquare,
   Monitor,
   MoreVertical,
+  ShieldAlert,
   ShieldCheck,
   Smartphone,
   Trash2,
@@ -35,7 +36,7 @@ import {
 import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { billingApi, getErrorMessage, teamApi, userApi, settingsApi, securityApi, apiAccessApi, integrationsApi, activityLogApi } from "../services/api";
+import { billingApi, getErrorMessage, teamApi, userApi, settingsApi, notificationApi, securityApi, apiAccessApi, integrationsApi, activityLogApi } from "../services/api";
 import { formatAccountDate, getInitials, resolveAvatarUrl } from "../utils/profile";
 import "./SettingsPage.css";
 
@@ -132,29 +133,7 @@ const overviewStats = [
   { label: "Avg. Response Time", value: "245ms", detail: "This month", icon: Clock3, tone: "orange" },
 ];
 
-const apiKeys = [
-  {
-    name: "Production Key",
-    desc: "Used in production environment",
-    key: "sk_live_....................a1b2c3d4",
-    created: ["16 May 2024", "10:30 AM"],
-    used: ["16 May 2024", "02:45 PM"],
-  },
-  {
-    name: "Development Key",
-    desc: "Used for development & testing",
-    key: "sk_test_....................e5f6g7h8",
-    created: ["10 May 2024", "09:15 AM"],
-    used: ["16 May 2024", "11:20 AM"],
-  },
-  {
-    name: "CI/CD Pipeline Key",
-    desc: "GitHub Actions integration",
-    key: "sk_live_....................i9j0k1l2",
-    created: ["05 May 2024", "04:20 PM"],
-    used: ["15 May 2024", "08:10 PM"],
-  },
-];
+// API Keys are now loaded from backend via apiAccessApi.getApiAccess()
 
 const endpoints = [
   ["GET", "/v1/domains", "List all domains", "green"],
@@ -193,21 +172,11 @@ const scanProfiles = [
 
 const defaultExclusions = ["/logout", "/admin/delete", "*.pdf", "staging.internal"];
 
-const securitySessions = [
-  ["Chrome on Windows", "Mumbai, India", "Current session", "Active"],
-  ["Edge on Windows", "Delhi, India", "Yesterday, 07:45 PM", "Active"],
-  ["Mobile app", "Bengaluru, India", "12 May 2024", "Expired"],
-];
-
-const securityEvents = [
-  ["Password changed", "Rahul Sharma", "12 days ago", "Success"],
-  ["MFA challenge passed", "Chrome on Windows", "Today, 11:10 AM", "Success"],
-  ["API key scope updated", "Production Key", "Yesterday, 03:18 PM", "Review"],
-];
+// Sessions and security events are now loaded from backend API
 
 const integrationCatalog = [
   { key: "slack", name: "Slack", desc: "Send critical alerts and scan updates to security channels.", status: "Connected", icon: MessageSquare, target: "#security-alerts" },
-  { key: "github", name: "GitHub", desc: "Create issues for vulnerabilities and sync remediation status.", status: "Connected", icon: Code2, target: "securescan/app" },
+  { key: "github", name: "GitHub", desc: "Create issues for vulnerabilities and sync remediation status.", status: "Connected", icon: Code2, target: "breach-radar/app" },
   { key: "jira", name: "Jira", desc: "Open tickets when vulnerabilities cross SLA thresholds.", status: "Available", icon: Wrench, target: "SEC project" },
   { key: "webhook", name: "Webhook", desc: "Post scan, report, and monitoring events to custom endpoints.", status: "Connected", icon: Webhook, target: "3 endpoints" },
 ];
@@ -218,14 +187,7 @@ const integrationActivity = [
   ["Webhook retry queued", "monitor.down event", "1 hour ago", "Retry"],
 ];
 
-const auditEvents = [
-  { id: "ACT-1029", type: "Scan", title: "Deep scan started", actor: "Ananya Verma", target: "example.com", time: "Today, 11:24 AM", status: "Success", severity: "Info" },
-  { id: "ACT-1028", type: "Security", title: "MFA challenge passed", actor: "Rahul Sharma", target: "Chrome on Windows", time: "Today, 11:10 AM", status: "Success", severity: "Info" },
-  { id: "ACT-1027", type: "Vulnerability", title: "Critical vulnerability assigned", actor: "Karan Mehta", target: "SQL Injection", time: "Today, 10:48 AM", status: "Review", severity: "Critical" },
-  { id: "ACT-1026", type: "Report", title: "Executive report generated", actor: "System", target: "Weekly Summary", time: "Yesterday, 06:20 PM", status: "Success", severity: "Low" },
-  { id: "ACT-1025", type: "Integration", title: "Webhook delivery failed", actor: "SecureScan API", target: "monitor.down", time: "Yesterday, 03:02 PM", status: "Retry", severity: "Medium" },
-  { id: "ACT-1024", type: "Team", title: "Role changed to Admin", actor: "Rahul Sharma", target: "Ananya Verma", time: "20 May 2024", status: "Success", severity: "Info" },
-];
+// Audit events are now loaded from backend via activityLogApi.getLogs()
 
 function InfoCard({ item }) {
   const Icon = item.icon;
@@ -1370,7 +1332,7 @@ function PlanBillingSettings() {
         key: response.key,
         amount: response.amount,
         currency: response.currency || "INR",
-        name: "SecureScan",
+        name: "Breach Radar",
         description: `Upgrade to ${selectedPlanForModal.displayName || selectedPlanForModal.name}`,
         order_id: response.orderId,
         handler: async function (paymentRes) {
@@ -2338,7 +2300,7 @@ function ScanPreferencesSettings() {
       <section className="settings-panel scan-pref-summary-panel">
         <div className="settings-panel-title">
           <h3>Recommended Policy</h3>
-          <p>SecureScan will use these preferences to keep scans useful while reducing noisy or risky requests.</p>
+          <p>Breach Radar will use these preferences to keep scans useful while reducing noisy or risky requests.</p>
         </div>
         <div className="scan-pref-policy-grid">
           <article><ShieldCheck size={18} /><strong>OWASP baseline</strong><span>Injection, XSS, auth, headers, SSL, and exposure checks.</span></article>
@@ -2360,17 +2322,32 @@ function SecuritySettings() {
   const [sessions, setSessions] = useState([]);
   const [events, setEvents] = useState([]);
 
+  const loadSecurityEvents = async () => {
+    const data = await activityLogApi.getLogs({ limit: 5, type: "Security" });
+    return Array.isArray(data?.logs) ? data.logs : [];
+  };
+
   const loadData = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const [sessionsData, eventsData, profileData] = await Promise.all([
+      const [sessionsResult, eventsResult, profileResult] = await Promise.allSettled([
         securityApi.getSessions(),
-        activityLogApi.getLogs({ limit: 5, type: 'Security' }),
+        loadSecurityEvents(),
         userApi.getProfile()
       ]);
-      setSessions(sessionsData || []);
-      setEvents(eventsData.logs || []);
+
+      setSessions(sessionsResult.status === "fulfilled" && Array.isArray(sessionsResult.value) ? sessionsResult.value : []);
+      setEvents(eventsResult.status === "fulfilled" ? eventsResult.value : []);
+
+      const profileData = profileResult.status === "fulfilled" ? profileResult.value : null;
       if (profileData && profileData.security) {
-        setMfaEnabled(profileData.security.mfaEnabled);
+        setMfaEnabled(Boolean(profileData.security.mfaEnabled));
+      }
+
+      const failedResult = [sessionsResult, eventsResult, profileResult].find((result) => result.status === "rejected");
+      if (failedResult) {
+        setError(getErrorMessage(failedResult.reason, "Some security details could not be loaded."));
       }
     } catch (err) {
       setError(getErrorMessage(err));
@@ -2401,6 +2378,11 @@ function SecuritySettings() {
       return;
     }
 
+    if (password.next.length < 8) {
+      setError("New password must be at least 8 characters long.");
+      return;
+    }
+
     if (password.next !== password.confirm) {
       setError("New password and confirmation do not match.");
       return;
@@ -2411,8 +2393,7 @@ function SecuritySettings() {
       setPassword({ current: "", next: "", confirm: "" });
       triggerToast("Password updated successfully.");
       
-      const eventsData = await activityLogApi.getLogs({ limit: 5, type: 'Security' });
-      setEvents(eventsData.logs || []);
+      setEvents(await loadSecurityEvents());
     } catch (err) {
       setError(getErrorMessage(err));
     }
@@ -2434,8 +2415,7 @@ function SecuritySettings() {
         }
         triggerToast("Two-factor authentication enabled successfully.");
       }
-      const eventsData = await activityLogApi.getLogs({ limit: 5, type: 'Security' });
-      setEvents(eventsData.logs || []);
+      setEvents(await loadSecurityEvents());
     } catch (err) {
       setError(getErrorMessage(err));
     }
@@ -2447,17 +2427,19 @@ function SecuritySettings() {
       triggerToast(id === "all" ? "All other device sessions terminated." : "Session terminated successfully.");
       const [sessionsData, eventsData] = await Promise.all([
         securityApi.getSessions(),
-        activityLogApi.getLogs({ limit: 5, type: 'Security' })
+        loadSecurityEvents()
       ]);
       setSessions(sessionsData || []);
-      setEvents(eventsData.logs || []);
+      setEvents(eventsData || []);
     } catch (err) {
       setError(getErrorMessage(err));
     }
   };
 
   const formatSessionTime = (dateStr) => {
+    if (!dateStr) return "Not available";
     const date = new Date(dateStr);
+    if (Number.isNaN(date.getTime())) return "Not available";
     return date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   };
 
@@ -2494,7 +2476,7 @@ function SecuritySettings() {
         <section className="settings-panel security-password-panel">
           <div className="settings-panel-title">
             <h3>Password & Authentication</h3>
-            <p>Manage account credentials and authentication policy for SecureScan access.</p>
+            <p>Manage account credentials and authentication policy for Breach Radar access.</p>
           </div>
           <form className="security-password-form" onSubmit={savePassword}>
             <label>
@@ -2548,17 +2530,21 @@ function SecuritySettings() {
             <p>Review signed-in devices and revoke access when needed.</p>
           </div>
           <div className="security-session-list">
-            {sessions.map((item) => (
-              <article className="security-session-row" key={item.id}>
-                <Monitor size={18} />
-                <strong>{item.device}<small>{item.location} ({item.ipAddress})</small></strong>
-                <span>{item.isCurrent ? "Current session" : formatSessionTime(item.lastActivity)}</span>
-                <b className={item.isCurrent ? "active" : "expired"}>{item.isCurrent ? "Active" : "Expired"}</b>
-                <button type="button" onClick={() => handleRevoke(item.id)} disabled={item.isCurrent}>
-                  Revoke
-                </button>
-              </article>
-            ))}
+            {sessions.length === 0 ? (
+              <div className="settings-empty-state">No active sessions found.</div>
+            ) : (
+              sessions.map((item) => (
+                <article className="security-session-row" key={item.id}>
+                  <Monitor size={18} />
+                  <strong>{item.device || "Unknown device"}<small>{item.location || "Unknown location"} ({item.ipAddress || "No IP"})</small></strong>
+                  <span>{item.isCurrent ? "Current session" : formatSessionTime(item.lastActivity)}</span>
+                  <b className={item.isCurrent || item.status === "active" ? "active" : "expired"}>{item.isCurrent || item.status === "active" ? "Active" : "Expired"}</b>
+                  <button type="button" onClick={() => handleRevoke(item.id)} disabled={item.isCurrent || !item.id}>
+                    Revoke
+                  </button>
+                </article>
+              ))
+            )}
           </div>
         </section>
 
@@ -2569,14 +2555,14 @@ function SecuritySettings() {
           </div>
           <div className="security-event-list">
             {events.length === 0 ? (
-              <div style={{ padding: "30px", textRendering: "optimizeLegibility", textAlign: "center", color: "#64748b" }}>No recent security events.</div>
+              <div className="settings-empty-state">No recent security events.</div>
             ) : (
               events.map((event) => (
                 <article className="security-event-row" key={event.id}>
                   <Lock size={17} />
-                  <strong>{event.title}<small>{event.actor}</small></strong>
+                  <strong>{event.title || "Security event"}<small>{event.actor || "System"}</small></strong>
                   <span>{formatSessionTime(event.time)}</span>
-                  <b className={event.status === "Success" ? "resolved" : "critical"}>{event.status}</b>
+                  <b className={event.status === "Success" ? "resolved" : "critical"}>{event.status || "Review"}</b>
                 </article>
               ))
             )}
@@ -2670,7 +2656,7 @@ function IntegrationsSettings() {
         <section className="settings-panel integrations-catalog-panel">
           <div className="settings-panel-title">
             <h3>Connected Integrations</h3>
-            <p>Connect SecureScan with chat, issue tracking, repositories, and custom automation endpoints.</p>
+            <p>Connect Breach Radar with chat, issue tracking, repositories, and custom automation endpoints.</p>
           </div>
           <div className="integration-card-grid">
             {integrationCatalog.map((item) => {
@@ -2771,43 +2757,146 @@ function ActivityLogSettings() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState("All");
   const [status, setStatus] = useState("All");
-  const [selectedEvent, setSelectedEvent] = useState(auditEvents[0]);
+  const [auditEvents, setAuditEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  function formatActivityDate(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleString(undefined, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  function normalizeActivityType(log) {
+    const rawType = log.type || log.category || log.module || log.resourceType || "General";
+    const normalized = String(rawType).replace(/[_-]+/g, " ").trim();
+    return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : "General";
+  }
+
+  function normalizeActivityStatus(log) {
+    const rawStatus = log.status || (log.success === false ? "Review" : "Success");
+    const normalized = String(rawStatus).replace(/[_-]+/g, " ").trim();
+    return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : "Success";
+  }
+
+  function getActivityActor(log) {
+    if (typeof log.actor === "string") return log.actor;
+    if (log.actor?.name || log.actor?.email) return log.actor.name || log.actor.email;
+    if (log.user?.profile?.name || log.user?.email) return log.user.profile?.name || log.user.email;
+    if (log.userId?.profile?.name || log.userId?.email) return log.userId.profile?.name || log.userId.email;
+    return "System";
+  }
+
+  function mapActivityLog(log, index) {
+    const typeLabel = normalizeActivityType(log);
+    const statusLabel = normalizeActivityStatus(log);
+    const title = log.action || log.title || log.event || `${typeLabel} activity`;
+    const target = log.target || log.resource || log.entity || log.description || log.path || "-";
+
+    return {
+      id: log._id || log.id || log.eventId || `activity-${index}`,
+      type: typeLabel,
+      title,
+      actor: getActivityActor(log),
+      target,
+      time: formatActivityDate(log.createdAt || log.timestamp || log.time),
+      status: statusLabel,
+      severity: log.severity || log.level || (statusLabel === "Success" ? "Info" : "Medium"),
+      description: log.description || log.message || `${title} on ${target}.`,
+      ipAddress: log.ipAddress || log.ip || log.requestIp || "-",
+      userAgent: log.userAgent || log.device || "-",
+    };
+  }
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError("");
+
+    activityLogApi.getLogs({ limit: 50 })
+      .then((data) => {
+        if (!active) return;
+        const logs = Array.isArray(data?.logs) ? data.logs : [];
+        const mapped = logs.map(mapActivityLog);
+        setAuditEvents(mapped);
+        setSelectedEvent(mapped[0] || null);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setAuditEvents([]);
+        setSelectedEvent(null);
+        setError(getErrorMessage(err, "Failed to load activity log."));
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filteredEvents = auditEvents.filter((event) => {
     const matchesQuery = `${event.title} ${event.actor} ${event.target} ${event.id}`.toLowerCase().includes(query.toLowerCase());
     const matchesType = type === "All" || event.type === type;
     const matchesStatus = status === "All" || event.status === status;
-
     return matchesQuery && matchesType && matchesStatus;
   });
 
   const criticalCount = auditEvents.filter((event) => event.severity === "Critical").length;
-  const retryCount = auditEvents.filter((event) => event.status === "Retry").length;
+  const reviewCount = auditEvents.filter((event) => event.status !== "Success").length;
+  const selectedActivity = selectedEvent || filteredEvents[0] || null;
+  const typeOptions = ["All", ...Array.from(new Set(auditEvents.map((event) => event.type))).sort()];
+  const statusOptions = ["All", ...Array.from(new Set(auditEvents.map((event) => event.status))).sort()];
 
-  function exportActivity() {
-    const rows = filteredEvents.map((event) => `${event.id},${event.type},${event.title},${event.actor},${event.target},${event.time},${event.status}`);
-    const blob = new Blob([["ID,Type,Title,Actor,Target,Time,Status", ...rows].join("\n")], { type: "text/csv;charset=utf-8" });
+  function downloadActivityCsv(blob, filename = "breach-radar-activity-log.csv") {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "securescan-activity-log.csv";
+    link.download = filename;
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function exportActivity() {
+    try {
+      const blob = await activityLogApi.exportLogsCsv();
+      downloadActivityCsv(blob);
+      setMessage("Activity log exported.");
+      return;
+    } catch (err) {
+      console.warn("Falling back to filtered activity CSV export", err);
+    }
+
+    const escapeCsv = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const rows = filteredEvents.map((event) => [event.id, event.type, event.title, event.actor, event.target, event.time, event.status].map(escapeCsv).join(","));
+    const blob = new Blob([["ID,Type,Title,Actor,Target,Time,Status", ...rows].join("\n")], { type: "text/csv;charset=utf-8" });
+
+    downloadActivityCsv(blob, "breach-radar-filtered-activity-log.csv");
     setMessage("Activity log exported.");
   }
 
   return (
     <div className="activity-log-layout">
       {message && <div className="settings-message">{message}</div>}
+      {error && <div className="settings-message error">{error}</div>}
 
       <div className="activity-log-stats-grid">
         {[
           ["Audit Events", auditEvents.length, "Recent workspace actions", Activity, "green"],
           ["Critical Items", criticalCount, "Need review", ShieldCheck, "orange"],
-          ["Retries", retryCount, "Integration sync", Webhook, "purple"],
-          ["Last Export", "Today", "CSV available", Download, "blue"],
+          ["Needs Review", reviewCount, "Non-success events", Webhook, "purple"],
+          ["Visible Events", filteredEvents.length, "Current filters", Download, "blue"],
         ].map(([label, value, detail, Icon, tone]) => (
           <article className="api-overview-card" key={label}>
             <span className={`api-card-icon ${tone}`}>
@@ -2837,26 +2926,27 @@ function ActivityLogSettings() {
           <div className="activity-log-filters">
             <input placeholder="Search activity..." value={query} onChange={(event) => setQuery(event.target.value)} />
             <select value={type} onChange={(event) => setType(event.target.value)}>
-              <option>All</option>
-              <option>Scan</option>
-              <option>Security</option>
-              <option>Vulnerability</option>
-              <option>Report</option>
-              <option>Integration</option>
-              <option>Team</option>
+              {typeOptions.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
             </select>
             <select value={status} onChange={(event) => setStatus(event.target.value)}>
-              <option>All</option>
-              <option>Success</option>
-              <option>Review</option>
-              <option>Retry</option>
+              {statusOptions.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
             </select>
           </div>
 
           <div className="activity-event-list">
-            {filteredEvents.map((event) => (
+            {loading && <div className="team-empty-state">Loading workspace activity...</div>}
+            {!loading && filteredEvents.length === 0 && (
+              <div className="team-empty-state">
+                {auditEvents.length === 0 ? "No activity has been recorded yet." : "No activity matches the current filters."}
+              </div>
+            )}
+            {!loading && filteredEvents.map((event) => (
               <button
-                className={selectedEvent.id === event.id ? "activity-event-row active" : "activity-event-row"}
+                className={selectedActivity?.id === event.id ? "activity-event-row active" : "activity-event-row"}
                 type="button"
                 key={event.id}
                 onClick={() => setSelectedEvent(event)}
@@ -2873,20 +2963,32 @@ function ActivityLogSettings() {
         <aside className="activity-log-side-column">
           <section className="settings-panel activity-detail-panel">
             <h3>Event Details</h3>
-            <div className="activity-detail-card">
-              <span className={`activity-type-badge ${selectedEvent.type.toLowerCase()}`}>{selectedEvent.type}</span>
-              <h4>{selectedEvent.title}</h4>
-              <p>{selectedEvent.actor} performed this action on {selectedEvent.target}.</p>
-              <dl>
-                <div><dt>Event ID</dt><dd>{selectedEvent.id}</dd></div>
-                <div><dt>Time</dt><dd>{selectedEvent.time}</dd></div>
-                <div><dt>Status</dt><dd>{selectedEvent.status}</dd></div>
-                <div><dt>Severity</dt><dd>{selectedEvent.severity}</dd></div>
-              </dl>
-              <button type="button" onClick={() => setMessage(`${selectedEvent.id} copied to review queue.`)}>
-                Add to Review
-              </button>
-            </div>
+            {selectedActivity ? (
+              <div className="activity-detail-card">
+                <span className={`activity-type-badge ${selectedActivity.type.toLowerCase()}`}>{selectedActivity.type}</span>
+                <h4>{selectedActivity.title}</h4>
+                <p>{selectedActivity.description}</p>
+                <dl>
+                  <div><dt>Event ID</dt><dd>{selectedActivity.id}</dd></div>
+                  <div><dt>Actor</dt><dd>{selectedActivity.actor}</dd></div>
+                  <div><dt>Target</dt><dd>{selectedActivity.target}</dd></div>
+                  <div><dt>Time</dt><dd>{selectedActivity.time}</dd></div>
+                  <div><dt>Status</dt><dd>{selectedActivity.status}</dd></div>
+                  <div><dt>Severity</dt><dd>{selectedActivity.severity}</dd></div>
+                  <div><dt>IP Address</dt><dd>{selectedActivity.ipAddress}</dd></div>
+                  <div><dt>User Agent</dt><dd>{selectedActivity.userAgent}</dd></div>
+                </dl>
+                <button type="button" onClick={() => setMessage(`${selectedActivity.id} added to review queue.`)}>
+                  Add to Review
+                </button>
+              </div>
+            ) : (
+              <div className="activity-detail-card">
+                <span className="activity-type-badge general">General</span>
+                <h4>No event selected</h4>
+                <p>Select an activity event to inspect its audit details.</p>
+              </div>
+            )}
           </section>
 
           <section className="settings-panel activity-retention-panel">
@@ -3067,7 +3169,7 @@ function ApiAccessPage() {
           <div className="settings-panel-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <h3>API Overview</h3>
-              <p>Integrate SecureScan into your workflows, CI/CD pipelines, and custom tools using our RESTful API.</p>
+              <p>Integrate Breach Radar into your workflows, CI/CD pipelines, and custom tools using our RESTful API.</p>
             </div>
             <button type="button" onClick={() => setShowGenerateModal(true)} style={{ background: "#3b82f6", color: "#fff", border: "none", padding: "10px 15px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
               Create API Key
@@ -3081,7 +3183,12 @@ function ApiAccessPage() {
         </section>
 
         <section className="settings-panel api-keys-panel">
-          <h3>Your API Keys</h3>
+          <div className="api-keys-heading">
+            <div>
+              <h3>Your API Keys</h3>
+              <p>Manage active keys used by your integrations and automation.</p>
+            </div>
+          </div>
           <div className="api-table-wrap">
             <table className="api-keys-table">
               <thead>
@@ -3097,47 +3204,52 @@ function ApiAccessPage() {
               <tbody>
                 {keys.length === 0 ? (
                   <tr>
-                    <td colSpan="6" style={{ padding: "30px", textRendering: "optimizeLegibility", textAlign: "center", color: "#64748b" }}>No active API keys found. Click "Create API Key" to generate one.</td>
+                    <td colSpan="6">
+                      <div className="api-table-empty">No active API keys found. Click "Create API Key" to generate one.</div>
+                    </td>
                   </tr>
                 ) : (
                   keys.map((item) => (
                     <tr key={item.id}>
-                      <td>
+                      <td data-label="Key Name">
                         <div className="api-key-name">
                           <strong>{item.name}</strong>
                           <small>{item.desc || "No description provided"}</small>
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Key">
                         <div className="api-key-value">
                           <span className="masked-key">{item.key}</span>
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Created At">
                         <div className="api-date-cell">
                           <span>{formatKeyDate(item.createdAt)}</span>
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Last Used">
                         <div className="api-date-cell">
                           <span>{item.lastUsedAt ? formatKeyDate(item.lastUsedAt) : "Never used"}</span>
                         </div>
                       </td>
-                      <td>
-                        <b className={`api-status ${item.status === 'active' ? 'active' : 'revoked'}`} style={{ color: item.status === 'active' ? '#10b981' : '#ef4444' }}>
-                          {item.status.toUpperCase()}
+                      <td data-label="Status">
+                        <b className={`api-status ${item.status === "active" ? "active" : "revoked"}`}>
+                          {String(item.status || "unknown").toUpperCase()}
                         </b>
                       </td>
-                      <td>
+                      <td data-label="Actions">
                         {item.status === 'active' && (
-                          <div style={{ display: "flex", gap: "8px" }}>
-                            <button type="button" onClick={() => handleRegenerate(item.id)} style={{ background: "transparent", border: "1px solid #475569", color: "#94a3b8", fontSize: "11px", padding: "4px 8px", borderRadius: "4px", cursor: "pointer" }}>
+                          <div className="api-key-actions">
+                            <button className="secondary" type="button" onClick={() => handleRegenerate(item.id)}>
                               Regenerate
                             </button>
-                            <button type="button" onClick={() => handleRevoke(item.id)} style={{ background: "transparent", border: "1px solid #ef4444", color: "#fca5a5", fontSize: "11px", padding: "4px 8px", borderRadius: "4px", cursor: "pointer" }}>
+                            <button className="danger" type="button" onClick={() => handleRevoke(item.id)}>
                               Revoke
                             </button>
                           </div>
+                        )}
+                        {item.status !== 'active' && (
+                          <span className="api-key-muted-action">No actions</span>
                         )}
                       </td>
                     </tr>
@@ -3155,7 +3267,7 @@ function ApiAccessPage() {
           <div className="api-section-row">
             <div>
               <h3>API Endpoints</h3>
-              <p>Core endpoints available in the SecureScan API.</p>
+              <p>Core endpoints available in the Breach Radar API.</p>
             </div>
             <a href="#docs">
               View Full Documentation <ExternalLink size={15} />
@@ -3208,7 +3320,7 @@ function ApiAccessPage() {
 
         <section className="settings-panel quick-panel">
           <h3>Quick Start</h3>
-          <p>Get started with SecureScan API in minutes.</p>
+          <p>Get started with Breach Radar API in minutes.</p>
           <div className="quick-links">
             {quickLinks.map(([title, desc, Icon]) => (
               <a href="#quick" key={title}>

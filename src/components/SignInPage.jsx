@@ -17,8 +17,7 @@ function AuthErrorMessage({ message }) {
       className="auth-error-message"
       style={{
         color: "#ef4444",
-        backgroundColor: "#fef2f2",
-        border: "1px solid #fee2e2",
+        backgroundColor: "rgba(239,68,68,0.1)",
         padding: "0.75rem",
         borderRadius: "0.375rem",
         marginBottom: "1rem",
@@ -140,7 +139,7 @@ export default function SignInPage() {
         </button>
 
         <p className="auth-switch">
-          Don't have an account ?
+          Don't have an account?
           <button type="button" onClick={() => navigate("/register", { state: location.state })}>
             Create Account
           </button>
@@ -153,14 +152,8 @@ export default function SignInPage() {
         </div>
 
         <div className="social-login">
-          <button type="button" onClick={() => window.location.href = '/api/v1/auth/google'}>
+          <button type="button" onClick={() => window.location.href = 'https://breach-radar-backend.onrender.com/api/v1/auth/google'}>
             <span className="google">G</span>Google
-          </button>
-          <button type="button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-            <span className="github">GH</span>GitHub
-          </button>
-          <button type="button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-            <span className="microsoft"></span>Microsoft
           </button>
         </div>
 

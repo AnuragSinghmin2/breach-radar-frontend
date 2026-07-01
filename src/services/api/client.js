@@ -1,6 +1,22 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+function normalizeApiBaseUrl(value) {
+  const baseUrl = (value || "/api/v1").trim().replace(/\/+$/, "");
+
+  if (!/^https?:\/\//i.test(baseUrl)) {
+    return baseUrl || "/api/v1";
+  }
+
+  const parsedUrl = new URL(baseUrl);
+  if (parsedUrl.pathname === "" || parsedUrl.pathname === "/") {
+    parsedUrl.pathname = "/api/v1";
+    return parsedUrl.toString().replace(/\/+$/, "");
+  }
+
+  return baseUrl;
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 const isPaymentEndpoint = (url = "") => url.includes("/payment") || url.includes("/billing");
 
 if (window.location.protocol === "https:" && API_BASE_URL.startsWith("http://")) {

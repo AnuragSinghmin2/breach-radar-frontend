@@ -89,14 +89,14 @@ const pricingPlans = [
     name: "Starter",
     desc: "Perfect for small websites",
     price: "99",
-    suffix: "/scan",
+    suffix: "/mo",
     features: ["1 Domain Scan", "Basic Vulnerability Report", "Email Support", "PDF Export"],
     cta: "Get Started",
   },
   {
     name: "Professional",
     desc: "Great for growing businesses",
-    price: "1",
+    price: "199",
     suffix: "/mo",
     features: ["10 Domain Scans", "Detailed Reports", "Priority Support", "API Access"],
     cta: "Get Started",
@@ -392,23 +392,23 @@ export default function LandingPage() {
               </button>
               <button className="demo-btn" type="button">
                 <span>View Demo</span>
-                <span className="play">&gt;</span>
+                <span className="play">▶</span>
               </button>
             </div>
 
             <div className="proof-grid">
               <div>
-                <span className="proof-icon">OK</span>
+                <span className="proof-icon">✓</span>
                 <strong>Accurate Scanning</strong>
                 <small>Advanced detection engine</small>
               </div>
               <div>
-                <span className="proof-icon amber">!</span>
+                <span className="proof-icon amber">⚡</span>
                 <strong>Fast &amp; Reliable</strong>
                 <small>Scan websites in minutes</small>
               </div>
               <div>
-                <span className="proof-icon yellow">L</span>
+                <span className="proof-icon yellow">🔒</span>
                 <strong>Secure &amp; Private</strong>
                 <small>Your data is fully protected</small>
               </div>
@@ -421,12 +421,12 @@ export default function LandingPage() {
         <section className="trusted" aria-label="Trusted by companies">
           <p>Trusted by 10,000+ companies worldwide</p>
           <div className="logos">
-            <span>TechCorp</span>
-            <span>DevStudio</span>
-            <span>WebSecure</span>
-            <span>AppShield</span>
-            <span>DataGuard</span>
-            <span>CloudNet</span>
+            <span>Fortune 500</span>
+            <span>Startups</span>
+            <span>Enterprises</span>
+            <span>Agencies</span>
+            <span>Dev Teams</span>
+            <span>SaaS Companies</span>
           </div>
         </section>
 
@@ -528,7 +528,7 @@ export default function LandingPage() {
             <div className="testimonial-grid">
               {testimonials.map((item) => (
                 <article className="testimonial-card" key={item.name}>
-                  <div className="stars">*****</div>
+                  <div className="stars">★★★★★</div>
                   <p>{item.quote}</p>
                   <div className="customer">
                     <span>{item.avatar}</span>
@@ -558,7 +558,7 @@ export default function LandingPage() {
             <h2>Stay Updated with Security Insights</h2>
             <p>Get the latest security tips, vulnerability alerts, and product updates.</p>
           </div>
-          <form className="subscribe-form">
+          <form className="subscribe-form" onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing!'); }}>
             <input type="email" placeholder="Enter your email address" aria-label="Email address" />
             <button className="start-btn" type="submit">
               Subscribe
@@ -577,10 +577,10 @@ export default function LandingPage() {
                 assets.
               </p>
               <div className="social-links" aria-label="Social links">
-                <a href="#">x</a>
-                <a href="#">in</a>
-                <a href="#">gh</a>
-                <a href="#">yt</a>
+                <a href="#" aria-label="Twitter">𝕏</a>
+                <a href="#" aria-label="LinkedIn">in</a>
+                <a href="#" aria-label="GitHub">⌥</a>
+                <a href="#" aria-label="YouTube">▶</a>
               </div>
             </div>
 
@@ -597,7 +597,7 @@ export default function LandingPage() {
           </div>
 
           <div className="footer-bottom">
-            <span>© 2024 SecureScan. All rights reserved.</span>
+            <span>© 2025 Breach Radar. All rights reserved.</span>
             <span>Made with love for a more secure web</span>
           </div>
         </div>

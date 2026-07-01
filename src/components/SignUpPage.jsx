@@ -15,8 +15,7 @@ function AuthErrorMessage({ message }) {
       className="auth-error-message"
       style={{
         color: "#ef4444",
-        backgroundColor: "#fef2f2",
-        border: "1px solid #fee2e2",
+        backgroundColor: "rgba(239,68,68,0.1)",
         padding: "0.75rem",
         borderRadius: "0.375rem",
         marginBottom: "1rem",
@@ -77,7 +76,7 @@ export default function SignUpPage() {
         return;
       }
 
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       setError(getErrorMessage(err, "Registration failed"));
     } finally {
@@ -89,7 +88,7 @@ export default function SignUpPage() {
     <form className="signin-card signup-card" onSubmit={handleSubmit}>
       <div className="form-lock form-user-add"></div>
       <h2>Create Account</h2>
-      <p>Join SecureScan and start your security journey today.</p>
+      <p>Join Breach Radar and start your security journey today.</p>
 
       <label className="field-label" htmlFor="fullName">
         Full Name
@@ -167,7 +166,7 @@ export default function SignUpPage() {
         />
         <span></span>
         <strong>
-          I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
         </strong>
       </label>
 
@@ -192,14 +191,8 @@ export default function SignUpPage() {
       </div>
 
       <div className="social-login">
-        <button type="button">
+        <button type="button" onClick={() => window.location.href = 'https://breach-radar-backend.onrender.com/api/v1/auth/google'}>
           <span className="google">G</span>Google
-        </button>
-        <button type="button">
-          <span className="github">GH</span>GitHub
-        </button>
-        <button type="button">
-          <span className="microsoft"></span>Microsoft
         </button>
       </div>
 
