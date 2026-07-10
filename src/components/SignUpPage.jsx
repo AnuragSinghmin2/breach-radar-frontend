@@ -76,7 +76,11 @@ export default function SignUpPage() {
         return;
       }
 
-      navigate("/dashboard", { replace: true });
+      // Show verification message instead of redirecting to dashboard
+      navigate("/check-email", {
+        replace: true,
+        state: { email: email.trim() }
+      });
     } catch (err) {
       setError(getErrorMessage(err, "Registration failed"));
     } finally {

@@ -84,6 +84,13 @@ export default function SignInPage() {
       });
       navigate(destination, { replace: true });
     } catch (err) {
+      // Email not verified — redirect to check email page
+      if (err?.code === 'EMAIL_NOT_VERIFIED' || err?.message?.includes('verify your email')) {
+        navigate("/check-email", {
+          state: { email: formData.email }
+        });
+        return;
+      }
       setError(getErrorMessage(err, "Login failed"));
     } finally {
       setLoading(false);

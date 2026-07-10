@@ -10,6 +10,8 @@ import PublicAuthRoute from "./components/PublicAuthRoute";
 import SignInPage from "./components/SignInPage";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import ResetPasswordPage from "./components/ResetPasswordPage";
+import EmailverifyPage from "./components/EmailverifyPage";
+import CheckMail from "./components/CheckMail";
 import GoogleAuthSuccessPage from "./pages/GoogleAuthSuccessPage";
 import Domains from "./components/Domains";
 import Scans from "./components/Scans";
@@ -75,6 +77,10 @@ function App() {
 
       {/* NEW — Google OAuth Success Handler */}
       <Route path="/auth/google/success" element={<GoogleAuthSuccessPage />} />
+
+      {/* NEW — Email Verification Routes */}
+      <Route path="/verify-email" element={<EmailverifyPage />} />
+      <Route path="/check-email" element={<CheckMail />} />
 
       {/* NEW — Password Reset Routes */}
       <Route
