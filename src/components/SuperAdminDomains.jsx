@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { Globe, Shield, RefreshCw, AlertTriangle, ShieldCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Globe, RefreshCw } from "lucide-react";
 import "./SuperAdmin.css";
+
+const DOMAINS_PER_PAGE = 8;
 
 export default function SuperAdminDomains() {
   const [domains, setDomains] = useState([]);
@@ -10,6 +12,7 @@ export default function SuperAdminDomains() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [scanningId, setScanningId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadDomains = async () => {
     try {
@@ -24,8 +27,33 @@ export default function SuperAdminDomains() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     loadDomains();
   }, [search, status]);
+
+  const totalPages = Math.max(1, Math.ceil(domains.length / DOMAINS_PER_PAGE));
+  const paginatedDomains = useMemo(() => {
+    const start = (currentPage - 1) * DOMAINS_PER_PAGE;
+    return domains.slice(start, start + DOMAINS_PER_PAGE);
+  }, [currentPage, domains]);
+  const pageNumbers = useMemo(() => {
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+    const start = Math.max(
+      1,
+      Math.min(currentPage - halfWindow, totalPages - maxVisiblePages + 1)
+    );
+    const end = Math.min(totalPages, start + maxVisiblePages - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [currentPage, totalPages]);
+  const showPagination = domains.length > DOMAINS_PER_PAGE;
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handleForceScan = async (domainId) => {
     try {
@@ -67,7 +95,7 @@ export default function SuperAdminDomains() {
         {loading ? (
           <div className="sa-empty" style={{ color: "#00d68f" }}>Loading domain records...</div>
         ) : (
-          <div className="sa-table-wrapper">
+          <div className={`sa-table-wrapper ${showPagination ? "sa-domains-table-wrapper" : ""}`}>
             <table className="sa-table">
               <thead>
                 <tr>
@@ -86,7 +114,7 @@ export default function SuperAdminDomains() {
                     <td colSpan={7} style={{ textAlign: "center" }} className="sa-empty">No domains found matching criteria.</td>
                   </tr>
                 ) : (
-                  domains.map((d) => {
+                  paginatedDomains.map((d) => {
                     const owner = d.workspaceId?.owner;
                     const workspaceName = d.workspaceId?.name || "N/A";
                     const isVerified = d.verificationStatus === "verified";
@@ -134,6 +162,38 @@ export default function SuperAdminDomains() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!loading && showPagination && (
+          <div className="sa-pagination">
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            >
+              <ChevronLeft size={14} /> Previous
+            </button>
+            <div>
+              {pageNumbers.map((page) => (
+                <button
+                  className={page === currentPage ? "active" : ""}
+                  type="button"
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  aria-current={page === currentPage ? "page" : undefined}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            >
+              Next <ChevronRight size={14} />
+            </button>
           </div>
         )}
       </div>

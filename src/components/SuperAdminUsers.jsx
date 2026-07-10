@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { Edit2, Trash2, Shield, UserX, UserCheck, ShieldAlert, Award } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit2, Trash2, UserX, UserCheck } from "lucide-react";
 import "./SuperAdmin.css";
+
+const USERS_PER_PAGE = 8;
 
 export default function SuperAdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [plans, setPlans] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Search & Filter state
   const [search, setSearch] = useState("");
@@ -42,9 +45,34 @@ export default function SuperAdminUsers() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     loadData();
     loadPlans();
   }, [search, role, status]);
+
+  const totalPages = Math.max(1, Math.ceil(users.length / USERS_PER_PAGE));
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * USERS_PER_PAGE;
+    return users.slice(start, start + USERS_PER_PAGE);
+  }, [currentPage, users]);
+  const pageNumbers = useMemo(() => {
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+    const start = Math.max(
+      1,
+      Math.min(currentPage - halfWindow, totalPages - maxVisiblePages + 1)
+    );
+    const end = Math.min(totalPages, start + maxVisiblePages - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [currentPage, totalPages]);
+  const showPagination = users.length > USERS_PER_PAGE;
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const toggleStatus = async (id, currentStatus) => {
     const nextStatus = currentStatus === "active" ? "suspended" : "active";
@@ -127,7 +155,7 @@ export default function SuperAdminUsers() {
         {loading ? (
           <div className="sa-empty" style={{ color: "#00d68f" }}>Loading user accounts...</div>
         ) : (
-          <div className="sa-table-wrapper">
+          <div className={`sa-table-wrapper ${showPagination ? "sa-users-table-wrapper" : ""}`}>
             <table className="sa-table">
               <thead>
                 <tr>
@@ -148,7 +176,7 @@ export default function SuperAdminUsers() {
                     <td colSpan={9} style={{ textAlign: "center" }} className="sa-empty">No users found matching query filters.</td>
                   </tr>
                 ) : (
-                  users.map((u) => (
+                  paginatedUsers.map((u) => (
                     <tr key={u._id}>
                       <td>{u.profile?.name || "N/A"}</td>
                       <td>{u.email}</td>
@@ -203,6 +231,38 @@ export default function SuperAdminUsers() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!loading && showPagination && (
+          <div className="sa-pagination">
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            >
+              <ChevronLeft size={14} /> Previous
+            </button>
+            <div>
+              {pageNumbers.map((page) => (
+                <button
+                  className={page === currentPage ? "active" : ""}
+                  type="button"
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  aria-current={page === currentPage ? "page" : undefined}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            >
+              Next <ChevronRight size={14} />
+            </button>
           </div>
         )}
       </div>

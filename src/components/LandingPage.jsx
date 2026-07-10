@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  Search, FileText, Activity, Zap, Users, ShieldCheck,
+  Globe, Target, BarChart2, Lock,
+  CheckCircle
+} from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import Footer from "./Footer";
+import LandingNavbar from "./LandingNavbar";
 import "./LandingPage.css";
 
 const metrics = [
@@ -20,37 +26,37 @@ const rows = [
 
 const features = [
   {
-    icon: "scan",
+    icon: Search,
     title: "Comprehensive Scanning",
     text: "Scan your entire web application for 1000+ security vulnerabilities with our advanced scanning engine.",
     tone: "green",
   },
   {
-    icon: "doc",
+    icon: FileText,
     title: "Detailed Reports",
     text: "Get in-depth reports with actionable insights, fix recommendations, and risk assessment.",
     tone: "purple",
   },
   {
-    icon: "chart",
+    icon: Activity,
     title: "Real-time Monitoring",
     text: "Continuous monitoring and instant alerts for new vulnerabilities and security threats.",
     tone: "blue",
   },
   {
-    icon: "shield",
+    icon: Zap,
     title: "Easy Integration",
     text: "Seamlessly integrate with your existing CI/CD pipeline and development workflow.",
     tone: "yellow",
   },
   {
-    icon: "team",
+    icon: Users,
     title: "Team Management",
     text: "Manage your team, set permissions, security collaboration, and improve threats.",
     tone: "pink",
   },
   {
-    icon: "compliance",
+    icon: ShieldCheck,
     title: "Compliance Ready",
     text: "Meet industry compliance standards with automated compliance checking and accurate.",
     tone: "cyan",
@@ -60,25 +66,25 @@ const features = [
 const processSteps = [
   {
     number: "01",
-    icon: "domain",
+    icon: Globe,
     title: "Add Your Domain",
     text: "Enter your domain and verify ownership using our simple verification methods.",
   },
   {
     number: "02",
-    icon: "target",
+    icon: Target,
     title: "Start Scanning",
     text: "Our AI-powered scanner analyzes your website for vulnerabilities.",
   },
   {
     number: "03",
-    icon: "results",
+    icon: BarChart2,
     title: "Get Results",
     text: "Receive detailed reports with security score and vulnerability details.",
   },
   {
     number: "04",
-    icon: "secure",
+    icon: Lock,
     title: "Fix & Secure",
     text: "Follow our recommendations to fix issues and secure your app/domain.",
   },
@@ -86,52 +92,44 @@ const processSteps = [
 
 const pricingPlans = [
   {
-    name: "Starter",
-    desc: "Perfect for small websites",
-    price: "99",
+    name: "Free",
+    desc: "Perfect for individuals getting started",
+    price: "0",
     suffix: "/mo",
-    features: ["1 Domain Scan", "Basic Vulnerability Report", "Email Support", "PDF Export"],
+    features: ["1 User Seat", "1 Verified Domain", "2 Scans / month", "Basic Reports", "Community Support"],
+    cta: "Get Started Free",
+  },
+  {
+    name: "Starter",
+    desc: "Perfect for small websites & startups",
+    price: "999",
+    suffix: "/mo",
+    features: ["3 User Seats", "5 Verified Domains", "30 Scans / month", "Email Alerts", "Standard Support", "Basic API Access"],
     cta: "Get Started",
   },
   {
     name: "Professional",
     desc: "Great for growing businesses",
-    price: "199",
+    price: "2,999",
     suffix: "/mo",
-    features: ["10 Domain Scans", "Detailed Reports", "Priority Support", "API Access"],
+    popular: true,
+    features: ["10 User Seats", "25 Verified Domains", "200 Scans / month", "Continuous Monitoring", "Full API Access", "Priority Support", "Compliance Reports"],
     cta: "Get Started",
   },
   {
     name: "Enterprise",
     desc: "For large organizations",
-    price: "999",
-    suffix: "/month",
-    popular: true,
-    features: [
-      "Unlimited Scans",
-      "Advanced Reports",
-      "Real-time Monitoring",
-      "Team Access",
-      "API Access",
-      "Priority Support",
-    ],
+    price: "9,999",
+    suffix: "/mo",
+    features: ["Unlimited User Seats", "Unlimited Domains", "Unlimited Scans", "Custom Scanning Agents", "SAML SSO Integration", "Dedicated TAM", "Custom Integrations"],
     cta: "Get Started",
-  },
-  {
-    name: "Custom",
-    desc: "For your custom needs",
-    price: "Contact Us",
-    suffix: "",
-    features: ["Custom Scans", "Dedicated Support", "SLA Guarantee", "Custom Integration"],
-    cta: "Contact Sales",
-    custom: true,
   },
 ];
 
 const testimonials = [
   {
     quote:
-      "SecureScan helped us identify critical vulnerabilities that could have been exploited. The reports are detailed and easy to understand.",
+      "PentestRadar helped us identify critical vulnerabilities that could have been exploited. The reports are detailed and easy to understand.",
     name: "Rahul Sharma",
     role: "CTO, TechCorp",
     avatar: "RS",
@@ -149,33 +147,6 @@ const testimonials = [
     name: "Amit Kumar",
     role: "Founder, WebSecure",
     avatar: "AK",
-  },
-];
-
-const navDropdowns = [
-  {
-    title: "Solutions",
-    items: [
-      { icon: "web", title: "Web Applications", text: "Scan apps, portals, and dashboards" },
-      { icon: "shop", title: "E-commerce", text: "Protect checkouts and storefronts" },
-      { icon: "api", title: "API Security", text: "Find risks across public APIs" },
-    ],
-  },
-  {
-    title: "Resources",
-    items: [
-      { icon: "blog", title: "Blog", text: "Security updates and product notes" },
-      { icon: "docs", title: "Documentation", text: "Guides, setup, and API reference" },
-      { icon: "guide", title: "Security Guide", text: "Best practices for safer releases" },
-    ],
-  },
-  {
-    title: "Company",
-    items: [
-      { icon: "about", title: "About Us", text: "Meet the SecureScan team" },
-      { icon: "careers", title: "Careers", text: "Build security tools with us" },
-      { icon: "contact", title: "Contact Us", text: "Talk to sales or support" },
-    ],
   },
 ];
 
@@ -312,66 +283,10 @@ export default function LandingPage() {
     }, 100);
   }, [location.hash]);
 
-  function handleSectionClick(event, sectionId) {
-    event.preventDefault();
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-    window.history.replaceState(null, "", `/#${sectionId}`);
-  }
-
   return (
     <main className="scan-page">
       <div className="scan-shell">
-        <nav className="navbar" aria-label="Primary navigation">
-          <a
-            className="brand"
-            href="/"
-            onClick={(event) => {
-              event.preventDefault();
-              navigate("/");
-            }}
-          >
-            <BrandLogo iconSize={22} />
-          </a>
-
-          <div className="nav-links">
-            <a href="#features" onClick={(event) => handleSectionClick(event, "features")}>
-              Features
-            </a>
-            <a href="#how-it-works" onClick={(event) => handleSectionClick(event, "how-it-works")}>
-              How It Works
-            </a>
-            <a href="#pricing" onClick={(event) => handleSectionClick(event, "pricing")}>
-              Pricing
-            </a>
-            {navDropdowns.map((dropdown) => (
-              <div className="nav-dropdown" key={dropdown.title}>
-                <button className="dropdown-trigger" type="button">
-                  {dropdown.title}
-                </button>
-                <div className="nav-menu">
-                  {dropdown.items.map((item) => (
-                    <a className="nav-menu-item" href="#" key={item.title}>
-                      <span className={`menu-icon ${item.icon}`}></span>
-                      <span>
-                        <strong>{item.title}</strong>
-                        <small>{item.text}</small>
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="nav-actions">
-            <button className="login" type="button" onClick={() => navigate("/login")}>
-              Log in
-            </button>
-            <button className="start-btn small" type="button" onClick={() => navigate("/register")}>
-              Get Started
-            </button>
-          </div>
-        </nav>
+        <LandingNavbar />
 
         <section className="hero-section">
           <div className="hero-copy">
@@ -398,17 +313,23 @@ export default function LandingPage() {
 
             <div className="proof-grid">
               <div>
-                <span className="proof-icon">✓</span>
+                <span className="proof-icon">
+                  <CheckCircle size={18} color="#16e095" strokeWidth={2} />
+                </span>
                 <strong>Accurate Scanning</strong>
                 <small>Advanced detection engine</small>
               </div>
               <div>
-                <span className="proof-icon amber">⚡</span>
+                <span className="proof-icon amber">
+                  <Zap size={18} color="#f59e0b" strokeWidth={2} />
+                </span>
                 <strong>Fast &amp; Reliable</strong>
                 <small>Scan websites in minutes</small>
               </div>
               <div>
-                <span className="proof-icon yellow">🔒</span>
+                <span className="proof-icon yellow">
+                  <Lock size={18} color="#eab308" strokeWidth={2} />
+                </span>
                 <strong>Secure &amp; Private</strong>
                 <small>Your data is fully protected</small>
               </div>
@@ -437,18 +358,20 @@ export default function LandingPage() {
             <p>Powerful tools to identify, analyze, and fix security vulnerabilities</p>
 
             <div className="features-grid">
-              {features.map((feature) => (
-                <article className="feature-card" key={feature.title}>
-                  <span className={`feature-icon ${feature.tone} ${feature.icon}`}>
-                    <span></span>
-                  </span>
-                  <div>
-                    <h3>{feature.title}</h3>
-                    <p>{feature.text}</p>
-                    <a href="#">Learn more <span>+</span></a>
-                  </div>
-                </article>
-              ))}
+              {features.map((feature) => {
+                const IconComponent = feature.icon;
+                return (
+                  <article className="feature-card" key={feature.title}>
+                    <span className={`feature-icon ${feature.tone}`}>
+                      <IconComponent size={26} strokeWidth={1.8} />
+                    </span>
+                    <div>
+                      <h3>{feature.title}</h3>
+                      <p>{feature.text}</p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -459,16 +382,19 @@ export default function LandingPage() {
           <p>Get started with security scanning in minutes</p>
 
           <div className="process-grid">
-            {processSteps.map((step) => (
-              <article className="process-card" key={step.number}>
-                <span className="step-badge">{step.number}</span>
-                <span className={`process-icon ${step.icon}`}>
-                  <span></span>
-                </span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </article>
-            ))}
+            {processSteps.map((step) => {
+              const IconComponent = step.icon;
+              return (
+                <article className="process-card" key={step.number}>
+                  <span className="step-badge">{step.number}</span>
+                  <span className="process-icon">
+                    <IconComponent size={28} strokeWidth={1.8} />
+                  </span>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -552,20 +478,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="newsletter-section" aria-label="Security insights subscription">
-          <div className="mail-icon"></div>
-          <div>
-            <h2>Stay Updated with Security Insights</h2>
-            <p>Get the latest security tips, vulnerability alerts, and product updates.</p>
-          </div>
-          <form className="subscribe-form" onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing!'); }}>
-            <input type="email" placeholder="Enter your email address" aria-label="Email address" />
-            <button className="start-btn" type="submit">
-              Subscribe
-            </button>
-          </form>
-        </section>
-
         <div className="landing-footer-hidden" aria-hidden="true">
           <div className="footer-top">
             <div className="footer-brand">
@@ -577,10 +489,18 @@ export default function LandingPage() {
                 assets.
               </p>
               <div className="social-links" aria-label="Social links">
-                <a href="#" aria-label="Twitter">𝕏</a>
-                <a href="#" aria-label="LinkedIn">in</a>
-                <a href="#" aria-label="GitHub">⌥</a>
-                <a href="#" aria-label="YouTube">▶</a>
+                <a href="#" aria-label="Twitter">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="#" aria-label="LinkedIn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+                <a href="#" aria-label="GitHub">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+                <a href="#" aria-label="YouTube">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </a>
               </div>
             </div>
 
@@ -597,7 +517,7 @@ export default function LandingPage() {
           </div>
 
           <div className="footer-bottom">
-            <span>© 2025 Breach Radar. All rights reserved.</span>
+            <span>© 2025 PentestRadar. All rights reserved.</span>
             <span>Made with love for a more secure web</span>
           </div>
         </div>

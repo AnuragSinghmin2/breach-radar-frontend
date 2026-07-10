@@ -19,7 +19,7 @@ const guideSteps = [
   {
     icon: Tag,
     title: "Meta Tag",
-    text: "Place the secure scan meta tag inside your site head.",
+    text: "Place the PentestRadar verification meta tag inside your site head.",
   },
 ];
 

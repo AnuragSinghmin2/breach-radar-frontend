@@ -161,7 +161,7 @@ export default function SuperAdminTickets() {
               <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", padding: "10px", maxHeight: "380px" }}>
                 {activeTicket.messages?.map((msg, idx) => {
                   // If senderId matches user profile, it's support message. Let's color accordingly
-                  const isAgent = msg.senderId === activeTicket.assignedTo?._id || msg.senderName === "Breach Radar Super Admin" || msg.senderName === "Support Agent" || msg.senderName.includes("Super Admin");
+                  const isAgent = msg.senderId === activeTicket.assignedTo?._id || msg.senderName === "PentestRadar Super Admin" || msg.senderName === "Breach Radar Super Admin" || msg.senderName === "Support Agent" || msg.senderName.includes("Super Admin");
                   return (
                     <div
                       key={idx}

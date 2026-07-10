@@ -120,7 +120,7 @@ export default function InviteAcceptPage() {
       <section className="invite-shell">
         <div className="invite-brand">
           <ShieldCheck size={30} />
-          <span>Breach Radar</span>
+          <span>PentestRadar</span>
         </div>
 
         {loading || isLoading ? (
@@ -129,7 +129,7 @@ export default function InviteAcceptPage() {
           <div className="invite-card">
             <div className="invite-icon"><Mail size={28} /></div>
             <h1>Team Invitation</h1>
-            <p>{inviterEmail} invited you to join {invitation.organization?.name} on Breach Radar.</p>
+            <p>{inviterEmail} invited you to join {invitation.organization?.name} on PentestRadar.</p>
 
             <dl className="invite-details">
               <div><dt>Inviter</dt><dd>{inviterEmail}</dd></div>

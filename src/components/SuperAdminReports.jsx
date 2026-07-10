@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { FileText, Download, CheckCircle, RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, Download, RefreshCw } from "lucide-react";
 import "./SuperAdmin.css";
+
+const REPORTS_PER_PAGE = 8;
 
 export default function SuperAdminReports() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadReports = async () => {
     try {
@@ -23,6 +26,27 @@ export default function SuperAdminReports() {
   useEffect(() => {
     loadReports();
   }, []);
+
+  const totalPages = Math.max(1, Math.ceil(reports.length / REPORTS_PER_PAGE));
+  const paginatedReports = useMemo(() => {
+    const start = (currentPage - 1) * REPORTS_PER_PAGE;
+    return reports.slice(start, start + REPORTS_PER_PAGE);
+  }, [currentPage, reports]);
+  const pageNumbers = useMemo(() => {
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+    const start = Math.max(1, Math.min(currentPage - halfWindow, totalPages - maxVisiblePages + 1));
+    const end = Math.min(totalPages, start + maxVisiblePages - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [currentPage, totalPages]);
+  const showPagination = reports.length > REPORTS_PER_PAGE;
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const downloadReportSample = (reportName) => {
     const csv = [
@@ -56,7 +80,7 @@ export default function SuperAdminReports() {
         {loading ? (
           <div className="sa-empty" style={{ color: "#00d68f" }}>Loading reports...</div>
         ) : (
-          <div className="sa-table-wrapper">
+          <div className={`sa-table-wrapper ${showPagination ? "sa-admin-table-paginated" : ""}`}>
             <table className="sa-table">
               <thead>
                 <tr>
@@ -74,7 +98,7 @@ export default function SuperAdminReports() {
                     <td colSpan={6} style={{ textAlign: "center" }} className="sa-empty">No reports have been generated yet.</td>
                   </tr>
                 ) : (
-                  reports.map((r) => (
+                  paginatedReports.map((r) => (
                     <tr key={r._id}>
                       <td style={{ fontWeight: 600, color: "#f8fafc" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -108,6 +132,24 @@ export default function SuperAdminReports() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!loading && showPagination && (
+          <div className="sa-pagination">
+            <button type="button" disabled={currentPage === 1} onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}>
+              <ChevronLeft size={14} /> Previous
+            </button>
+            <div>
+              {pageNumbers.map((page) => (
+                <button className={page === currentPage ? "active" : ""} type="button" key={page} onClick={() => setCurrentPage(page)} aria-current={page === currentPage ? "page" : undefined}>
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button type="button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}>
+              Next <ChevronRight size={14} />
+            </button>
           </div>
         )}
       </div>

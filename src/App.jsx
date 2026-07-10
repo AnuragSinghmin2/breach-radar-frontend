@@ -1,5 +1,8 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
+import AboutUsPage from "./pages/AboutUsPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import RefundPolicyPage from "./pages/RefundPolicyPage";
+import TermsOfServicePage from "./pages/TermsOfServicePage";
 import AppLayout from "./components/AppLayout";
 import UserRoute from "./components/UserRoute";
 import SuperAdminRoute from "./components/SuperAdminRoute";
@@ -47,6 +50,10 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/about" element={<AboutUsPage />} />
+<Route path="/privacy" element={<PrivacyPolicyPage />} />
+<Route path="/refund-policy" element={<RefundPolicyPage />} />
+<Route path="/terms-of-service" element={<TermsOfServicePage />} />
       <Route path="/invite/:token" element={<InviteAcceptPage />} />
 
       <Route

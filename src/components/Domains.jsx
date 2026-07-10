@@ -16,6 +16,10 @@ import {
   Copy,
   Check,
   AlertCircle,
+  FileText,
+  Pencil,
+  PlayCircle,
+  Trash2,
   X,
 } from "lucide-react";
 import "./Domains.css";
@@ -28,6 +32,7 @@ const severityLabels = [
 ];
 
 const statusOptions = ["All Status", "Active", "Needs Attention"];
+const DOMAINS_PER_PAGE = 8;
 
 function totalVulnerabilities(item) {
   return Object.values(item.vulnerabilities).reduce((sum, value) => sum + value, 0);
@@ -56,6 +61,7 @@ export default function Domains() {
   const [activeMenu, setActiveMenu] = useState("");
   const [newDomain, setNewDomain] = useState("");
   const [message, setMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     function scrollToHash() {
@@ -141,6 +147,27 @@ export default function Domains() {
     });
   }, [criticalOnly, domains, query, statusFilter]);
 
+  const totalDomains = filteredDomains.length;
+  const totalPages = Math.max(1, Math.ceil(totalDomains / DOMAINS_PER_PAGE));
+  const paginatedDomains = useMemo(() => {
+    const start = (currentPage - 1) * DOMAINS_PER_PAGE;
+    return filteredDomains.slice(start, start + DOMAINS_PER_PAGE);
+  }, [currentPage, filteredDomains]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setActiveMenu("");
+  }, [query, statusFilter, criticalOnly]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const startDomain = totalDomains === 0 ? 0 : (currentPage - 1) * DOMAINS_PER_PAGE + 1;
+  const endDomain = Math.min(currentPage * DOMAINS_PER_PAGE, totalDomains);
+
   function cycleStatusFilter() {
     const nextIndex = (statusOptions.indexOf(statusFilter) + 1) % statusOptions.length;
     setStatusFilter(statusOptions[nextIndex]);
@@ -178,14 +205,37 @@ export default function Domains() {
     }
   }
 
-  async function toggleDomainStatus(domainItem) {
-    try {
-      const updated = await domainApi.toggleDomainStatus(domainItem._id);
-      await refreshDomains();
+  async function editDomain(domainItem) {
+    const value = window.prompt("Edit domain", domainItem.domain)?.trim().toLowerCase();
+
+    if (!value || value === domainItem.domain) {
       setActiveMenu("");
-      setMessage(`${updated.domain} is now ${updated.status}.`);
+      return;
+    }
+
+    try {
+      await domainApi.updateDomain(domainItem._id, { domain: value, tag: domainItem.tag });
+      await Promise.all([refreshDomains(), refreshStats()]);
+      setActiveMenu("");
+      setMessage(`${domainItem.domain} updated to ${value}.`);
     } catch (error) {
-      setMessage(error.response?.data?.message || "Failed to update domain status.");
+      setMessage(error.response?.data?.message || "Failed to update domain.");
+    }
+  }
+
+  async function deleteDomain(domainItem) {
+    if (!window.confirm(`Delete ${domainItem.domain}? This cannot be undone.`)) {
+      setActiveMenu("");
+      return;
+    }
+
+    try {
+      await domainApi.deleteDomain(domainItem._id);
+      await Promise.all([refreshDomains(), refreshStats()]);
+      setActiveMenu("");
+      setMessage(`${domainItem.domain} deleted.`);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to delete domain.");
     }
   }
 
@@ -252,6 +302,31 @@ export default function Domains() {
 
       {loading && <div className="domains-message">Loading domains...</div>}
       {message && <div className="domains-message">{message}</div>}
+       <section className="domains-upgrade" id="add-domain">
+        <div className="upgrade-copy">
+          <span className="upgrade-icon">
+            <ShieldCheck size={34} />
+          </span>
+          <div>
+            <h3>Add More Domains</h3>
+            <p>Monitor more domains and enhance your security coverage.</p>
+          </div>
+        </div>
+        <form className="domain-add-form" onSubmit={addDomain}>
+          <input
+            type="text"
+            placeholder="newdomain.com"
+            value={newDomain}
+            onChange={(event) => setNewDomain(event.target.value)}
+          />
+          <button className="outline" type="button" onClick={() => navigate("/dashboard/settings/plan-billing")}>
+            Upgrade Plan
+          </button>
+          <button className="primary" type="submit">
+            Add Domain
+          </button>
+        </form>
+      </section>
 
       <section className="domains-panel">
         <div className="domains-panel-header">
@@ -289,30 +364,31 @@ export default function Domains() {
                 <th>Status</th>
                 <th>Security Score</th>
                 <th>Vulnerabilities</th>
-                <th>Last Scan</th>
-                <th>Actions</th>
+                <th className="domain-actions-heading">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredDomains.map((item) => (
+              {paginatedDomains.map((item, index) => (
                 <tr key={item.domain}>
                   <td>
-                    <button
-                      className="domain-name-cell domain-name-button"
-                      type="button"
-                      onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
-                    >
-                      <span className={`domain-row-icon ${item.iconTone}`}>
-                        <Globe2 size={23} />
-                      </span>
-                      <span>
-                        <strong>
-                          {item.domain}
-                          {item.tag && <em>{item.tag}</em>}
-                        </strong>
-                        <small>{item.added}</small>
-                      </span>
-                    </button>
+                    <div className="domain-name-cell">
+                      <button
+                        className="domain-name-button"
+                        type="button"
+                        onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
+                      >
+                        <span className={`domain-row-icon ${item.iconTone}`}>
+                          <Globe2 size={23} />
+                        </span>
+                        <span className="domain-name-copy">
+                          <strong title={item.domain}>
+                            <span>{item.domain}</span>
+                            {item.tag && <em>{item.tag}</em>}
+                          </strong>
+                          <small>{item.added}</small>
+                        </span>
+                      </button>
+                    </div>
                   </td>
                   <td>
                     <div className={`domain-status ${item.status === "Needs Attention" ? "warning" : item.status === "Inactive" ? "inactive-row" : ""}`}>
@@ -347,34 +423,12 @@ export default function Domains() {
                     </div>
                   </td>
                   <td>
-                    <div className="last-scan">
-                      <strong>{item.date}</strong>
-                      <small>{item.ago}</small>
-                      {item.verificationStatus === "verified" && (
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
-                        >
-                          View Report
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                  <td>
                     <div className="domain-actions">
-                      {item.verificationStatus === "verified" ? (
-                        <button type="button" onClick={() => scanDomain(item.domain)}>
-                          Scan Now
-                        </button>
-                      ) : (
-                        <button type="button" className="verify-button-action" onClick={() => openVerification(item)}>
-                          Verify Domain
-                        </button>
-                      )}
                       <button
                         className="domain-menu-trigger"
                         type="button"
                         aria-label={`More actions for ${item.domain}`}
+                        aria-expanded={activeMenu === item.domain}
                         onClick={() =>
                           setActiveMenu((current) => (current === item.domain ? "" : item.domain))
                         }
@@ -382,20 +436,32 @@ export default function Domains() {
                         <EllipsisVertical size={19} />
                       </button>
                       {activeMenu === item.domain && (
-                        <div className="domain-row-menu">
+                        <div className={`domain-row-menu ${index >= paginatedDomains.length - 2 ? "open-up" : ""}`}>
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/dashboard/domains?domain=${encodeURIComponent(item.domain)}`)}
+                          >
+                            <Globe2 size={15} />
+                            <span>View Details</span>
+                          </button>
+                          <button type="button" onClick={() => scanDomain(item.domain)}>
+                            <PlayCircle size={15} />
+                            <span>Scan Now</span>
+                          </button>
                           <button
                             type="button"
                             onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
                           >
-                            View Details
+                            <FileText size={15} />
+                            <span>View Reports</span>
                           </button>
-                          {item.verificationStatus === "verified" && (
-                            <button type="button" onClick={() => toggleDomainStatus(item)}>
-                              {item.status === "Active" ? "Pause Scanning" : "Enable Scanning"}
-                            </button>
-                          )}
-                          <button type="button" onClick={() => navigate("/dashboard/settings/scan-preferences")}>
-                            Scan Settings
+                          <button type="button" onClick={() => editDomain(item)}>
+                            <Pencil size={15} />
+                            <span>Edit Domain</span>
+                          </button>
+                          <button className="danger" type="button" onClick={() => deleteDomain(item)}>
+                            <Trash2 size={15} />
+                            <span>Delete Domain</span>
                           </button>
                         </div>
                       )}
@@ -405,7 +471,7 @@ export default function Domains() {
               ))}
               {filteredDomains.length === 0 && (
                 <tr>
-                  <td className="domains-empty" colSpan="6">
+                  <td className="domains-empty" colSpan="5">
                     No scan data available
                   </td>
                 </tr>
@@ -416,48 +482,39 @@ export default function Domains() {
 
         <div className="domains-pagination">
           <span>
-            Showing {filteredDomains.length ? 1 : 0} to {filteredDomains.length} of{" "}
-            {domains.length} domains
+            Showing {startDomain} to {endDomain} of {totalDomains} domains
           </span>
           <div>
-            <button type="button" aria-label="Previous page" disabled>
+            <button
+              type="button"
+              aria-label="Previous page"
+              disabled={currentPage === 1}
+              onClick={() => {
+                setCurrentPage((page) => Math.max(1, page - 1));
+                setActiveMenu("");
+              }}
+            >
               <ChevronLeft size={16} />
             </button>
             <button className="active" type="button">
-              1
+              {currentPage}
             </button>
-            <button type="button" aria-label="Next page" disabled>
+            <span>of {totalPages}</span>
+            <button
+              type="button"
+              aria-label="Next page"
+              disabled={currentPage === totalPages}
+              onClick={() => {
+                setCurrentPage((page) => Math.min(totalPages, page + 1));
+                setActiveMenu("");
+              }}
+            >
               <ChevronRight size={16} />
             </button>
           </div>
         </div>
       </section>
 
-      <section className="domains-upgrade" id="add-domain">
-        <div className="upgrade-copy">
-          <span className="upgrade-icon">
-            <ShieldCheck size={34} />
-          </span>
-          <div>
-            <h3>Add More Domains</h3>
-            <p>Monitor more domains and enhance your security coverage.</p>
-          </div>
-        </div>
-        <form className="domain-add-form" onSubmit={addDomain}>
-          <input
-            type="text"
-            placeholder="newdomain.com"
-            value={newDomain}
-            onChange={(event) => setNewDomain(event.target.value)}
-          />
-          <button className="outline" type="button" onClick={() => navigate("/dashboard/settings/plan-billing")}>
-            Upgrade Plan
-          </button>
-          <button className="primary" type="submit">
-            Add Domain
-          </button>
-        </form>
-      </section>
 
       {/* Premium Verification Modal */}
       {verifyModalDomain && (

@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { DollarSign, RefreshCcw, CheckCircle, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, DollarSign, CheckCircle, RotateCcw } from "lucide-react";
 import "./SuperAdmin.css";
+
+const PAYMENTS_PER_PAGE = 8;
 
 export default function SuperAdminPayments() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refundId, setRefundId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadPayments = async () => {
     try {
@@ -24,6 +27,29 @@ export default function SuperAdminPayments() {
   useEffect(() => {
     loadPayments();
   }, []);
+
+  const payments = data?.payments || [];
+  const summary = data?.summary || { totalRevenue: 0, succeededCount: 0, refundedCount: 0 };
+  const totalPages = Math.max(1, Math.ceil(payments.length / PAYMENTS_PER_PAGE));
+  const paginatedPayments = useMemo(() => {
+    const start = (currentPage - 1) * PAYMENTS_PER_PAGE;
+    return payments.slice(start, start + PAYMENTS_PER_PAGE);
+  }, [currentPage, payments]);
+  const pageNumbers = useMemo(() => {
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+    const start = Math.max(1, Math.min(currentPage - halfWindow, totalPages - maxVisiblePages + 1));
+    const end = Math.min(totalPages, start + maxVisiblePages - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [currentPage, totalPages]);
+  const showPagination = payments.length > PAYMENTS_PER_PAGE;
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handleRefund = async (id) => {
     if (!window.confirm("Are you sure you want to refund this payment transaction? This will mark the record as refunded and updates ARR metrics.")) return;
@@ -46,8 +72,6 @@ export default function SuperAdminPayments() {
   if (error) {
     return <div className="sa-empty" style={{ color: "#ef4444", textAlign: "center", padding: "40px" }}>{error}</div>;
   }
-
-  const { payments, summary } = data;
 
   return (
     <div className="sa-container">
@@ -82,7 +106,7 @@ export default function SuperAdminPayments() {
           <button className="sa-btn sa-btn-secondary" onClick={loadPayments}>Refresh Ledger</button>
         </div>
 
-        <div className="sa-table-wrapper">
+        <div className={`sa-table-wrapper ${showPagination ? "sa-admin-table-paginated" : ""}`}>
           <table className="sa-table">
             <thead>
               <tr>
@@ -101,7 +125,7 @@ export default function SuperAdminPayments() {
                   <td colSpan={7} style={{ textAlign: "center" }} className="sa-empty">No payments registered.</td>
                 </tr>
               ) : (
-                payments.map((p) => {
+                paginatedPayments.map((p) => {
                   const isRefunded = p.status === "refunded";
                   return (
                     <tr key={p._id}>
@@ -137,6 +161,23 @@ export default function SuperAdminPayments() {
             </tbody>
           </table>
         </div>
+        {showPagination && (
+          <div className="sa-pagination">
+            <button type="button" disabled={currentPage === 1} onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}>
+              <ChevronLeft size={14} /> Previous
+            </button>
+            <div>
+              {pageNumbers.map((page) => (
+                <button className={page === currentPage ? "active" : ""} type="button" key={page} onClick={() => setCurrentPage(page)} aria-current={page === currentPage ? "page" : undefined}>
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button type="button" disabled={currentPage === totalPages} onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}>
+              Next <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

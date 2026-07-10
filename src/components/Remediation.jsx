@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDashboard } from "../context/DashboardContext";
 import { vulnerabilityApi } from "../services/api";
@@ -43,6 +43,8 @@ const resources = [
   ["Secure Code Examples", "View secure code examples", Code2],
   ["OWASP Top 10", "Learn about OWASP Top 10", ShieldCheck],
 ];
+
+const ISSUES_PER_PAGE = 7;
 
 const severityMeta = {
   Critical: { priority: "High", eta: "2-4 hours", effort: "High", icon: ShieldX },
@@ -106,6 +108,7 @@ export default function Remediation() {
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [activeMenu, setActiveMenu] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [completedActions, setCompletedActions] = useState(["Use parameterized queries"]);
 
   const contextIssues = useMemo(
@@ -161,6 +164,27 @@ export default function Remediation() {
     });
   }, [issues, query, severityFilter, tab]);
 
+  const totalIssues = filteredIssues.length;
+  const totalPages = Math.max(1, Math.ceil(totalIssues / ISSUES_PER_PAGE));
+  const paginatedIssues = useMemo(() => {
+    const start = (currentPage - 1) * ISSUES_PER_PAGE;
+    return filteredIssues.slice(start, start + ISSUES_PER_PAGE);
+  }, [currentPage, filteredIssues]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setActiveMenu("");
+  }, [query, severityFilter, tab]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const startIssue = totalIssues === 0 ? 0 : (currentPage - 1) * ISSUES_PER_PAGE + 1;
+  const endIssue = Math.min(currentPage * ISSUES_PER_PAGE, totalIssues);
+
   async function updateStatus(target, status) {
     try {
       await vulnerabilityApi.updateVulnerabilityStatus(target.id, status);
@@ -187,7 +211,7 @@ export default function Remediation() {
     if (!selected) return;
 
     const text = [
-      "SecureScan Remediation Plan",
+      "PentestRadar Remediation Plan",
       `Selected Issue: ${selected.title}`,
       `Asset: ${selected.asset}${selected.path}`,
       `Status: ${selected.status}`,
@@ -261,7 +285,7 @@ export default function Remediation() {
                   <span>Vulnerability</span><span>Severity</span><span>Affected Asset</span><span>Status</span><span>Fix Priority</span><span>Actions</span>
                 </div>
 
-                {filteredIssues.map((issue) => (
+                {paginatedIssues.map((issue) => (
                   <div className="rem-issue-row" key={issue.id}>
                     <button className="rem-vuln-cell" type="button" onClick={() => setSelectedId(issue.id)}>
                       <IssueIcon issue={issue} />
@@ -299,11 +323,30 @@ export default function Remediation() {
             </div>
 
             <div className="rem-pagination">
-              <p>Showing {filteredIssues.length ? 1 : 0} to {filteredIssues.length} of {issues.length} vulnerabilities</p>
+              <p>Showing {startIssue} to {endIssue} of {totalIssues} vulnerabilities</p>
               <div>
-                <button type="button" disabled><ChevronLeft size={16} /></button>
-                <button className="active" type="button">1</button>
-                <button type="button" disabled><ChevronRight size={16} /></button>
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => {
+                    setCurrentPage((page) => Math.max(1, page - 1));
+                    setActiveMenu("");
+                  }}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button className="active" type="button">{currentPage}</button>
+                <span>of {totalPages}</span>
+                <button
+                  type="button"
+                  disabled={currentPage === totalPages}
+                  onClick={() => {
+                    setCurrentPage((page) => Math.min(totalPages, page + 1));
+                    setActiveMenu("");
+                  }}
+                >
+                  <ChevronRight size={16} />
+                </button>
               </div>
             </div>
           </section>

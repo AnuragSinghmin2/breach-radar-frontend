@@ -46,7 +46,7 @@ const navDropdowns = [
   {
     title: "Company",
     items: [
-      { icon: "about", title: "About Us", text: "Meet the SecureScan team" },
+      { icon: "about", title: "About Us", text: "Meet the PentestRadar team" },
       { icon: "careers", title: "Careers", text: "Build security tools with us" },
       { icon: "contact", title: "Contact Us", text: "Talk to sales or support" },
     ],
@@ -138,7 +138,7 @@ export default function AuthPageLayout({ children }) {
       </header>
 
       <main className="signin-page">
-        <section className="signin-info" aria-label="SecureScan overview">
+        <section className="signin-info" aria-label="PentestRadar overview">
           <div className="trust-badge">
             <span></span>
             Trusted by 10,000+ businesses worldwide

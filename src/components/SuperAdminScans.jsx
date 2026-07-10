@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { Play, Square, RefreshCw, Scan, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Square, RefreshCw } from "lucide-react";
 import "./SuperAdmin.css";
+
+const SCANS_PER_PAGE = 8;
 
 export default function SuperAdminScans() {
   const [scans, setScans] = useState([]);
@@ -9,6 +11,7 @@ export default function SuperAdminScans() {
   const [error, setError] = useState("");
   const [status, setStatus] = useState("all");
   const [processingId, setProcessingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadScans = async () => {
     try {
@@ -23,8 +26,33 @@ export default function SuperAdminScans() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     loadScans();
   }, [status]);
+
+  const totalPages = Math.max(1, Math.ceil(scans.length / SCANS_PER_PAGE));
+  const paginatedScans = useMemo(() => {
+    const start = (currentPage - 1) * SCANS_PER_PAGE;
+    return scans.slice(start, start + SCANS_PER_PAGE);
+  }, [currentPage, scans]);
+  const pageNumbers = useMemo(() => {
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+    const start = Math.max(
+      1,
+      Math.min(currentPage - halfWindow, totalPages - maxVisiblePages + 1)
+    );
+    const end = Math.min(totalPages, start + maxVisiblePages - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [currentPage, totalPages]);
+  const showPagination = scans.length > SCANS_PER_PAGE;
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const handleCancel = async (id) => {
     if (!window.confirm("Are you sure you want to force-cancel this active scan?")) return;
@@ -72,7 +100,7 @@ export default function SuperAdminScans() {
         {loading ? (
           <div className="sa-empty" style={{ color: "#00d68f" }}>Loading scans queue...</div>
         ) : (
-          <div className="sa-table-wrapper">
+          <div className={`sa-table-wrapper ${showPagination ? "sa-admin-table-paginated" : ""}`}>
             <table className="sa-table">
               <thead>
                 <tr>
@@ -91,7 +119,7 @@ export default function SuperAdminScans() {
                     <td colSpan={7} style={{ textAlign: "center" }} className="sa-empty">No scan records match filter status.</td>
                   </tr>
                 ) : (
-                  scans.map((s) => {
+                  paginatedScans.map((s) => {
                     const counts = s.vulnerabilitiesCount || { critical: 0, high: 0, medium: 0, low: 0 };
                     const isActive = s.status === "Queued" || s.status === "In Progress";
                     return (
@@ -142,6 +170,38 @@ export default function SuperAdminScans() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {!loading && showPagination && (
+          <div className="sa-pagination">
+            <button
+              type="button"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            >
+              <ChevronLeft size={14} /> Previous
+            </button>
+            <div>
+              {pageNumbers.map((page) => (
+                <button
+                  className={page === currentPage ? "active" : ""}
+                  type="button"
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  aria-current={page === currentPage ? "page" : undefined}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            >
+              Next <ChevronRight size={14} />
+            </button>
           </div>
         )}
       </div>

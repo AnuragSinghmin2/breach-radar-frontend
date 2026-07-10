@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { Plus, Edit2, Trash2, CheckCircle2, UserCheck, UserX, Settings } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Edit2, Trash2, UserCheck, UserX, Settings } from "lucide-react";
 import "./SuperAdmin.css";
+
+const SUBSCRIPTIONS_PER_PAGE = 8;
 
 export default function SuperAdminSubscriptions() {
   const [activeTab, setActiveTab] = useState("plans"); // 'plans' or 'customers'
@@ -10,10 +12,12 @@ export default function SuperAdminSubscriptions() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [plansPage, setPlansPage] = useState(1);
 
   // Customer subscriptions state
   const [customers, setCustomers] = useState([]);
   const [customersLoading, setCustomersLoading] = useState(false);
+  const [customersPage, setCustomersPage] = useState(1);
 
   // Plan creation / editing modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -56,11 +60,55 @@ export default function SuperAdminSubscriptions() {
 
   useEffect(() => {
     if (activeTab === "plans") {
+      setPlansPage(1);
       loadPlans();
     } else {
+      setCustomersPage(1);
       loadCustomers();
     }
   }, [activeTab]);
+
+  const plansTotalPages = Math.max(1, Math.ceil(plans.length / SUBSCRIPTIONS_PER_PAGE));
+  const paginatedPlans = useMemo(() => {
+    const start = (plansPage - 1) * SUBSCRIPTIONS_PER_PAGE;
+    return plans.slice(start, start + SUBSCRIPTIONS_PER_PAGE);
+  }, [plans, plansPage]);
+  const plansPageNumbers = useMemo(() => {
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+    const start = Math.max(1, Math.min(plansPage - halfWindow, plansTotalPages - maxVisiblePages + 1));
+    const end = Math.min(plansTotalPages, start + maxVisiblePages - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [plansPage, plansTotalPages]);
+  const showPlansPagination = plans.length > SUBSCRIPTIONS_PER_PAGE;
+
+  const customersTotalPages = Math.max(1, Math.ceil(customers.length / SUBSCRIPTIONS_PER_PAGE));
+  const paginatedCustomers = useMemo(() => {
+    const start = (customersPage - 1) * SUBSCRIPTIONS_PER_PAGE;
+    return customers.slice(start, start + SUBSCRIPTIONS_PER_PAGE);
+  }, [customers, customersPage]);
+  const customersPageNumbers = useMemo(() => {
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+    const start = Math.max(1, Math.min(customersPage - halfWindow, customersTotalPages - maxVisiblePages + 1));
+    const end = Math.min(customersTotalPages, start + maxVisiblePages - 1);
+
+    return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+  }, [customersPage, customersTotalPages]);
+  const showCustomersPagination = customers.length > SUBSCRIPTIONS_PER_PAGE;
+
+  useEffect(() => {
+    if (plansPage > plansTotalPages) {
+      setPlansPage(plansTotalPages);
+    }
+  }, [plansPage, plansTotalPages]);
+
+  useEffect(() => {
+    if (customersPage > customersTotalPages) {
+      setCustomersPage(customersTotalPages);
+    }
+  }, [customersPage, customersTotalPages]);
 
   const openCreateModal = () => {
     setEditingPlan(null);
@@ -179,7 +227,7 @@ export default function SuperAdminSubscriptions() {
           {loading ? (
             <div className="sa-empty" style={{ color: "#00d68f" }}>Loading plans list...</div>
           ) : (
-            <div className="sa-table-wrapper">
+            <div className={`sa-table-wrapper ${showPlansPagination ? "sa-admin-table-paginated" : ""}`}>
               <table className="sa-table">
                 <thead>
                   <tr>
@@ -197,7 +245,7 @@ export default function SuperAdminSubscriptions() {
                       <td colSpan={6} style={{ textAlign: "center" }} className="sa-empty">No subscription plans defined. Click "Create Plan" to define one.</td>
                     </tr>
                   ) : (
-                    plans.map((p) => (
+                    paginatedPlans.map((p) => (
                       <tr key={p._id}>
                         <td style={{ fontWeight: 700, color: "#f8fafc" }}>{p.name}</td>
                         <td style={{ color: "#eab308", fontWeight: 600 }}>
@@ -241,6 +289,23 @@ export default function SuperAdminSubscriptions() {
               </table>
             </div>
           )}
+          {!loading && showPlansPagination && (
+            <div className="sa-pagination">
+              <button type="button" disabled={plansPage === 1} onClick={() => setPlansPage((page) => Math.max(1, page - 1))}>
+                <ChevronLeft size={14} /> Previous
+              </button>
+              <div>
+                {plansPageNumbers.map((page) => (
+                  <button className={page === plansPage ? "active" : ""} type="button" key={page} onClick={() => setPlansPage(page)} aria-current={page === plansPage ? "page" : undefined}>
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button type="button" disabled={plansPage === plansTotalPages} onClick={() => setPlansPage((page) => Math.min(plansTotalPages, page + 1))}>
+                Next <ChevronRight size={14} />
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <div className="sa-card">
@@ -254,7 +319,7 @@ export default function SuperAdminSubscriptions() {
           {customersLoading ? (
             <div className="sa-empty" style={{ color: "#00d68f" }}>Loading active customer accounts...</div>
           ) : (
-            <div className="sa-table-wrapper">
+            <div className={`sa-table-wrapper ${showCustomersPagination ? "sa-admin-table-paginated" : ""}`}>
               <table className="sa-table">
                 <thead>
                   <tr>
@@ -274,7 +339,7 @@ export default function SuperAdminSubscriptions() {
                       <td colSpan={8} style={{ textAlign: "center" }} className="sa-empty">No active organization subscriptions found.</td>
                     </tr>
                   ) : (
-                    customers.map((c) => {
+                    paginatedCustomers.map((c) => {
                       const isSuspended = c.status === "suspended";
                       return (
                         <tr key={c._id}>
@@ -322,6 +387,23 @@ export default function SuperAdminSubscriptions() {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+          {!customersLoading && showCustomersPagination && (
+            <div className="sa-pagination">
+              <button type="button" disabled={customersPage === 1} onClick={() => setCustomersPage((page) => Math.max(1, page - 1))}>
+                <ChevronLeft size={14} /> Previous
+              </button>
+              <div>
+                {customersPageNumbers.map((page) => (
+                  <button className={page === customersPage ? "active" : ""} type="button" key={page} onClick={() => setCustomersPage(page)} aria-current={page === customersPage ? "page" : undefined}>
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button type="button" disabled={customersPage === customersTotalPages} onClick={() => setCustomersPage((page) => Math.min(customersTotalPages, page + 1))}>
+                Next <ChevronRight size={14} />
+              </button>
             </div>
           )}
         </div>

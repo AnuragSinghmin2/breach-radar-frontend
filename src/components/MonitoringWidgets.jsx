@@ -92,7 +92,7 @@ export default function MonitoringWidgets() {
     <section className="monitoring-widgets">
       <div className="monitoring-widgets-head">
         <div>
-          <h3>Breach Radar Monitoring</h3>
+          <h3>PentestRadar Monitoring</h3>
           <p>SSL, domain expiry, scheduled scans, and security alerts</p>
         </div>
         <button type="button" onClick={() => navigate("/dashboard/monitoring")}>

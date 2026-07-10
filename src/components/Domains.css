@@ -105,7 +105,7 @@
 
 .domains-panel {
   border-radius: 7px;
-  overflow: hidden;
+  overflow: visible;
   margin-bottom: 18px;
 }
 
@@ -197,12 +197,14 @@
 }
 
 .domains-table-wrap {
-  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: visible;
 }
 
 .domains-table {
   width: 100%;
-  min-width: 1040px;
+  min-width: 0;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -213,14 +215,14 @@
   font-weight: 600;
   line-height: 1;
   height: 42px;
-  padding: 0 16px;
+  padding: 0 12px;
   text-align: left;
   border-bottom: 1px solid rgba(67, 83, 104, 0.42);
 }
 
 .domains-table td {
-  height: 76px;
-  padding: 10px 16px;
+  height: 72px;
+  padding: 10px 12px;
   vertical-align: middle;
   border-top: 0;
   border-bottom: 1px solid rgba(67, 83, 104, 0.34);
@@ -232,17 +234,17 @@
 
 .domains-table th:nth-child(1),
 .domains-table td:nth-child(1) {
-  width: 22%;
+  width: 33%;
 }
 
 .domains-table th:nth-child(2),
 .domains-table td:nth-child(2) {
-  width: 15%;
+  width: 20%;
 }
 
 .domains-table th:nth-child(3),
 .domains-table td:nth-child(3) {
-  width: 13%;
+  width: 15%;
 }
 
 .domains-table th:nth-child(4),
@@ -252,12 +254,14 @@
 
 .domains-table th:nth-child(5),
 .domains-table td:nth-child(5) {
-  width: 15%;
+  width: 96px;
+  min-width: 96px;
+  padding-right: 18px;
 }
 
-.domains-table th:nth-child(6),
-.domains-table td:nth-child(6) {
-  width: 11%;
+.domain-actions-heading {
+  text-align: right;
+  white-space: nowrap;
 }
 
 .domain-name-cell,
@@ -270,7 +274,9 @@
 }
 
 .domain-name-cell {
-  gap: 12px;
+  gap: 8px;
+  min-width: 0;
+  position: relative;
 }
 
 .domain-name-button {
@@ -279,9 +285,13 @@
   background: transparent;
   color: inherit;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font: inherit;
   padding: 0;
   text-align: left;
+  min-width: 0;
 }
 
 .domain-name-button:hover strong,
@@ -294,8 +304,8 @@
 }
 
 .domain-row-icon {
-  width: 39px;
-  height: 39px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   display: grid;
   place-items: center;
@@ -307,9 +317,21 @@
   align-items: center;
   gap: 8px;
   color: #f9fafb;
-  font-size: 12px;
-  line-height: 1.3;
-  flex-wrap: wrap;
+  font-size: 11.5px;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.domain-name-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.domain-name-cell strong span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .domain-name-cell em {
@@ -328,8 +350,8 @@
 .last-scan small {
   color: #aeb8c7;
   display: block;
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 10px;
+  line-height: 1.3;
 }
 
 .domain-status span {
@@ -337,9 +359,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
-  margin-bottom: 5px;
+  font-size: 11px;
+  margin-bottom: 4px;
   white-space: normal;
+}
+
+.domain-status-scan-time {
+  color: #8f9bad;
+  margin-top: 2px;
 }
 
 .domain-status i {
@@ -360,14 +387,14 @@
 }
 
 .domain-score-cell {
-  gap: 8px;
+  gap: 6px;
   justify-content: flex-start;
 }
 
 .domain-score-ring {
   --score: 0;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: conic-gradient(#00d68f calc(var(--score) * 1%), #183049 0);
   position: relative;
@@ -398,7 +425,7 @@
 
 .domain-score-ring strong {
   color: #f9fafb;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1;
   margin-top: 5px;
 }
@@ -410,9 +437,10 @@
 }
 
 .score-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 .score-label.good,
@@ -426,9 +454,9 @@
 
 .severity-list {
   display: grid;
-  grid-template-columns: repeat(4, minmax(36px, 1fr));
-  gap: 10px;
-  max-width: 220px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  max-width: 180px;
 }
 
 .severity-item {
@@ -451,14 +479,14 @@
 }
 
 .severity-item b {
-  width: 28px;
-  height: 28px;
-  border-radius: 9px;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
   display: inline-grid;
   place-items: center;
-  font-size: 13px;
+  font-size: 11px;
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .severity-item .critical {
@@ -484,8 +512,8 @@
 .last-scan strong {
   color: #f8fafc;
   display: block;
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 10.5px;
+  line-height: 1.3;
   font-weight: 600;
   margin-bottom: 3px;
 }
@@ -497,7 +525,7 @@
   display: inline-block;
   cursor: pointer;
   font: inherit;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.3;
   padding: 0;
@@ -511,16 +539,20 @@
 }
 
 .domain-actions {
-  gap: 8px;
+  gap: 0;
   position: relative;
   justify-content: flex-end;
+  margin-left: auto;
+  min-width: 0;
+  width: 100%;
+  white-space: nowrap;
 }
 
 .domain-actions > button:not(.domain-menu-trigger) {
   height: 32px;
-  min-width: 82px;
-  padding: 0 10px;
-  font-size: 11px;
+  min-width: 74px;
+  padding: 0 8px;
+  font-size: 10.5px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -536,43 +568,98 @@
   place-items: center;
   cursor: pointer;
   padding: 0;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.domain-menu-trigger:hover,
+.domain-menu-trigger:focus-visible,
+.domain-menu-trigger[aria-expanded="true"] {
+  border-color: rgba(0, 214, 143, 0.48);
+  background: rgba(0, 214, 143, 0.1);
+  color: #00d68f;
+  outline: none;
+}
+
+.domain-menu-trigger:active {
+  transform: translateY(1px);
 }
 
 .domain-actions svg {
-  color: #f8fafc;
+  color: currentColor;
 }
 
 .domain-row-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
-  z-index: 15;
-  width: 150px;
+  z-index: 40;
+  width: min(220px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
   border: 1px solid rgba(65, 82, 104, 0.72);
-  border-radius: 7px;
-  background: #071321;
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
-  padding: 6px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #091727, #050d18);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-sizing: border-box;
+  padding: 8px;
+  transform-origin: top right;
+  animation: domainMenuReveal 0.16s ease;
+}
+
+.domain-row-menu.open-up {
+  top: auto;
+  bottom: calc(100% + 10px);
+  transform-origin: bottom right;
+}
+
+@keyframes domainMenuReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .domain-row-menu button {
   width: 100%;
   border: 0;
-  border-radius: 5px;
+  border-radius: 6px;
   background: transparent;
   color: #dbe3ee;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 8px;
+  min-height: 36px;
+  padding: 9px 10px;
   text-align: left;
+  transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
 }
 
 .domain-row-menu button:hover,
 .domain-row-menu button:focus-visible {
-  background: rgba(31, 41, 55, 0.86);
+  background: rgba(0, 214, 143, 0.1);
+  color: #f8fafc;
   outline: none;
+}
+
+.domain-row-menu button:active {
+  transform: translateX(1px);
+}
+
+.domain-row-menu button.danger {
+  color: #ff8a8f;
+}
+
+.domain-row-menu button.danger:hover,
+.domain-row-menu button.danger:focus-visible {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ffb4b7;
 }
 
 .domains-message {
@@ -632,6 +719,7 @@
 .domains-upgrade {
   border-radius: 7px;
   min-height: 78px;
+  margin-bottom: 18px;
   padding: 14px 22px;
   box-sizing: border-box;
   display: flex;
@@ -668,6 +756,7 @@
 .domain-add-form {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .domain-add-form input {
@@ -698,19 +787,12 @@
   cursor: pointer;
 }
 
-.upgrade-actions .outline,
-.domain-add-form .outline {
-  min-width: 105px;
-  background: rgba(6, 15, 28, 0.72);
-  color: #dbe3ee;
-}
-
 .upgrade-actions .primary,
 .domain-add-form .primary {
   color: #03150f;
   border-color: transparent;
   background: #00d68f;
-  min-width: 103px;
+  min-width: 118px;
 }
 
 @media (max-width: 1180px) {
@@ -732,6 +814,45 @@
   .domain-search {
     flex: 1 1 auto;
     min-width: 220px;
+  }
+
+  .domains-table th {
+    padding: 0 10px;
+  }
+
+  .domains-table td {
+    padding: 10px;
+  }
+
+  .domains-table th:nth-child(1),
+  .domains-table td:nth-child(1) {
+    width: 31%;
+  }
+
+  .domains-table th:nth-child(2),
+  .domains-table td:nth-child(2) {
+    width: 21%;
+  }
+
+  .domains-table th:nth-child(3),
+  .domains-table td:nth-child(3) {
+    width: 16%;
+  }
+
+  .domains-table th:nth-child(4),
+  .domains-table td:nth-child(4) {
+    width: 24%;
+  }
+
+  .domains-table th:nth-child(5),
+  .domains-table td:nth-child(5) {
+    width: 88px;
+    min-width: 88px;
+    padding-right: 14px;
+  }
+
+  .severity-list {
+    max-width: 156px;
   }
 }
 
@@ -773,6 +894,82 @@
     flex-direction: column;
     gap: 12px;
     padding: 14px 18px;
+  }
+
+  .domains-table th {
+    font-size: 10.5px;
+    line-height: 1.2;
+    padding: 0 6px;
+  }
+
+  .domains-table td {
+    padding: 10px 6px;
+  }
+
+  .domains-table th:nth-child(1),
+  .domains-table td:nth-child(1) {
+    width: 34%;
+  }
+
+  .domains-table th:nth-child(2),
+  .domains-table td:nth-child(2) {
+    width: 21%;
+  }
+
+  .domains-table th:nth-child(3),
+  .domains-table td:nth-child(3) {
+    width: 17%;
+  }
+
+  .domains-table th:nth-child(4),
+  .domains-table td:nth-child(4) {
+    width: 17%;
+  }
+
+  .domains-table th:nth-child(5),
+  .domains-table td:nth-child(5) {
+    width: 46px;
+    min-width: 46px;
+    padding-right: 8px;
+  }
+
+  .domain-actions-heading {
+    color: transparent;
+  }
+
+  .domain-row-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .domain-name-button {
+    gap: 7px;
+  }
+
+  .domain-menu-trigger {
+    width: 28px;
+    height: 28px;
+  }
+
+  .domain-status span,
+  .domain-name-cell strong {
+    font-size: 10.5px;
+  }
+
+  .domain-score-cell {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .domain-score-ring {
+    width: 38px;
+    height: 38px;
+  }
+
+  .severity-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    max-width: 70px;
   }
 
   .domains-upgrade {

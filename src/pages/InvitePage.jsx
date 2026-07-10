@@ -98,7 +98,7 @@ export default function InvitePage() {
       <section className="invite-shell">
         <div className="invite-brand">
           <ShieldCheck size={30} />
-          <span>Breach Radar</span>
+          <span>PentestRadar</span>
         </div>
 
         {loading ? (
@@ -107,7 +107,7 @@ export default function InvitePage() {
           <div className="invite-card">
             <div className="invite-icon"><Mail size={28} /></div>
             <h1>Team Invitation</h1>
-            <p>{invitation.organization?.name} invited you to join their Breach Radar workspace.</p>
+            <p>{invitation.organization?.name} invited you to join their PentestRadar workspace.</p>
 
             <dl className="invite-details">
               <div><dt>Organization</dt><dd>{invitation.organization?.name}</dd></div>

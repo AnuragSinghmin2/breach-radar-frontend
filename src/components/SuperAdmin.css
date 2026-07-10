@@ -101,6 +101,18 @@
   width: 100%;
 }
 
+.sa-users-table-wrapper {
+  min-height: 468px;
+}
+
+.sa-domains-table-wrapper {
+  min-height: 440px;
+}
+
+.sa-admin-table-paginated {
+  min-height: 440px;
+}
+
 .sa-table {
   width: 100%;
   border-collapse: collapse;
@@ -202,6 +214,53 @@
 .sa-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.sa-pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.sa-pagination div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sa-pagination button {
+  min-height: 32px;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: transparent;
+  color: #00d68f;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 10px;
+}
+
+.sa-pagination div button {
+  min-width: 32px;
+  padding: 0 8px;
+}
+
+.sa-pagination button.active {
+  background: rgba(0, 214, 143, 0.12);
+  border-color: #00d68f;
+  color: #00d68f;
+}
+
+.sa-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* 6. Badges */
@@ -358,4 +417,21 @@
 .sa-health-dot.warning {
   background: #facc15;
   box-shadow: 0 0 8px #facc15;
+}
+
+@media (max-width: 640px) {
+  .sa-pagination {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .sa-pagination > button {
+    flex: 1 1 130px;
+  }
+
+  .sa-pagination div {
+    flex: 1 1 100%;
+    justify-content: center;
+    order: -1;
+  }
 }

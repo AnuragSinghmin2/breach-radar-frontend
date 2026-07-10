@@ -6,6 +6,7 @@ import {
   CalendarCheck,
   Check,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Clock3,
   Globe2,
@@ -29,8 +30,28 @@ const steps = [
   ["Review & Start", "Review and start scan"],
 ];
 
+const checkLabels = {
+  owasp: "OWASP Top 10",
+  ssl: "SSL/TLS Checks",
+  headers: "Security Headers",
+  ports: "Port Exposure",
+  malware: "Malware Signals",
+  compliance: "Compliance Mapping",
+};
+
+const SCAN_HISTORY_PAGE_SIZE = 10;
+
 function Badge({ children, tone }) {
   return <span className={`scans-badge ${tone}`}>{children}</span>;
+}
+
+function getVisiblePages(currentPage, totalPages) {
+  const maxVisible = 5;
+  const halfWindow = Math.floor(maxVisible / 2);
+  const start = Math.max(1, Math.min(currentPage - halfWindow, totalPages - maxVisible + 1));
+  const end = Math.min(totalPages, start + maxVisible - 1);
+
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
 
 function ScanStatusPanel({ scan, formatScanTime }) {
@@ -108,6 +129,7 @@ export default function Scans() {
   const [selectedType, setSelectedType] = useState("Full Scan");
   const [activeStep, setActiveStep] = useState(0);
   const [openMenu, setOpenMenu] = useState("");
+  const [scanHistoryPage, setScanHistoryPage] = useState(1);
   const [checks, setChecks] = useState({
     owasp: true,
     ssl: true,
@@ -119,6 +141,28 @@ export default function Scans() {
 
   const selectedScan = SCAN_TYPE_META[selectedType];
   const canStartScan = Boolean(selectedDomain);
+  const enabledChecksCount = Object.values(checks).filter(Boolean).length;
+  const stepValidation = [
+    Boolean(selectedDomain),
+    Boolean(selectedType),
+    enabledChecksCount > 0,
+    Boolean(selectedDomain && selectedType && enabledChecksCount > 0),
+  ];
+  const canContinue = stepValidation[activeStep];
+  const progressPercent = (activeStep / (steps.length - 1)) * 100;
+  const scanHistoryTotalPages = Math.max(
+    1,
+    Math.ceil(filteredHistory.length / SCAN_HISTORY_PAGE_SIZE)
+  );
+  const paginatedHistory = useMemo(() => {
+    const start = (scanHistoryPage - 1) * SCAN_HISTORY_PAGE_SIZE;
+    return filteredHistory.slice(start, start + SCAN_HISTORY_PAGE_SIZE);
+  }, [filteredHistory, scanHistoryPage]);
+  const scanHistoryPages = useMemo(
+    () => getVisiblePages(scanHistoryPage, scanHistoryTotalPages),
+    [scanHistoryPage, scanHistoryTotalPages]
+  );
+  const showScanHistoryPagination = filteredHistory.length > SCAN_HISTORY_PAGE_SIZE;
 
   useEffect(() => {
     const paramDomain = searchParams.get("domain");
@@ -134,6 +178,16 @@ export default function Scans() {
       setSelectedDomain(domains[0]);
     }
   }, [domains, searchParams, selectedDomain]);
+
+  useEffect(() => {
+    setScanHistoryPage(1);
+  }, [statusFilter]);
+
+  useEffect(() => {
+    if (scanHistoryPage > scanHistoryTotalPages) {
+      setScanHistoryPage(scanHistoryTotalPages);
+    }
+  }, [scanHistoryPage, scanHistoryTotalPages]);
 
   const statCards = useMemo(
     () => [
@@ -177,8 +231,33 @@ export default function Scans() {
     setChecks((current) => ({ ...current, [key]: !current[key] }));
   }
 
+  function goToStep(stepIndex) {
+    if (stepIndex < 0 || stepIndex >= steps.length) return;
+    if (stepIndex > activeStep + 1) return;
+    if (stepIndex > activeStep && !stepValidation[activeStep]) return;
+    setOpenMenu("");
+    setActiveStep(stepIndex);
+  }
+
+  function previousStep() {
+    setOpenMenu("");
+    setActiveStep((step) => Math.max(step - 1, 0));
+  }
+
   async function continueWizard() {
+    if (!canContinue) {
+      if (activeStep === 0) {
+        setMessage("Select a verified domain to continue.");
+      } else if (activeStep === 1) {
+        setMessage("Select a scan type to continue.");
+      } else if (activeStep === 2) {
+        setMessage("Enable at least one scan check to continue.");
+      }
+      return;
+    }
+
     if (activeStep < steps.length - 1) {
+      setOpenMenu("");
       setActiveStep((step) => step + 1);
       return;
     }
@@ -252,140 +331,167 @@ export default function Scans() {
         <div className="scans-left-column">
           <section className="scans-panel scans-new-panel" id="new-scan">
             <h3>New Scan</h3>
-            <p>Start a targeted security scan for a monitored domain</p>
+            <p>Move through each step to create and launch a focused security scan.</p>
 
             <div className="scans-steps">
-              {steps.map(([label, help], index) => (
+              <div className="scans-steps-progress" aria-hidden="true">
+                <span style={{ width: `${progressPercent}%` }} />
+              </div>
+              {steps.map(([label, help], index) => {
+                const isCompleted = index < activeStep;
+                const isActive = index === activeStep;
+                const isFuture = index > activeStep;
+
+                return (
                 <button
-                  className="scans-step"
+                  className={`scans-step ${isCompleted ? "completed" : ""} ${isActive ? "active" : ""} ${isFuture ? "future" : ""}`}
                   type="button"
                   key={label}
-                  onClick={() => setActiveStep(index)}
+                  onClick={() => goToStep(index)}
+                  disabled={isFuture && index !== activeStep + 1}
                 >
-                  <span className={index <= activeStep ? "active" : ""}>{index + 1}</span>
+                  <span className={isCompleted || isActive ? "active" : ""}>
+                    {isCompleted ? <Check size={12} /> : index + 1}
+                  </span>
                   <strong>{label}</strong>
                   <small>{help}</small>
                 </button>
-              ))}
+                );
+              })}
             </div>
 
-            <div className="scans-form-grid">
-              <label>
-                <span>Select Domain</span>
-                <button type="button" onClick={() => setOpenMenu(openMenu === "domain" ? "" : "domain")}>
-                  <Globe2 size={17} />
-                  {selectedDomain || "No verified domains"}
-                  {selectedDomain && <Badge tone="green">Active</Badge>}
-                  <ChevronDown size={16} />
-                </button>
-                {openMenu === "domain" && (
-                  <div className="scans-dropdown">
-                    {domains.length === 0 && (
-                      <button type="button" onClick={() => navigate("/dashboard/domains")}>
-                        Verify a domain first
-                      </button>
-                    )}
-                    {domains.map((domain) => (
-                      <button
-                        type="button"
-                        key={domain}
-                        onClick={() => {
-                          setSelectedDomain(domain);
-                          setOpenMenu("");
-                          setActiveStep(Math.max(activeStep, 1));
-                        }}
-                      >
-                        {domain}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </label>
+            <div className="scans-step-panel">
+              <div className="scans-step-intro">
+                <h4>{steps[activeStep][0]}</h4>
+                <p>{steps[activeStep][1]}</p>
+              </div>
 
-              <label>
-                <span>Scan Type</span>
-                <button type="button" onClick={() => setOpenMenu(openMenu === "type" ? "" : "type")}>
-                  {selectedType}
-                  <Badge tone="purple">{selectedScan.badge}</Badge>
-                  <ChevronDown size={16} />
-                </button>
-                {openMenu === "type" && (
-                  <div className="scans-dropdown">
-                    {Object.keys(SCAN_TYPE_META).map((type) => (
+              {activeStep === 0 && (
+                <div className="scans-step-content">
+                  <label className="scans-step-field">
+                    <span>Verified Domain</span>
+                    <button type="button" onClick={() => setOpenMenu(openMenu === "domain" ? "" : "domain")}>
+                      <Globe2 size={17} />
+                      {selectedDomain || "No verified domains"}
+                      {selectedDomain && <Badge tone="green">Active</Badge>}
+                      <ChevronDown size={16} />
+                    </button>
+                    {openMenu === "domain" && (
+                      <div className="scans-dropdown">
+                        {domains.length === 0 && (
+                          <button type="button" onClick={() => navigate("/dashboard/domains")}>
+                            Verify a domain first
+                          </button>
+                        )}
+                        {domains.map((domain) => (
+                          <button
+                            type="button"
+                            key={domain}
+                            onClick={() => {
+                              setSelectedDomain(domain);
+                              setOpenMenu("");
+                            }}
+                          >
+                            {domain}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </label>
+                </div>
+              )}
+
+              {activeStep === 1 && (
+                <div className="scans-step-content">
+                  <div className="scans-type-grid">
+                    {Object.entries(SCAN_TYPE_META).map(([type, meta]) => (
                       <button
+                        className={`scans-type-card ${selectedType === type ? "selected" : ""}`}
                         type="button"
                         key={type}
-                        onClick={() => {
-                          setSelectedType(type);
-                          setOpenMenu("");
-                          setActiveStep(Math.max(activeStep, 2));
-                        }}
+                        onClick={() => setSelectedType(type)}
                       >
-                        {type}
+                        <div className="scans-type-head">
+                          <strong>{type}</strong>
+                          <Badge tone="purple">{meta.badge}</Badge>
+                        </div>
+                        <span className="scans-type-time">
+                          <Timer size={14} /> {meta.duration}
+                        </span>
+                        {selectedType === type && <small className="scans-type-selected">Selected</small>}
                       </button>
                     ))}
                   </div>
-                )}
-              </label>
-            </div>
-
-            <div className="scans-detail-box">
-              <div className="scan-info-copy">
-                <Info size={17} />
-                <div>
-                  <strong>{selectedType}</strong>
-                  <small>{selectedScan.description}</small>
                 </div>
-              </div>
-              <div>
-                <small>Scan Duration</small>
-                <strong><Timer size={16} /> {selectedScan.duration}</strong>
-              </div>
-              <div>
-                <small>Risk Coverage</small>
-                <strong><ShieldCheck size={16} /> {selectedScan.coverage}</strong>
-              </div>
-              <div>
-                <small>Resource Usage</small>
-                <strong className="usage-medium"><Activity size={16} /> {selectedScan.usage}</strong>
-              </div>
+              )}
+
+              {activeStep === 2 && (
+                <div className="scans-step-content">
+                  <div className="scans-config-grid">
+                    {Object.entries(checks).map(([key, enabled]) => (
+                      <button
+                        className={enabled ? "enabled" : ""}
+                        type="button"
+                        key={key}
+                        onClick={() => toggleCheck(key)}
+                      >
+                        <span>{enabled ? <Check size={15} /> : <X size={15} />}</span>
+                        {checkLabels[key]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeStep === 3 && (
+                <div className="scans-step-content">
+                  <div className="scans-detail-box scans-review-grid">
+                    <div className="scan-info-copy">
+                      <Info size={17} />
+                      <div>
+                        <strong>{selectedDomain || "No domain selected"}</strong>
+                        <small>{selectedType}</small>
+                      </div>
+                    </div>
+                    <div>
+                      <small>Estimated Duration</small>
+                      <strong><Timer size={16} /> {selectedScan.duration}</strong>
+                    </div>
+                    <div>
+                      <small>Risk Coverage</small>
+                      <strong><ShieldCheck size={16} /> {selectedScan.coverage}</strong>
+                    </div>
+                    <div>
+                      <small>Resource Usage</small>
+                      <strong className="usage-medium"><Activity size={16} /> {selectedScan.usage}</strong>
+                    </div>
+                  </div>
+
+                  <div className="scans-review-box">
+                    <strong>Checks Enabled</strong>
+                    <span>{enabledChecksCount} selected</span>
+                    <small>{Object.entries(checks).filter(([, enabled]) => enabled).map(([key]) => checkLabels[key]).join(", ")}</small>
+                  </div>
+                </div>
+              )}
             </div>
-
-            {activeStep >= 2 && (
-              <div className="scans-config-grid">
-                {Object.entries(checks).map(([key, enabled]) => (
-                  <button
-                    className={enabled ? "enabled" : ""}
-                    type="button"
-                    key={key}
-                    onClick={() => toggleCheck(key)}
-                  >
-                    <span>{enabled ? <Check size={15} /> : <X size={15} />}</span>
-                    {key === "owasp" && "OWASP Top 10"}
-                    {key === "ssl" && "SSL/TLS Checks"}
-                    {key === "headers" && "Security Headers"}
-                    {key === "ports" && "Port Exposure"}
-                    {key === "malware" && "Malware Signals"}
-                    {key === "compliance" && "Compliance Mapping"}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {activeStep === 3 && (
-              <div className="scans-review-box">
-                <strong>{selectedDomain}</strong>
-                <span>{selectedType}</span>
-                <small>{Object.values(checks).filter(Boolean).length} modules enabled</small>
-              </div>
-            )}
 
             <div className="scans-action-row">
-              <button className="scans-primary-btn" type="button" onClick={continueWizard} disabled={!canStartScan}>
-                {activeStep === 3 ? "Start Scan" : "Continue to Configuration"} <ArrowRight size={16} />
+              <button
+                className="scans-secondary-btn"
+                type="button"
+                onClick={previousStep}
+                disabled={activeStep === 0}
+              >
+                Previous
               </button>
-              <button className="scans-secondary-btn" type="button" onClick={handleScheduleScan} disabled={!canStartScan}>
-                <CalendarCheck size={16} /> Schedule
+              <button
+                className="scans-primary-btn"
+                type="button"
+                onClick={continueWizard}
+                disabled={activeStep === 3 ? !canStartScan || !canContinue : !canContinue}
+              >
+                {activeStep === 3 ? "Start Scan" : "Continue"} <ArrowRight size={16} />
               </button>
             </div>
           </section>
@@ -484,8 +590,14 @@ export default function Scans() {
               )}
             </div>
 
-            <div className="scans-recent-list">
-              {filteredHistory.map((scan) => (
+            <div className={`scans-recent-list ${showScanHistoryPagination ? "paginated" : ""}`}>
+              <div className="scans-history-head" aria-hidden="true">
+                <span>Domain</span>
+                <span>Status</span>
+                <span>Completed</span>
+              </div>
+
+              {paginatedHistory.map((scan) => (
                 <button
                   className={scan.active ? "active" : ""}
                   type="button"
@@ -510,6 +622,42 @@ export default function Scans() {
             <button className="scans-wide-link" type="button" onClick={handleRerunScan}>
               <CalendarCheck size={16} /> Re-run Selected Scan <ChevronRight size={17} />
             </button>
+
+            {showScanHistoryPagination && (
+              <div className="scans-history-pagination">
+                <button
+                  type="button"
+                  disabled={scanHistoryPage === 1}
+                  onClick={() => setScanHistoryPage((page) => Math.max(1, page - 1))}
+                >
+                  <ChevronLeft size={15} /> Previous
+                </button>
+
+                <div>
+                  {scanHistoryPages.map((page) => (
+                    <button
+                      className={page === scanHistoryPage ? "active" : ""}
+                      type="button"
+                      key={page}
+                      onClick={() => setScanHistoryPage(page)}
+                      aria-current={page === scanHistoryPage ? "page" : undefined}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={scanHistoryPage === scanHistoryTotalPages}
+                  onClick={() =>
+                    setScanHistoryPage((page) => Math.min(scanHistoryTotalPages, page + 1))
+                  }
+                >
+                  Next <ChevronRight size={15} />
+                </button>
+              </div>
+            )}
           </section>
         </aside>
       </div>

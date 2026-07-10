@@ -1,7 +1,17 @@
 import axios from "axios";
 
+function isLocalDevHost() {
+  return window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
+}
+
 function normalizeApiBaseUrl(value) {
-  const baseUrl = (value || "/api/v1").trim().replace(/\/+$/, "");
+  const configuredBaseUrl = (value || "").trim();
+
+  if (isLocalDevHost()) {
+    return "/api/v1";
+  }
+
+  const baseUrl = (configuredBaseUrl || "/api/v1").replace(/\/+$/, "");
 
   if (!/^https?:\/\//i.test(baseUrl)) {
     return baseUrl || "/api/v1";
@@ -18,6 +28,24 @@ function normalizeApiBaseUrl(value) {
 
 const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 const isPaymentEndpoint = (url = "") => url.includes("/payment") || url.includes("/billing");
+
+function getLoginRedirectUrl() {
+  const configuredUrl = (import.meta.env.VITE_ADMIN_LOGIN_URL || "").trim();
+
+  if (!configuredUrl) {
+    return "/login";
+  }
+
+  try {
+    const resolvedUrl = new URL(configuredUrl, window.location.origin);
+    if (isLocalDevHost()) {
+      return `${window.location.origin}/login`;
+    }
+    return resolvedUrl.toString();
+  } catch {
+    return "/login";
+  }
+}
 
 if (window.location.protocol === "https:" && API_BASE_URL.startsWith("http://")) {
   console.error("[api] HTTPS frontend cannot call an HTTP backend. Set VITE_API_BASE_URL to an HTTPS backend URL.");
@@ -105,7 +133,11 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (code === "TOKEN_EXPIRED" || !accessToken) {
+    if (
+      code === "TOKEN_EXPIRED" ||
+      !accessToken ||
+      error.response?.data?.message === "Authentication token required"
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -125,10 +157,14 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
+        if (!refreshError.response) {
+          return Promise.reject(error);
+        }
+
         clearAccessToken();
         localStorage.removeItem("user");
         window.dispatchEvent(new CustomEvent("auth:logout"));
-        window.location.href = import.meta.env.VITE_ADMIN_LOGIN_URL || "/login";
+        window.location.href = getLoginRedirectUrl();
         return Promise.reject(refreshError);
       }
     }

@@ -409,7 +409,7 @@ export default function Monitoring() {
             <CheckCircle size={18} />
             {criticalAlerts
               ? "Some monitored assets need attention"
-              : "Breach Radar monitoring is active for verified domains"}
+              : "PentestRadar monitoring is active for verified domains"}
           </div>
         </section>
       </div>

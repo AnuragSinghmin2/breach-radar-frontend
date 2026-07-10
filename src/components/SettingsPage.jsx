@@ -5,6 +5,8 @@ import {
   Bell,
   Camera,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Check,
   Clock3,
   Code2,
@@ -41,6 +43,7 @@ import { formatAccountDate, getInitials, resolveAvatarUrl } from "../utils/profi
 import "./SettingsPage.css";
 
 let razorpayScriptPromise = null;
+const SECURITY_SESSIONS_PER_PAGE = 7;
 
 const maskRazorpayKey = (key = "") => {
   if (!key) return "missing";
@@ -497,7 +500,7 @@ function ProfileSettings() {
         <section className="settings-panel profile-form-panel">
           <div className="settings-panel-title">
             <h3>Personal Information</h3>
-            <p>These details come from your authenticated Breach Radar account.</p>
+            <p>These details come from your authenticated PentestRadar account.</p>
           </div>
 
           <form className="profile-form" onSubmit={saveProfile}>
@@ -1332,7 +1335,7 @@ function PlanBillingSettings() {
         key: response.key,
         amount: response.amount,
         currency: response.currency || "INR",
-        name: "Breach Radar",
+        name: "PentestRadar",
         description: `Upgrade to ${selectedPlanForModal.displayName || selectedPlanForModal.name}`,
         order_id: response.orderId,
         handler: async function (paymentRes) {
@@ -2300,7 +2303,7 @@ function ScanPreferencesSettings() {
       <section className="settings-panel scan-pref-summary-panel">
         <div className="settings-panel-title">
           <h3>Recommended Policy</h3>
-          <p>Breach Radar will use these preferences to keep scans useful while reducing noisy or risky requests.</p>
+          <p>PentestRadar will use these preferences to keep scans useful while reducing noisy or risky requests.</p>
         </div>
         <div className="scan-pref-policy-grid">
           <article><ShieldCheck size={18} /><strong>OWASP baseline</strong><span>Injection, XSS, auth, headers, SSL, and exposure checks.</span></article>
@@ -2321,6 +2324,7 @@ function SecuritySettings() {
   const [password, setPassword] = useState({ current: "", next: "", confirm: "" });
   const [sessions, setSessions] = useState([]);
   const [events, setEvents] = useState([]);
+  const [sessionsPage, setSessionsPage] = useState(1);
 
   const loadSecurityEvents = async () => {
     const data = await activityLogApi.getLogs({ limit: 5, type: "Security" });
@@ -2359,6 +2363,19 @@ function SecuritySettings() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const totalSessionPages = Math.max(1, Math.ceil(sessions.length / SECURITY_SESSIONS_PER_PAGE));
+  const paginatedSessions = sessions.slice(
+    (sessionsPage - 1) * SECURITY_SESSIONS_PER_PAGE,
+    sessionsPage * SECURITY_SESSIONS_PER_PAGE
+  );
+  const showSessionsPagination = sessions.length > SECURITY_SESSIONS_PER_PAGE;
+
+  useEffect(() => {
+    if (sessionsPage > totalSessionPages) {
+      setSessionsPage(totalSessionPages);
+    }
+  }, [sessionsPage, totalSessionPages]);
 
   const triggerToast = (text) => {
     setMessage(text);
@@ -2476,7 +2493,7 @@ function SecuritySettings() {
         <section className="settings-panel security-password-panel">
           <div className="settings-panel-title">
             <h3>Password & Authentication</h3>
-            <p>Manage account credentials and authentication policy for Breach Radar access.</p>
+            <p>Manage account credentials and authentication policy for PentestRadar access.</p>
           </div>
           <form className="security-password-form" onSubmit={savePassword}>
             <label>
@@ -2533,7 +2550,7 @@ function SecuritySettings() {
             {sessions.length === 0 ? (
               <div className="settings-empty-state">No active sessions found.</div>
             ) : (
-              sessions.map((item) => (
+              paginatedSessions.map((item) => (
                 <article className="security-session-row" key={item.id}>
                   <Monitor size={18} />
                   <strong>{item.device || "Unknown device"}<small>{item.location || "Unknown location"} ({item.ipAddress || "No IP"})</small></strong>
@@ -2546,6 +2563,27 @@ function SecuritySettings() {
               ))
             )}
           </div>
+          {showSessionsPagination && (
+            <div className="security-sessions-pagination">
+              <span>Page {sessionsPage} of {totalSessionPages}</span>
+              <div>
+                <button
+                  type="button"
+                  disabled={sessionsPage === 1}
+                  onClick={() => setSessionsPage((page) => Math.max(1, page - 1))}
+                >
+                  <ChevronLeft size={15} /> Previous
+                </button>
+                <button
+                  type="button"
+                  disabled={sessionsPage === totalSessionPages}
+                  onClick={() => setSessionsPage((page) => Math.min(totalSessionPages, page + 1))}
+                >
+                  Next <ChevronRight size={15} />
+                </button>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="settings-panel security-events-panel">
@@ -2588,7 +2626,7 @@ function IntegrationsSettings() {
     closeOnRetest: false,
   });
   const [webhooks, setWebhooks] = useState([
-    "https://hooks.example.com/securescan",
+    "https://hooks.example.com/pentestradar",
     "https://alerts.example.com/monitoring",
   ]);
   const [webhookUrl, setWebhookUrl] = useState("");
@@ -2656,7 +2694,7 @@ function IntegrationsSettings() {
         <section className="settings-panel integrations-catalog-panel">
           <div className="settings-panel-title">
             <h3>Connected Integrations</h3>
-            <p>Connect Breach Radar with chat, issue tracking, repositories, and custom automation endpoints.</p>
+            <p>Connect PentestRadar with chat, issue tracking, repositories, and custom automation endpoints.</p>
           </div>
           <div className="integration-card-grid">
             {integrationCatalog.map((item) => {
@@ -2715,7 +2753,7 @@ function IntegrationsSettings() {
             <p>Custom endpoints receive JSON events for scans, vulnerabilities, reports, and monitors.</p>
           </div>
           <form onSubmit={addWebhook}>
-            <input placeholder="https://hooks.example.com/securescan" value={webhookUrl} onChange={(event) => setWebhookUrl(event.target.value)} />
+            <input placeholder="https://hooks.example.com/pentestradar" value={webhookUrl} onChange={(event) => setWebhookUrl(event.target.value)} />
             <button type="submit">Add Webhook</button>
           </form>
           <div className="integration-webhook-list">
@@ -2858,7 +2896,7 @@ function ActivityLogSettings() {
   const typeOptions = ["All", ...Array.from(new Set(auditEvents.map((event) => event.type))).sort()];
   const statusOptions = ["All", ...Array.from(new Set(auditEvents.map((event) => event.status))).sort()];
 
-  function downloadActivityCsv(blob, filename = "breach-radar-activity-log.csv") {
+  function downloadActivityCsv(blob, filename = "pentestradar-activity-log.csv") {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
 
@@ -2882,7 +2920,7 @@ function ActivityLogSettings() {
     const rows = filteredEvents.map((event) => [event.id, event.type, event.title, event.actor, event.target, event.time, event.status].map(escapeCsv).join(","));
     const blob = new Blob([["ID,Type,Title,Actor,Target,Time,Status", ...rows].join("\n")], { type: "text/csv;charset=utf-8" });
 
-    downloadActivityCsv(blob, "breach-radar-filtered-activity-log.csv");
+    downloadActivityCsv(blob, "pentestradar-filtered-activity-log.csv");
     setMessage("Activity log exported.");
   }
 
@@ -3169,7 +3207,7 @@ function ApiAccessPage() {
           <div className="settings-panel-title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <h3>API Overview</h3>
-              <p>Integrate Breach Radar into your workflows, CI/CD pipelines, and custom tools using our RESTful API.</p>
+              <p>Integrate PentestRadar into your workflows, CI/CD pipelines, and custom tools using our RESTful API.</p>
             </div>
             <button type="button" onClick={() => setShowGenerateModal(true)} style={{ background: "#3b82f6", color: "#fff", border: "none", padding: "10px 15px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
               Create API Key
@@ -3267,7 +3305,7 @@ function ApiAccessPage() {
           <div className="api-section-row">
             <div>
               <h3>API Endpoints</h3>
-              <p>Core endpoints available in the Breach Radar API.</p>
+              <p>Core endpoints available in the PentestRadar API.</p>
             </div>
             <a href="#docs">
               View Full Documentation <ExternalLink size={15} />
@@ -3320,7 +3358,7 @@ function ApiAccessPage() {
 
         <section className="settings-panel quick-panel">
           <h3>Quick Start</h3>
-          <p>Get started with Breach Radar API in minutes.</p>
+          <p>Get started with PentestRadar API in minutes.</p>
           <div className="quick-links">
             {quickLinks.map(([title, desc, Icon]) => (
               <a href="#quick" key={title}>

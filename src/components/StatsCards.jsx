@@ -62,7 +62,7 @@ export default function StatsCards() {
         <div className="dashboard-score-copy">
           <p>Security Score</p>
           <strong>{loading ? "..." : stats.securityScoreLabel || "Not Scanned"}</strong>
-          <small>Workspace average from scanned domains</small>
+          <small>Avg. across domains</small>
         </div>
         <div
           className="dashboard-score-ring"

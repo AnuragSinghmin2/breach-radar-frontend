@@ -72,6 +72,16 @@
   font-weight: 800;
   line-height: 1.2;
   margin-top: 7px;
+}
+
+.dashboard-score-copy small {
+  color: #8d9aab;
+  font-weight: 650;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-stat-card small {
   white-space: nowrap;
 }
 

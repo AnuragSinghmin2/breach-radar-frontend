@@ -1,0 +1,116 @@
+/* Privacy-specific overrides — base layout reuses AboutUsPage.css */
+
+.privacy-hero .eyebrow {
+  display: block;
+}
+
+.privacy-updated {
+  margin: 14px auto 0;
+  color: #6f8480;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.privacy-section {
+  text-align: left;
+  max-width: 850px;
+  margin: 0 auto 40px;
+  padding: 0 12px;
+}
+
+.simple-policy-section h2 {
+  color: #f6fffb;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 800;
+  margin-bottom: 18px;
+}
+
+.policy-text {
+  color: #c6d2ca;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.policy-text p,
+.policy-text h4,
+.policy-text ul,
+.policy-text ol,
+.policy-text li {
+  margin-bottom: 16px;
+}
+
+.policy-text h4 {
+  color: #f6fffb;
+  font-size: 16px;
+  font-weight: 800;
+  margin-top: 22px;
+}
+
+.policy-text ul,
+.policy-text ol {
+  padding-left: 22px;
+  color: #c6d2ca;
+}
+
+.policy-text li {
+  margin-bottom: 10px;
+}
+
+.policy-text a {
+  color: #1def91;
+  text-decoration: underline;
+}
+
+.policy-contact {
+  color: #c6d2ca !important;
+  line-height: 1.9 !important;
+}
+
+.privacy-cta {
+  padding-top: 48px;
+}
+
+.privacy-cta-icon {
+  margin: 0 auto 20px;
+}
+
+.privacy-cta .about-tagline {
+  max-width: 640px;
+  margin: 0 auto;
+  font-size: clamp(18px, 2.4vw, 24px);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .privacy-section {
+    margin-bottom: 32px;
+  }
+}
+
+.policy-contact {
+  color: #eafff6 !important;
+  line-height: 1.9 !important;
+}
+
+.privacy-cta {
+  padding-top: 48px;
+}
+
+.privacy-cta-icon {
+  margin: 0 auto 20px;
+}
+
+.privacy-cta .about-tagline {
+  max-width: 640px;
+  margin: 0 auto;
+  font-size: clamp(18px, 2.4vw, 24px);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .privacy-grid.two {
+    grid-template-columns: 1fr;
+  }
+}

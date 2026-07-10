@@ -135,6 +135,14 @@ export default function Sidebar({ isOpen }) {
     getUsageMetric(planUsage, "seats"),
   ];
 
+  function scrollContentToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    const contentArea = document.querySelector(".content-area");
+    if (contentArea) {
+      contentArea.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
   return (
     <div className={`sidebar ${isOpen ? "show" : "hide"}`}>
       <div className="logo">
@@ -158,6 +166,7 @@ export default function Sidebar({ isOpen }) {
           to="/dashboard/domains"
           title="Domains"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          onClick={scrollContentToTop}
         >
           <Globe size={18} /> <span className="menu-label">Domains</span>
         </NavLink>

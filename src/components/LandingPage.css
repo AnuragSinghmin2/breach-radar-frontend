@@ -16,7 +16,7 @@
 }
 
 .navbar {
-  height: 48px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -46,9 +46,14 @@
   text-decoration: none;
 }
 
+.brand .brand-logo {
+  gap: 11px;
+}
+
 .brand .brand-logo strong {
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.2px;
 }
 
 .side-brand .brand-logo strong {

@@ -2752,6 +2752,44 @@
   opacity: 0.45;
 }
 
+.security-sessions-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+  color: #aeb8c7;
+  font-size: 12px;
+}
+
+.security-sessions-pagination div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.security-sessions-pagination button {
+  min-height: 32px;
+  border: 1px solid rgba(42, 69, 96, 0.72);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.78);
+  color: #dbe3ee;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 0 11px;
+}
+
+.security-sessions-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .integrations-settings-layout {
   display: flex;
   flex-direction: column;
@@ -3579,6 +3617,19 @@
 
   .security-session-row button {
     width: 100%;
+  }
+
+  .security-sessions-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .security-sessions-pagination div {
+    width: 100%;
+  }
+
+  .security-sessions-pagination button {
+    flex: 1;
   }
 
   .integration-card button,

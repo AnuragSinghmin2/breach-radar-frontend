@@ -21,7 +21,13 @@ import {
 } from "lucide-react";
 import "./table.css";
 
+const ITEMS_PER_PAGE = 6;
+
+
 function mapVulnerability(item) {
+
+ 
+
   return {
     id: item._id,
     name: item.name,
@@ -68,6 +74,7 @@ export default function VulnerabilitiesTable() {
   const [activeMenu, setActiveMenu] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+   const [currentPage, setCurrentPage] = useState(1);
 
   const loadVulnerabilities = useCallback(async () => {
     try {
@@ -123,6 +130,20 @@ export default function VulnerabilitiesTable() {
       return matchesQuery && matchesSeverity && matchesStatus;
     });
   }, [items, query, severityFilter, statusFilter]);
+  const totalItems = filteredItems.length;
+const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+
+const paginatedItems = useMemo(() => {
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  return filteredItems.slice(start, start + ITEMS_PER_PAGE);
+}, [filteredItems, currentPage]);
+
+useEffect(() => {
+  setCurrentPage(1);
+}, [query, severityFilter, statusFilter]);
+
+const startItem = totalItems === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
 
   const domainBars = useMemo(() => {
     const byDomain = items.reduce((acc, item) => {
@@ -164,7 +185,7 @@ export default function VulnerabilitiesTable() {
   function exportCsv() {
     const csv = [
       ["Vulnerability", "Domain", "Severity", "Status", "CWE", "Path"],
-      ...filteredItems.map((item) => [item.name, item.domain, item.severity, item.status, item.cwe, item.path]),
+      ...paginatedItems.map((item) => [item.name, item.domain, item.severity, item.status, item.cwe, item.path]),
     ]
       .map((row) => row.join(","))
       .join("\n");
@@ -262,7 +283,7 @@ export default function VulnerabilitiesTable() {
                   <span>Actions</span>
                 </div>
 
-                {filteredItems.map((item) => (
+                {paginatedItems.map((item) => (
                   <div className="vuln-row" key={`${item.name}-${item.domain}`}>
                     <button className="vuln-name-cell" type="button" onClick={() => setSelected(item)}>
                       <span className={`vuln-bug-icon ${item.tone}`}>
@@ -309,12 +330,31 @@ export default function VulnerabilitiesTable() {
             </div>
 
             <div className="vuln-pagination">
-              <p>Showing {filteredItems.length ? 1 : 0} to {filteredItems.length} of {items.length} vulnerabilities</p>
-              <div>
-                <button type="button" disabled><ChevronLeft size={16} /></button>
-                <button className="active" type="button">1</button>
-                <button type="button" disabled><ChevronRight size={16} /></button>
-              </div>
+             <p>
+  Showing {startItem} to {endItem} of {totalItems} vulnerabilities
+</p>
+
+<div>
+  <button
+    type="button"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => p - 1)}
+  >
+    <ChevronLeft size={16} />
+  </button>
+
+  <button className="active" type="button">
+    {currentPage}
+  </button>
+
+  <button
+    type="button"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => p + 1)}
+  >
+    <ChevronRight size={16} />
+  </button>
+</div>
             </div>
           </section>
 

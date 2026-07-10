@@ -15,9 +15,7 @@ import {
   MoreVertical,
   Search,
   Send,
-  Shield,
   ShieldCheck,
-  Zap,
   X,
 } from "lucide-react";
 import "./Reports.css";
@@ -32,6 +30,7 @@ const included = [
 ];
 
 const statusFilters = ["All", "Completed", "In Progress", "Failed"];
+const REPORTS_PER_PAGE = 5;
 
 function Badge({ tone, children }) {
   return <span className={`reports-badge ${tone}`}>{children}</span>;
@@ -48,7 +47,10 @@ function Score({ value }) {
   }
 
   return (
-    <div className={`reports-score ${value >= 70 ? "good" : value >= 55 ? "warn" : "bad"}`}>
+    <div
+      className={`reports-score ${value >= 70 ? "good" : value >= 55 ? "warn" : "bad"}`}
+      style={{ "--score": value }}
+    >
       <strong>{value}</strong>
       <span>/100</span>
     </div>
@@ -67,7 +69,7 @@ function reportText(report) {
     : "Findings are not available yet.";
 
   return [
-    "SecureScan Security Report",
+    "PentestRadar Security Report",
     `Report ID: ${report.id}`,
     `Domain: ${report.domain}`,
     `Scan Type: ${report.scanType}`,
@@ -91,6 +93,7 @@ export default function Reports() {
   const [selected, setSelected] = useState(null);
   const [activeMenu, setActiveMenu] = useState("");
   const [message, setMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [builderOpen, setBuilderOpen] = useState(window.location.hash === "#new-report");
   const [draft, setDraft] = useState({
     domain: initialDomain || domains[0]?.domain || "",
@@ -142,6 +145,27 @@ export default function Reports() {
       return matchesQuery && matchesStatus;
     });
   }, [query, reports, statusFilter]);
+
+  const totalReports = filteredReports.length;
+  const totalPages = Math.max(1, Math.ceil(totalReports / REPORTS_PER_PAGE));
+  const paginatedReports = useMemo(() => {
+    const start = (currentPage - 1) * REPORTS_PER_PAGE;
+    return filteredReports.slice(start, start + REPORTS_PER_PAGE);
+  }, [currentPage, filteredReports]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setActiveMenu("");
+  }, [query, statusFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const startReport = totalReports === 0 ? 0 : (currentPage - 1) * REPORTS_PER_PAGE + 1;
+  const endReport = Math.min(currentPage * REPORTS_PER_PAGE, totalReports);
 
   const stats = useMemo(() => {
     const completed = reports.filter((report) => report.status === "Completed").length;
@@ -203,7 +227,7 @@ export default function Reports() {
 
   function shareReport(report = selected) {
     if (!report) return;
-    setMessage(`Share link copied for ${report.id}: securescan.local/reports/${report.id.replace("#", "")}`);
+    setMessage(`Share link copied for ${report.id}: pentestradar.local/reports/${report.id.replace("#", "")}`);
   }
 
   function toggleSection(section) {
@@ -303,34 +327,29 @@ export default function Reports() {
               <div className="reports-row reports-head">
                 <span>Report</span>
                 <span>Domain</span>
-                <span>Scan Type</span>
                 <span>Status</span>
-                <span>Vulnerabilities</span>
                 <span>Score</span>
-                <span>Generated At</span>
+                <span>Generated</span>
                 <span>Actions</span>
               </div>
 
-              {filteredReports.map((report) => (
+              {paginatedReports.map((report) => (
                 <div className="reports-row" key={report.id}>
                   <button className="reports-name-cell" type="button" onClick={() => setSelected(report)}>
                     <span className="reports-pdf-icon">PDF</span>
-                    <strong>
-                      {report.title}
+                    <strong title={report.title}>
+                      <span>{report.title}</span>
                       <small>{report.id}</small>
                     </strong>
                   </button>
                   <button
                     className="reports-domain-btn"
                     type="button"
+                    title={report.domain}
                     onClick={() => navigate(`/dashboard/domains?domain=${report.domain}`)}
                   >
                     {report.domain}
                   </button>
-                  <span className={`reports-scan-type ${report.type}`}>
-                    {report.type === "quick" ? <Zap size={15} /> : <Shield size={15} />}
-                    {report.scanType}
-                  </span>
                   <button
                     className="reports-plain-btn"
                     type="button"
@@ -338,28 +357,9 @@ export default function Reports() {
                   >
                     <Badge tone={statusTone(report.status)}>{report.status}</Badge>
                   </button>
-                  <div className="reports-vuln-counts">
-                    {report.vulns ? (
-                      ["critical", "high", "medium", "low"].map((tone, index) => (
-                        <button
-                          className={tone}
-                          type="button"
-                          key={tone}
-                          onClick={() =>
-                            navigate(`/dashboard/vulnerabilities?domain=${report.domain}&severity=${tone}`)
-                          }
-                        >
-                          <b>{report.vulns[index]}</b>
-                          <small>{tone[0].toUpperCase() + tone.slice(1)}</small>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="empty">-</span>
-                    )}
-                  </div>
                   <Score value={report.score} />
                   <span className="reports-generated">
-                    {report.generated.split("\n").map((line) => (
+                    {report.generated.split("\n").slice(0, 2).map((line) => (
                       <small key={line}>{line}</small>
                     ))}
                   </span>
@@ -408,17 +408,31 @@ export default function Reports() {
 
           <div className="reports-pagination">
             <p>
-              Showing {filteredReports.length ? 1 : 0} to {filteredReports.length} of{" "}
-              {reports.length} reports
+              Showing {startReport} to {endReport} of {totalReports} reports
             </p>
             <div>
-              <button type="button" disabled>
+              <button
+                type="button"
+                disabled={currentPage === 1}
+                onClick={() => {
+                  setCurrentPage((page) => Math.max(1, page - 1));
+                  setActiveMenu("");
+                }}
+              >
                 <ChevronLeft size={16} />
               </button>
               <button className="active" type="button">
-                1
+                {currentPage}
               </button>
-              <button type="button" disabled>
+              <span>of {totalPages}</span>
+              <button
+                type="button"
+                disabled={currentPage === totalPages}
+                onClick={() => {
+                  setCurrentPage((page) => Math.min(totalPages, page + 1));
+                  setActiveMenu("");
+                }}
+              >
                 <ChevronRight size={16} />
               </button>
             </div>
@@ -507,7 +521,7 @@ export default function Reports() {
                 <div className="reports-preview-body">
                   <div className="reports-cover">
                     <ShieldCheck size={21} />
-                    <b>SecureScan</b>
+                    <b>PentestRadar</b>
                     <strong>{selected.title}</strong>
                     <small>
                       {selected.domain}

@@ -59,7 +59,7 @@ export default function SignUpPage() {
     }
 
     if (!acceptedTerms) {
-      setError("You must agree to the Terms of Service and Privacy Policy.");
+      setError("You must agree to the Terms and Conditions and Privacy Policy.");
       return;
     }
 
@@ -88,7 +88,7 @@ export default function SignUpPage() {
     <form className="signin-card signup-card" onSubmit={handleSubmit}>
       <div className="form-lock form-user-add"></div>
       <h2>Create Account</h2>
-      <p>Join Breach Radar and start your security journey today.</p>
+      <p>Join PentestRadar and start your security journey today.</p>
 
       <label className="field-label" htmlFor="fullName">
         Full Name
@@ -166,7 +166,7 @@ export default function SignUpPage() {
         />
         <span></span>
         <strong>
-          I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+          I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
         </strong>
       </label>
 
