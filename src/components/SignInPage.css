@@ -25,11 +25,6 @@
   margin: 0 auto;
 }
 
-.auth-navbar .brand-logo strong {
-  font-size: 14px;
-  font-weight: 800;
-}
-
 .auth-landing-footer {
   width: min(1180px, calc(100% - 44px));
   margin: 0 auto;

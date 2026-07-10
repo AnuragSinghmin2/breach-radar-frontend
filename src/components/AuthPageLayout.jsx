@@ -75,7 +75,7 @@ export default function AuthPageLayout({ children }) {
               navigate("/");
             }}
           >
-            <BrandLogo iconSize={22} />
+            <BrandLogo iconSize={26} />
           </a>
 
           <div className="nav-links">
