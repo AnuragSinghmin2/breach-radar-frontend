@@ -356,6 +356,7 @@ button {
 
 .hero-copy {
   max-width: 520px;
+  transform: translateY(-50px);
 }
 
 .eyebrow {
@@ -470,6 +471,7 @@ button {
 .dashboard-wrap {
   position: relative;
   min-width: 0;
+  transform: translateY(-30px);
 }
 
 .dashboard-glow {
@@ -1782,6 +1784,7 @@ button {
   }
 
   .hero-copy {
+   
     max-width: 760px;
     text-align: center;
     margin: 0 auto;
