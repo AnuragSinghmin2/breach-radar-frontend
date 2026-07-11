@@ -85,9 +85,11 @@ export default function SignInPage() {
       navigate(destination, { replace: true });
     } catch (err) {
       // Email not verified — redirect to check email page
-      if (err?.code === 'EMAIL_NOT_VERIFIED' || err?.message?.includes('verify your email')) {
+      const errorCode = err?.response?.data?.code || err?.code;
+      const errorMessage = err?.response?.data?.message || err?.message || "";
+      if (errorCode === 'EMAIL_NOT_VERIFIED' || errorMessage.includes('verify your email')) {
         navigate("/check-email", {
-          state: { email: formData.email }
+          state: { email }
         });
         return;
       }
