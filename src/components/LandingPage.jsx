@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Search, FileText, Activity, Zap, Users, ShieldCheck,
   Globe, Target, BarChart2, Lock,
-  CheckCircle
+  Monitor, ShoppingBag, Code2, BookOpen, FileCode, BookMarked,
+  Info, Briefcase, Mail, CheckCircle, ArrowRight
 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import Footer from "./Footer";
@@ -274,6 +275,67 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Demo section state
+  const [demoStep, setDemoStep] = useState(1);
+  const [demoTyped, setDemoTyped] = useState("");
+  const [demoProgress, setDemoProgress] = useState(0);
+  const [demoLogs, setDemoLogs] = useState([]);
+  const demoRef = useRef(null);
+
+  // Typing animation for Step 1
+  useEffect(() => {
+    if (demoStep !== 1) return;
+    const text = "myapp.com";
+    let i = 0;
+    setDemoTyped("");
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setDemoTyped(text.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 120);
+    return () => clearInterval(interval);
+  }, [demoStep]);
+
+  // Progress bar + logs for Step 2
+  useEffect(() => {
+    if (demoStep !== 2) return;
+    setDemoProgress(0);
+    setDemoLogs([]);
+
+    const logs = [
+      "Checking DNS records...",
+      "Scanning open ports...",
+      "Testing SSL certificate...",
+      "Checking for XSS vulnerabilities...",
+      "Testing SQL injection points...",
+      "Analyzing security headers...",
+      "Scan complete!",
+    ];
+
+    let progress = 0;
+    let logIndex = 0;
+
+    const interval = setInterval(() => {
+      progress += 2;
+      setDemoProgress(Math.min(progress, 100));
+
+      if (progress % 14 === 0 && logIndex < logs.length) {
+        setDemoLogs((prev) => [...prev, logs[logIndex]]);
+        logIndex++;
+      }
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => setDemoStep(3), 500);
+      }
+    }, 60);
+
+    return () => clearInterval(interval);
+  }, [demoStep]);
+
   useEffect(() => {
     const sectionId = location.hash.replace("#", "");
     if (!sectionId) return;
@@ -340,14 +402,14 @@ export default function LandingPage() {
         </section>
 
         <section className="trusted" aria-label="Trusted by companies">
-          <p>Trusted by 10,000+ companies worldwide</p>
+          <p>Trusted by 1000+ companies worldwide</p>
           <div className="logos">
-            <span>Fortune 500</span>
-            <span>Startups</span>
-            <span>Enterprises</span>
-            <span>Agencies</span>
-            <span>Dev Teams</span>
-            <span>SaaS Companies</span>
+            <span>Breach Radar</span>
+            <span>Dork Radar</span>
+            <span>360 Flash Drive</span>
+            <span>SAS Hospital</span>
+            <span>Cybersena.in</span>
+            <span>Priya Hospital</span>
           </div>
         </section>
 
@@ -395,6 +457,135 @@ export default function LandingPage() {
                 </article>
               );
             })}
+          </div>
+        </section>
+
+        {/* LIVE DEMO SECTION */}
+        <section className="demo-section" id="demo">
+          <div className="section-kicker">Live Demo</div>
+          <h2>See Pentest Radar in Action</h2>
+          <p>Watch how easy it is to scan your domain for vulnerabilities</p>
+
+          <div className="demo-container">
+            {/* Left — Steps */}
+            <div className="demo-steps">
+              <div className={`demo-step ${demoStep === 1 ? "active" : demoStep > 1 ? "done" : ""}`}>
+                <span className="demo-step-num">{demoStep > 1 ? "✓" : "1"}</span>
+                <div>
+                  <strong>Add Your Domain</strong>
+                  <small>Enter domain to scan</small>
+                </div>
+              </div>
+              <div className={`demo-step ${demoStep === 2 ? "active" : demoStep > 2 ? "done" : ""}`}>
+                <span className="demo-step-num">{demoStep > 2 ? "✓" : "2"}</span>
+                <div>
+                  <strong>Scanning...</strong>
+                  <small>AI analyzes vulnerabilities</small>
+                </div>
+              </div>
+              <div className={`demo-step ${demoStep === 3 ? "active" : ""}`}>
+                <span className="demo-step-num">3</span>
+                <div>
+                  <strong>View Results</strong>
+                  <small>Get security report</small>
+                </div>
+              </div>
+            </div>
+
+            {/* Right — Demo UI */}
+            <div className="demo-screen">
+              {demoStep === 1 && (
+                <div className="demo-card">
+                  <p className="demo-step-label">Step 1 of 3</p>
+                  <h3>Add Your Domain</h3>
+                  <p className="demo-desc">Enter the domain you want to scan for vulnerabilities.</p>
+                  <div className="demo-input-box">
+                    <Globe size={16} color="#9ca3af" />
+                    <span className="demo-typed-text">
+                      {demoTyped}
+                      <span className="demo-cursor">|</span>
+                    </span>
+                    <button
+                      className="demo-go-btn"
+                      onClick={() => setDemoStep(2)}
+                      type="button"
+                    >
+                      <ArrowRight size={16} color="#fff" />
+                    </button>
+                  </div>
+                  <p className="demo-hint">Free scan · No credit card required</p>
+                </div>
+              )}
+
+              {demoStep === 2 && (
+                <div className="demo-card">
+                  <p className="demo-step-label">Step 2 of 3</p>
+                  <h3>Scanning Domain...</h3>
+                  <p className="demo-desc">Our AI is analyzing <strong style={{ color: "#16e095" }}>myapp.com</strong> for vulnerabilities.</p>
+                  <div className="demo-scan-progress">
+                    <div className="demo-scan-bar">
+                      <div className="demo-scan-fill" style={{ width: `${demoProgress}%` }}></div>
+                    </div>
+                    <span>{demoProgress}%</span>
+                  </div>
+                  <div className="demo-scan-logs">
+                    {demoLogs.map((log, i) => (
+                      <div key={i} className="demo-log-line">
+                        <span className="demo-log-dot"></span>
+                        {log}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {demoStep === 3 && (
+                <div className="demo-card">
+                  <p className="demo-step-label">Step 3 of 3</p>
+                  <h3>Scan Complete!</h3>
+                  <p className="demo-desc">Security report for <strong style={{ color: "#16e095" }}>myapp.com</strong></p>
+                  <div className="demo-results">
+                    <div className="demo-score-box">
+                      <strong>68</strong>
+                      <span>Security Score</span>
+                    </div>
+                    <div className="demo-vulns">
+                      <div className="demo-vuln-row critical">
+                        <span>Critical</span>
+                        <strong>3</strong>
+                      </div>
+                      <div className="demo-vuln-row high">
+                        <span>High</span>
+                        <strong>7</strong>
+                      </div>
+                      <div className="demo-vuln-row medium">
+                        <span>Medium</span>
+                        <strong>12</strong>
+                      </div>
+                      <div className="demo-vuln-row low">
+                        <span>Low</span>
+                        <strong>5</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    className="start-btn"
+                    style={{ width: "100%", marginTop: 16 }}
+                    onClick={() => navigate("/register")}
+                    type="button"
+                  >
+                    Start Free Scan →
+                  </button>
+                  <button
+                    className="demo-restart-btn"
+                    onClick={() => { setDemoStep(1); setDemoProgress(0); setDemoLogs([]); setDemoTyped(""); }}
+                    type="button"
+                  >
+                    ↺ Restart Demo
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
