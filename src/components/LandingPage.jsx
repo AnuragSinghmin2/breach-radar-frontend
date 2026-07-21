@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Search, FileText, Activity, Zap, Users, ShieldCheck,
@@ -280,7 +280,6 @@ export default function LandingPage() {
   const [demoTyped, setDemoTyped] = useState("");
   const [demoProgress, setDemoProgress] = useState(0);
   const [demoLogs, setDemoLogs] = useState([]);
-  const demoRef = useRef(null);
 
   // Typing animation for Step 1
   useEffect(() => {
@@ -298,6 +297,13 @@ export default function LandingPage() {
     }, 120);
     return () => clearInterval(interval);
   }, [demoStep]);
+
+  useEffect(() => {
+    if (demoStep !== 1 || demoTyped !== "myapp.com") return undefined;
+
+    const timeout = setTimeout(() => setDemoStep(2), 700);
+    return () => clearTimeout(timeout);
+  }, [demoStep, demoTyped]);
 
   // Progress bar + logs for Step 2
   useEffect(() => {
@@ -334,6 +340,25 @@ export default function LandingPage() {
     }, 60);
 
     return () => clearInterval(interval);
+  }, [demoStep]);
+
+  useEffect(() => {
+    if (demoStep !== 3) return undefined;
+
+    const timeout = setTimeout(() => setDemoStep(4), 2400);
+    return () => clearTimeout(timeout);
+  }, [demoStep]);
+
+  useEffect(() => {
+    if (demoStep !== 4) return undefined;
+
+    const timeout = setTimeout(() => {
+      setDemoProgress(0);
+      setDemoLogs([]);
+      setDemoTyped("");
+      setDemoStep(1);
+    }, 3600);
+    return () => clearTimeout(timeout);
   }, [demoStep]);
 
   useEffect(() => {
@@ -483,11 +508,18 @@ export default function LandingPage() {
                   <small>AI analyzes vulnerabilities</small>
                 </div>
               </div>
-              <div className={`demo-step ${demoStep === 3 ? "active" : ""}`}>
-                <span className="demo-step-num">3</span>
+              <div className={`demo-step ${demoStep === 3 ? "active" : demoStep > 3 ? "done" : ""}`}>
+                <span className="demo-step-num">{demoStep > 3 ? "✓" : "3"}</span>
                 <div>
                   <strong>View Results</strong>
                   <small>Get security report</small>
+                </div>
+              </div>
+              <div className={`demo-step ${demoStep === 4 ? "active" : ""}`}>
+                <span className="demo-step-num">4</span>
+                <div>
+                  <strong>Fix &amp; Secure</strong>
+                  <small>Apply recommended fixes</small>
                 </div>
               </div>
             </div>
@@ -496,7 +528,7 @@ export default function LandingPage() {
             <div className="demo-screen">
               {demoStep === 1 && (
                 <div className="demo-card">
-                  <p className="demo-step-label">Step 1 of 3</p>
+                  <p className="demo-step-label">Step 1 of 4</p>
                   <h3>Add Your Domain</h3>
                   <p className="demo-desc">Enter the domain you want to scan for vulnerabilities.</p>
                   <div className="demo-input-box">
@@ -507,7 +539,8 @@ export default function LandingPage() {
                     </span>
                     <button
                       className="demo-go-btn"
-                      onClick={() => setDemoStep(2)}
+                      aria-label="Demo advances automatically"
+                      disabled
                       type="button"
                     >
                       <ArrowRight size={16} color="#fff" />
@@ -519,7 +552,7 @@ export default function LandingPage() {
 
               {demoStep === 2 && (
                 <div className="demo-card">
-                  <p className="demo-step-label">Step 2 of 3</p>
+                  <p className="demo-step-label">Step 2 of 4</p>
                   <h3>Scanning Domain...</h3>
                   <p className="demo-desc">Our AI is analyzing <strong style={{ color: "#16e095" }}>myapp.com</strong> for vulnerabilities.</p>
                   <div className="demo-scan-progress">
@@ -541,7 +574,7 @@ export default function LandingPage() {
 
               {demoStep === 3 && (
                 <div className="demo-card">
-                  <p className="demo-step-label">Step 3 of 3</p>
+                  <p className="demo-step-label">Step 3 of 4</p>
                   <h3>Scan Complete!</h3>
                   <p className="demo-desc">Security report for <strong style={{ color: "#16e095" }}>myapp.com</strong></p>
                   <div className="demo-results">
@@ -583,6 +616,31 @@ export default function LandingPage() {
                   >
                     ↺ Restart Demo
                   </button>
+                </div>
+              )}
+
+              {demoStep === 4 && (
+                <div className="demo-card">
+                  <p className="demo-step-label">Step 4 of 4</p>
+                  <h3>Fix &amp; Secure</h3>
+                  <p className="demo-desc">Prioritized recommendations help your team close the most important issues first.</p>
+                  <div className="demo-fix-list">
+                    {[
+                      ["Critical", "Patch SQL injection endpoint", "Ready"],
+                      ["High", "Add missing security headers", "Ready"],
+                      ["Medium", "Rotate exposed API token", "Queued"],
+                    ].map(([severity, title, status]) => (
+                      <div className={`demo-fix-row ${severity.toLowerCase()}`} key={title}>
+                        <span>{severity}</span>
+                        <strong>{title}</strong>
+                        <em>{status}</em>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="demo-secure-note">
+                    <ShieldCheck size={18} color="#16e095" />
+                    <span>Remediation workflow prepared automatically</span>
+                  </div>
                 </div>
               )}
             </div>

@@ -14,3 +14,8 @@ export async function getReportById(id) {
   const { data } = await apiClient.get(`/reports/${id}`);
   return data;
 }
+
+export async function downloadReportPdf(id) {
+  const { data } = await apiClient.get(`/reports/${id}/pdf`, { responseType: "blob" });
+  return data;
+}

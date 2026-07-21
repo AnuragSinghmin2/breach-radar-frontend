@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Download,
   EllipsisVertical,
   Filter,
   Globe2,
@@ -22,6 +23,11 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import {
+  createDomainSecurityReportPdf,
+  getDomainReportFilename,
+  getDomainVulnerabilities,
+} from "../utils/domainReportPdf";
 import "./Domains.css";
 
 const severityLabels = [
@@ -36,6 +42,46 @@ const DOMAINS_PER_PAGE = 8;
 
 function totalVulnerabilities(item) {
   return Object.values(item.vulnerabilities).reduce((sum, value) => sum + value, 0);
+}
+
+function getHtmlVerificationToken(instructions) {
+  return instructions?.dns?.value || instructions?.html?.content || "";
+}
+
+function getDownloadVerificationFilename(instructions) {
+  const host = instructions?.dns?.host || instructions?.html?.filename?.replace(/\.html$/i, "") || "";
+  const safeFilename = host
+    .trim()
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `${safeFilename}.html`;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function getDownloadVerificationHtml(instructions) {
+  const token = getHtmlVerificationToken(instructions);
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PentestRadar Verification</title>
+</head>
+<body>
+${escapeHtml(token)}
+</body>
+</html>`;
 }
 
 function ScoreRing({ value, tone }) {
@@ -53,7 +99,7 @@ function ScoreRing({ value, tone }) {
 
 export default function Domains() {
   const navigate = useNavigate();
-  const { domains, stats: dashboardStats, loading, refreshDomains, refreshScans, refreshStats } =
+  const { domains, vulnerabilities, stats: dashboardStats, loading, refreshDomains, refreshScans, refreshStats } =
     useDashboard();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
@@ -61,6 +107,7 @@ export default function Domains() {
   const [activeMenu, setActiveMenu] = useState("");
   const [newDomain, setNewDomain] = useState("");
   const [message, setMessage] = useState("");
+  const [generatingReportDomain, setGeneratingReportDomain] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -239,6 +286,37 @@ export default function Domains() {
     }
   }
 
+  async function downloadDomainReport(domainItem) {
+    if (generatingReportDomain) return;
+
+    setGeneratingReportDomain(domainItem.domain);
+    setActiveMenu("");
+    setMessage(`Generating security report for ${domainItem.domain}...`);
+
+    try {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      const domainVulnerabilities = getDomainVulnerabilities(vulnerabilities, domainItem.domain);
+      const blob = createDomainSecurityReportPdf({
+        domain: domainItem,
+        vulnerabilities: domainVulnerabilities,
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = getDomainReportFilename(domainItem.domain);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setMessage(`${getDomainReportFilename(domainItem.domain)} downloaded successfully.`);
+    } catch (error) {
+      setMessage(error.message || "Failed to generate security report.");
+    } finally {
+      setGeneratingReportDomain("");
+    }
+  }
+
   async function openVerification(domainItem) {
     setVerifyModalDomain(domainItem);
     setVerifyError("");
@@ -255,6 +333,23 @@ export default function Domains() {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(""), 2000);
+  }
+
+  function downloadVerificationHtmlFile() {
+    if (!verificationInstructions) return;
+
+    const filename = getDownloadVerificationFilename(verificationInstructions);
+    const content = getDownloadVerificationHtml(verificationInstructions);
+    const blob = new Blob([content], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   async function performVerification(bypass = false) {
@@ -375,7 +470,7 @@ export default function Domains() {
                       <button
                         className="domain-name-button"
                         type="button"
-                        onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}
+                        onClick={() => navigate(`/dashboard/vulnerabilities?domain=${encodeURIComponent(item.domain)}`)}
                       >
                         <span className={`domain-row-icon ${item.iconTone}`}>
                           <Globe2 size={23} />
@@ -414,7 +509,7 @@ export default function Domains() {
                           className="severity-item"
                           type="button"
                           key={key}
-                          onClick={() => navigate(`/dashboard/vulnerabilities?domain=${item.domain}&severity=${key}`)}
+                          onClick={() => navigate(`/dashboard/vulnerabilities?domain=${encodeURIComponent(item.domain)}&severity=${key}`)}
                         >
                           <b className={key}>{item.vulnerabilities[key]}</b>
                           <small>{label}</small>
@@ -439,10 +534,10 @@ export default function Domains() {
                         <div className={`domain-row-menu ${index >= paginatedDomains.length - 2 ? "open-up" : ""}`}>
                           <button
                             type="button"
-                            onClick={() => navigate(`/dashboard/domains?domain=${encodeURIComponent(item.domain)}`)}
+                            onClick={() => navigate(`/dashboard/vulnerabilities?domain=${encodeURIComponent(item.domain)}`)}
                           >
-                            <Globe2 size={15} />
-                            <span>View Details</span>
+                            <ShieldPlus size={15} />
+                            <span>View Vulnerabilities</span>
                           </button>
                           <button type="button" onClick={() => scanDomain(item.domain)}>
                             <PlayCircle size={15} />
@@ -454,6 +549,16 @@ export default function Domains() {
                           >
                             <FileText size={15} />
                             <span>View Reports</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={generatingReportDomain === item.domain}
+                            onClick={() => downloadDomainReport(item)}
+                          >
+                            <Download size={15} />
+                            <span>
+                              {generatingReportDomain === item.domain ? "Generating..." : "Download Report"}
+                            </span>
                           </button>
                           <button type="button" onClick={() => editDomain(item)}>
                             <Pencil size={15} />
@@ -544,6 +649,12 @@ export default function Domains() {
                 >
                   HTML File Upload
                 </button>
+                <button
+                  className={`verify-tab-btn ${verifyTab === "download-html" ? "active" : ""}`}
+                  onClick={() => setVerifyTab("download-html")}
+                >
+                  Download HTML File
+                </button>
               </div>
 
               {verifyError && (
@@ -590,7 +701,7 @@ export default function Domains() {
                       Note: DNS changes can take up to 24 hours to propagate, although they are usually active within a few minutes.
                     </div>
                   </div>
-                ) : (
+                ) : verifyTab === "html" ? (
                   <div className="verify-tab-content">
                     <div className="instruction-step">
                       <label>1. File Name</label>
@@ -625,6 +736,46 @@ export default function Domains() {
                     <div className="instruction-note">
                       Upload the file to the root of your web server and verify that it resolves directly.
                     </div>
+                  </div>
+                ) : (
+                  <div className="verify-tab-content">
+                    <div className="instruction-step">
+                      <label>1. Download the generated HTML file</label>
+                      <input
+                        className="download-filename-input"
+                        value={getDownloadVerificationFilename(verificationInstructions)}
+                        readOnly
+                        aria-label="Verification HTML filename"
+                      />
+                      <div className="download-helper-text">
+                        The filename is generated from the current Host / Name value. Keep it unchanged.
+                      </div>
+                    </div>
+                    <div className="instruction-step">
+                      <label>2. Upload it to the website root/public_html directory</label>
+                      <div className="instruction-note">
+                        Place the downloaded file in your website root or public_html directory so it is reachable from your domain.
+                      </div>
+                    </div>
+                    <div className="instruction-step">
+                      <label>3. Keep the filename unchanged</label>
+                      <div className="code-copy-box">
+                        <code>{getDownloadVerificationFilename(verificationInstructions)}</code>
+                      </div>
+                    </div>
+                    <div className="instruction-step">
+                      <label>4. Click Verify Ownership</label>
+                      <div className="code-copy-box">
+                        <code>{getHtmlVerificationToken(verificationInstructions)}</code>
+                      </div>
+                    </div>
+                    <button
+                      className="download-html-btn"
+                      type="button"
+                      onClick={downloadVerificationHtmlFile}
+                    >
+                      Download HTML File
+                    </button>
                   </div>
                 )
               ) : (

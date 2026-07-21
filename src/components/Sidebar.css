@@ -1,16 +1,16 @@
 .sidebar {
-  width: 260px;
+  width: 220px;
   flex-shrink: 0;
 
   background: linear-gradient(180deg, #020617, #0b1220);
   color: #cbd5e1;
 
-  padding: 20px;
+  padding: 16px;
   box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 
   overflow-y: auto;
   overflow-x: hidden;
@@ -24,8 +24,8 @@
 
 /* ✅ SHOW */
 .sidebar.show {
-  width: 260px;
-  padding: 20px;
+  width: 220px;
+  padding: 16px;
 }
 
 /* ✅ HIDE (MAIN FIX) */
@@ -291,13 +291,13 @@
 /* PLAN CARD */
 .plan-card {
   background: #111827;
-  padding: 15px;
-  border-radius: 15px;
+  padding: 10px 12px;
+  border-radius: 12px;
 }
 
 .plan-title {
-  margin: 0 0 8px;
-  font-size: 12px;
+  margin: 0 0 4px;
+  font-size: 11px;
   color: #94a3b8;
 }
 
@@ -310,7 +310,7 @@
 .plan-header h3 {
   color: white;
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -318,41 +318,41 @@
 .badge {
   background: #22c55e;
   color: black;
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 8px;
 }
 
 .plan-date {
-  font-size: 12px;
-  margin: 5px 0 10px;
+  font-size: 11px;
+  margin: 3px 0 6px;
   color: #94a3b8;
 }
 
 .plan-details {
   display: grid;
-  gap: 6px;
-  margin: 10px 0 6px;
+  gap: 4px;
+  margin: 6px 0 4px;
 }
 
 .plan-details span {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   color: #cbd5e1;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .plan-details b {
   color: #94a3b8;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .plan-stats.compact {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   align-items: stretch;
-  margin: 10px 0 0;
+  margin: 6px 0 0;
   overflow: hidden;
 }
 
@@ -360,14 +360,14 @@
   min-width: 0;
   flex: 1;
   display: grid;
-  gap: 2px;
-  padding: 7px 5px;
+  gap: 1px;
+  padding: 4px 2px;
   border: 1px solid rgba(51, 65, 85, 0.8);
-  border-radius: 7px;
+  border-radius: 6px;
   background: #1f2937;
   color: #cbd5e1;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 700;
   line-height: 1.1;
   text-align: center;
 }
@@ -375,37 +375,37 @@
 .plan-usage-pill b {
   display: block;
   color: #94a3b8;
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 8px;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .upgrade-btn {
-  margin-top: 10px;
+  margin-top: 8px;
   width: 100%;
   background: linear-gradient(90deg, #22c55e, #16a34a);
   border: none;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 7px;
+  border-radius: 8px;
   color: white;
   cursor: pointer;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .support-btn {
-  margin-top: 10px;
+  margin-top: 8px;
   width: 100%;
   background: #1f2937;
   border: 1px solid #334155;
-  padding: 10px;
+  padding: 7px;
   border-radius: 8px;
   color: #cbd5e1;
   cursor: default;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .plan-error {
@@ -433,18 +433,19 @@
 /* HELP CARD */
 .help-card {
   background: #111827;
-  padding: 15px;
-  border-radius: 15px;
+  padding: 10px 12px;
+  border-radius: 12px;
 }
 
 .help-card h4 {
-  margin-bottom: 10px;
+  margin: 0 0 6px 0;
   color: white;
+  font-size: 13px;
 }
 
 .help-card p {
-  font-size: 13px;
-  margin: 5px 0;
+  font-size: 12px;
+  margin: 4px 0;
   cursor: pointer;
   display: flex;
   align-items: center;

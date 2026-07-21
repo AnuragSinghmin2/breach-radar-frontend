@@ -44,6 +44,7 @@
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
+  transition: filter 180ms ease, transform 180ms ease;
 }
 
 .brand .brand-logo {
@@ -74,6 +75,7 @@
   font-size: 12px;
   font-weight: 700;
   text-decoration: none;
+  transition: color 180ms ease, filter 180ms ease, transform 180ms ease;
 }
 
 .dropdown-trigger {
@@ -147,6 +149,20 @@
   color: #f3fffb;
 }
 
+.nav-links > a:hover,
+.dropdown-trigger:hover,
+.login:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.nav-links > a:active,
+.dropdown-trigger:active,
+.login:active {
+  filter: brightness(0.98);
+  transform: translateY(0);
+}
+
 .nav-dropdown:hover .dropdown-trigger::after,
 .nav-dropdown:focus-within .dropdown-trigger::after {
   border-color: #18f091;
@@ -162,10 +178,20 @@
   padding: 10px;
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.025);
+  text-decoration: none;
+  transition: background 180ms ease, box-shadow 180ms ease, filter 180ms ease, transform 180ms ease;
 }
 
 .nav-menu-item:hover {
   background: rgba(29, 239, 145, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.nav-menu-item:active {
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.14);
+  filter: brightness(0.98);
+  transform: translateY(0);
 }
 
 .nav-menu-item strong,
@@ -321,6 +347,36 @@ button {
   border: 0;
 }
 
+.scan-page button:not(:disabled),
+.scan-page a[href] {
+  cursor: pointer;
+}
+
+.scan-page button:disabled,
+.scan-page button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.58;
+  filter: saturate(0.75);
+  box-shadow: none;
+}
+
+.scan-page a:focus-visible,
+.scan-page button:focus-visible {
+  outline: 2px solid rgba(29, 239, 145, 0.72);
+  outline-offset: 4px;
+}
+
+.brand:hover,
+.brand:focus-visible {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.brand:active {
+  filter: brightness(0.98);
+  transform: translateY(0);
+}
+
 .login {
   padding: 0;
   background: transparent;
@@ -332,6 +388,7 @@ button {
   border-radius: 5px;
   font-size: 12px;
   font-weight: 800;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, filter 180ms ease, transform 180ms ease;
 }
 
 .start-btn {
@@ -339,6 +396,18 @@ button {
   color: #001f13;
   background: linear-gradient(135deg, #0ef08a, #20ff9d);
   box-shadow: 0 0 30px rgba(20, 250, 146, 0.26);
+}
+
+.start-btn:hover:not(:disabled) {
+  filter: brightness(1.04);
+  box-shadow: 0 0 34px rgba(20, 250, 146, 0.34);
+  transform: translateY(-1px);
+}
+
+.start-btn:active:not(:disabled) {
+  filter: brightness(0.98);
+  box-shadow: 0 0 22px rgba(20, 250, 146, 0.22);
+  transform: translateY(0);
 }
 
 .start-btn.small {
@@ -356,6 +425,7 @@ button {
 
 .hero-copy {
   max-width: 520px;
+  transform: translateY(-80px);
 }
 
 .eyebrow {
@@ -409,6 +479,18 @@ button {
   border: 1px solid rgba(202, 255, 237, 0.16);
   color: #edf8f5;
   background: rgba(255, 255, 255, 0.03);
+}
+
+.demo-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.demo-btn:active:not(:disabled) {
+  filter: brightness(0.98);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.14);
+  transform: translateY(0);
 }
 
 .play {
@@ -470,6 +552,7 @@ button {
 .dashboard-wrap {
   position: relative;
   min-width: 0;
+  transform: translateY(-50px);
 }
 
 .dashboard-glow {
@@ -1109,6 +1192,17 @@ button {
   font-size: 12px;
   font-weight: 850;
   text-decoration: none;
+  transition: color 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.feature-card a:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.feature-card a:active {
+  filter: brightness(0.98);
+  transform: translateY(0);
 }
 
 .feature-card a span {
@@ -1446,6 +1540,19 @@ button {
   background: rgba(255, 255, 255, 0.025);
   font-size: 11px;
   font-weight: 850;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.sales-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.sales-btn:active:not(:disabled) {
+  filter: brightness(0.98);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.14);
+  transform: translateY(0);
 }
 
 .pricing-notes {
@@ -1583,6 +1690,19 @@ button {
   transform: translateY(-50%);
   font-size: 22px;
   font-weight: 800;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.slider-btn:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(calc(-50% - 1px));
+}
+
+.slider-btn:active:not(:disabled) {
+  filter: brightness(0.98);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.14);
+  transform: translateY(-50%) scale(0.98);
 }
 
 .slider-btn.prev {
@@ -1744,6 +1864,19 @@ button {
   font-size: 11px;
   font-weight: 850;
   text-decoration: none;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.social-links a:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.social-links a:active {
+  filter: brightness(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+  transform: translateY(0);
 }
 
 .footer-group h3 {
@@ -1758,6 +1891,17 @@ button {
   color: #9cafaa;
   font-size: 12px;
   text-decoration: none;
+  transition: color 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.footer-group a:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.footer-group a:active {
+  filter: brightness(0.98);
+  transform: translateY(0);
 }
 
 .footer-bottom {
@@ -1785,6 +1929,7 @@ button {
     max-width: 760px;
     text-align: center;
     margin: 0 auto;
+    transform: translateY(-60px);
   }
 
   .hero-copy p,
@@ -1801,6 +1946,7 @@ button {
   .dashboard-wrap {
     width: min(760px, 100%);
     margin: 0 auto;
+    transform: translateY(-30px);
   }
 
   .features-grid {
@@ -2246,11 +2392,32 @@ button {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  transition: background 0.2s;
+  transition: background 180ms ease, box-shadow 180ms ease, filter 180ms ease, transform 180ms ease;
 }
 
 .demo-go-btn:hover {
   background: #0fcc80;
+  filter: brightness(1.03);
+  box-shadow: 0 8px 20px rgba(22, 224, 149, 0.18);
+  transform: translateY(-1px);
+}
+
+.demo-go-btn:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.demo-go-btn:disabled:hover {
+  background: #16e095;
+  filter: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.demo-go-btn:active {
+  filter: brightness(0.98);
+  box-shadow: 0 4px 12px rgba(22, 224, 149, 0.14);
+  transform: translateY(0);
 }
 
 .demo-hint {
@@ -2370,6 +2537,64 @@ button {
 
 .demo-vuln-row strong { font-weight: 800; }
 
+.demo-card > .start-btn,
+.demo-card > .demo-restart-btn {
+  display: none;
+}
+
+.demo-fix-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.demo-fix-row {
+  display: grid;
+  grid-template-columns: 74px 1fr 62px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #20324a;
+  border-radius: 10px;
+  background: rgba(10, 21, 35, 0.72);
+}
+
+.demo-fix-row span {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.demo-fix-row strong {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.demo-fix-row em {
+  color: #aeb8c7;
+  font-size: 12px;
+  font-style: normal;
+  text-align: right;
+}
+
+.demo-fix-row.critical span { color: #ef4444; }
+.demo-fix-row.high span { color: #f97316; }
+.demo-fix-row.medium span { color: #eab308; }
+
+.demo-secure-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(22, 224, 149, 0.28);
+  border-radius: 10px;
+  background: rgba(22, 224, 149, 0.08);
+  color: #d8fff0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .demo-restart-btn {
   width: 100%;
   margin-top: 8px;
@@ -2380,12 +2605,21 @@ button {
   color: #aeb8c7;
   cursor: pointer;
   font-size: 13px;
-  transition: all 0.2s;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, filter 180ms ease, transform 180ms ease;
 }
 
 .demo-restart-btn:hover {
   border-color: #16e095;
   color: #16e095;
+  filter: brightness(1.04);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+  transform: translateY(-1px);
+}
+
+.demo-restart-btn:active {
+  filter: brightness(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(0);
 }
 
 @media (max-width: 768px) {

@@ -6,8 +6,9 @@
 .rem-stats-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 18px;
+  gap: 10px;
   margin-bottom: 18px;
+  width: 100%;
 }
 
 .rem-stat-card,
@@ -19,12 +20,13 @@
 }
 
 .rem-stat-card {
-  min-height: 112px;
+  min-width: 0;
+  min-height: 96px;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 20px;
-  min-width: 0;
+  gap: 10px;
+  padding: 12px 10px;
   color: inherit;
   cursor: pointer;
   font: inherit;
@@ -40,12 +42,17 @@
 }
 
 .rem-stat-icon {
-  width: clamp(52px, 4.2vw, 64px);
-  height: clamp(52px, 4.2vw, 64px);
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
+}
+
+.rem-stat-body {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .rem-stat-icon.critical {
@@ -76,23 +83,36 @@
 }
 
 .rem-stat-card p {
-  font-size: clamp(11px, 0.82vw, 13px);
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rem-stat-card strong {
   color: #f8fafc;
   display: block;
-  font-size: clamp(25px, 2.05vw, 34px);
+  font-size: 24px;
+  font-weight: 850;
   line-height: 1;
-  margin: 7px 0 8px;
+  margin: 4px 0 0;
 }
 
 .rem-stat-card small {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: clamp(10px, 0.74vw, 12px);
+  max-width: 100%;
+  font-size: 11px;
   font-weight: 800;
+  line-height: 1.2;
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rem-stat-card small.good {
@@ -135,6 +155,37 @@
 .rem-issues-panel {
   padding: 0;
   overflow: hidden;
+}
+
+.rem-detail-view {
+  color: #dbe3ee;
+}
+
+.rem-detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  margin: 18px 20px 0;
+  padding: 0 12px;
+  border: 1px solid rgba(42, 69, 96, 0.7);
+  border-radius: 6px;
+  background: rgba(3, 12, 23, 0.72);
+  color: #00d68f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rem-detail-back:hover,
+.rem-detail-back:focus-visible {
+  border-color: rgba(0, 214, 143, 0.62);
+  outline: none;
+}
+
+.rem-detail-view .rem-detail-head {
+  padding-top: 14px;
 }
 
 .rem-issues-toolbar {
@@ -936,10 +987,6 @@
 }
 
 @media (max-width: 1360px) {
-  .rem-stats-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .rem-layout-grid {
     grid-template-columns: 1fr;
   }
@@ -954,8 +1001,11 @@
   }
 }
 
-@media (max-width: 920px) {
-  .rem-stats-grid,
+@media (max-width: 900px) {
+  .rem-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .rem-side-column,
   .rem-summary-body,
   .rem-solution-grid {
@@ -995,6 +1045,12 @@
   .rem-detail-actions {
     width: 100%;
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .rem-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

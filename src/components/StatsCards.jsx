@@ -90,9 +90,9 @@ export default function StatsCards() {
             onClick={() => navigate(target)}
           >
             <span className={`dashboard-stat-icon ${item.tone}`}>
-              <Icon size={28} />
+              <Icon size={18} strokeWidth={2.2} />
             </span>
-            <div>
+            <div className="dashboard-stat-body">
               <p>{item.label}</p>
               <strong>{loading ? "—" : item.value}</strong>
               <small className={item.positive ? "positive" : item.neutral ? "neutral" : ""}>

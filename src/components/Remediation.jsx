@@ -26,7 +26,6 @@ import {
   Target,
   Users,
   Wrench,
-  X,
 } from "lucide-react";
 import "./Remediation.css";
 
@@ -117,19 +116,16 @@ export default function Remediation() {
   );
   const issues = contextIssues;
   const selected = useMemo(
-    () => {
-      if (selectedId === "__closed__") return null;
-
-      return (
-        issues.find((issue) => issue.id === selectedId) ||
-        issues.find((issue) => issue.title === initialIssue) ||
-        issues[0] ||
-        null
-      );
-    },
-    [initialIssue, issues, selectedId]
+    () => (selectedId ? issues.find((issue) => issue.id === selectedId) || null : null),
+    [issues, selectedId]
   );
   const loading = contextLoading;
+
+  useEffect(() => {
+    if (!initialIssue || selectedId) return;
+    const match = issues.find((issue) => issue.title === initialIssue);
+    if (match) setSelectedId(match.id);
+  }, [initialIssue, issues, selectedId]);
 
   const stats = useMemo(() => {
     const total = issues.length;
@@ -185,6 +181,16 @@ export default function Remediation() {
   const startIssue = totalIssues === 0 ? 0 : (currentPage - 1) * ISSUES_PER_PAGE + 1;
   const endIssue = Math.min(currentPage * ISSUES_PER_PAGE, totalIssues);
 
+  function openIssue(issue) {
+    setActiveMenu("");
+    setSelectedId(issue.id);
+  }
+
+  function closeIssue() {
+    setSelectedId("");
+    setActiveMenu("");
+  }
+
   async function updateStatus(target, status) {
     try {
       await vulnerabilityApi.updateVulnerabilityStatus(target.id, status);
@@ -238,9 +244,9 @@ export default function Remediation() {
           return (
             <button className="rem-stat-card" type="button" key={item.label} onClick={() => setTab(item.filter)}>
               <span className={`rem-stat-icon ${item.tone}`}>
-                <Icon size={31} />
+                <Icon size={18} strokeWidth={2.2} />
               </span>
-              <div>
+              <div className="rem-stat-body">
                 <p>{item.label}</p>
                 <strong>{item.value}</strong>
                 <small className={item.trend === "up" ? "bad" : "good"}>
@@ -259,151 +265,156 @@ export default function Remediation() {
       <div className="rem-layout-grid">
         <div className="rem-main-column">
           <section className="rem-panel rem-issues-panel">
-            <div className="rem-issues-toolbar">
-              <div className="rem-tabs">
-                {["All Issues", "Fixable", "In Progress", "Resolved", "Ignored"].map((item) => (
-                  <button className={tab === item ? "active" : ""} key={item} type="button" onClick={() => setTab(item)}>
-                    {item}
-                  </button>
-                ))}
-              </div>
-
-              <div className="rem-controls">
-                <button type="button" onClick={cycleSeverity}>
-                  <Filter size={15} /> {severityFilter} <ChevronDown size={14} />
+            {selected ? (
+              <div className="rem-detail-view">
+                <button className="rem-detail-back" type="button" onClick={closeIssue}>
+                  <ChevronLeft size={16} /> Back to All Issues
                 </button>
-                <label>
-                  <Search size={16} />
-                  <input placeholder="Search vulnerabilities..." value={query} onChange={(event) => setQuery(event.target.value)} />
-                </label>
-              </div>
-            </div>
 
-            <div className="rem-table-wrap">
-              <div className="rem-issue-table">
-                <div className="rem-issue-row rem-head">
-                  <span>Vulnerability</span><span>Severity</span><span>Affected Asset</span><span>Status</span><span>Fix Priority</span><span>Actions</span>
-                </div>
-
-                {paginatedIssues.map((issue) => (
-                  <div className="rem-issue-row" key={issue.id}>
-                    <button className="rem-vuln-cell" type="button" onClick={() => setSelectedId(issue.id)}>
-                      <IssueIcon issue={issue} />
-                      <strong>{issue.title}<small>{issue.text} <em>{issue.code}</em></small></strong>
-                    </button>
-                    <button className="rem-plain-btn" type="button" onClick={() => setSeverityFilter(issue.severity)}>
-                      <Pill tone={issue.severity.toLowerCase()}>{issue.severity}</Pill>
-                    </button>
-                    <button className="rem-asset-cell" type="button" onClick={() => navigate(`/dashboard/domains?domain=${issue.asset}`)}>
-                      <Globe size={18} />
-                      <strong>{issue.asset}<small>{issue.path}</small></strong>
-                    </button>
-                    <StatusSelect status={issue.status} onClick={() => updateStatus(issue, issue.status === "Open" ? "In Progress" : issue.status === "In Progress" ? "Resolved" : "Open")} />
-                    <span className={`rem-priority ${issue.priority.toLowerCase()}`}>
-                      {issue.priority === "High" ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-                      {issue.priority}
-                    </span>
-                    <div className="rem-actions">
-                      <button type="button" onClick={() => setSelectedId(issue.id)}>View Details</button>
-                      <button aria-label="More actions" type="button" onClick={() => setActiveMenu(activeMenu === issue.id ? "" : issue.id)}>
-                        <MoreVertical size={16} />
-                      </button>
-                      {activeMenu === issue.id && (
-                        <div className="rem-row-menu">
-                          <button type="button" onClick={() => updateStatus(issue, "In Progress")}>Start Fix</button>
-                          <button type="button" onClick={() => updateStatus(issue, "Resolved")}>Mark Resolved</button>
-                          <button type="button" onClick={() => navigate(`/dashboard/vulnerabilities?domain=${issue.asset}`)}>Open Finding</button>
-                        </div>
-                      )}
-                    </div>
+                <div className="rem-detail-head">
+                  <div className="rem-detail-title">
+                    <Pill tone={selected.severity.toLowerCase()}>{selected.severity}</Pill>
+                    <h3>{selected.title}</h3>
+                    <span>{selected.code}</span>
+                    <p>{selected.text} affects {selected.asset}{selected.path}.</p>
                   </div>
-                ))}
-                {filteredIssues.length === 0 && <div className="rem-empty">No remediation items match your filters.</div>}
-              </div>
-            </div>
-
-            <div className="rem-pagination">
-              <p>Showing {startIssue} to {endIssue} of {totalIssues} vulnerabilities</p>
-              <div>
-                <button
-                  type="button"
-                  disabled={currentPage === 1}
-                  onClick={() => {
-                    setCurrentPage((page) => Math.max(1, page - 1));
-                    setActiveMenu("");
-                  }}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button className="active" type="button">{currentPage}</button>
-                <span>of {totalPages}</span>
-                <button
-                  type="button"
-                  disabled={currentPage === totalPages}
-                  onClick={() => {
-                    setCurrentPage((page) => Math.min(totalPages, page + 1));
-                    setActiveMenu("");
-                  }}
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {selected && (
-            <section className="rem-panel rem-detail-panel">
-              <div className="rem-detail-head">
-                <div className="rem-detail-title">
-                  <Pill tone={selected.severity.toLowerCase()}>{selected.severity}</Pill>
-                  <h3>{selected.title}</h3>
-                  <span>{selected.code}</span>
-                  <p>{selected.text} affects {selected.asset}{selected.path}.</p>
+                  <div className="rem-detail-actions">
+                    <button type="button" onClick={() => updateStatus(selected, "In Progress")}>Mark as In Progress</button>
+                    <button type="button" onClick={() => updateStatus(selected, "Resolved")}>Mark as Resolved</button>
+                    <button aria-label="Export plan" type="button" onClick={exportPlan}><ChevronsUp size={16} /></button>
+                  </div>
                 </div>
-                <div className="rem-detail-actions">
-                  <button type="button" onClick={() => updateStatus(selected, "In Progress")}>Mark as In Progress</button>
-                  <button type="button" onClick={() => updateStatus(selected, "Resolved")}>Mark as Resolved</button>
-                  <button aria-label="Export plan" type="button" onClick={exportPlan}><ChevronsUp size={16} /></button>
-                  <button aria-label="Close" type="button" onClick={() => setSelectedId("__closed__")}><X size={16} /></button>
+
+                <div className="rem-detail-tabs">
+                  {["Details", "Impact", "Solution", "References", "Activity"].map((item) => (
+                    <button className={item === "Solution" ? "active" : ""} key={item} type="button" onClick={() => setMessage(`${item} content selected for ${selected.title}.`)}>
+                      {item}
+                    </button>
+                  ))}
                 </div>
-              </div>
 
-              <div className="rem-detail-tabs">
-                {["Details", "Impact", "Solution", "References", "Activity"].map((item) => (
-                  <button className={item === "Solution" ? "active" : ""} key={item} type="button" onClick={() => setMessage(`${item} content selected for ${selected.title}.`)}>
-                    {item}
-                  </button>
-                ))}
-              </div>
-
-              <div className="rem-solution-grid">
-                <div>
-                  <h4>How to Fix</h4>
-                  <p>{selected.fix}</p>
-                  <pre>{`// Vulnerable Code
+                <div className="rem-solution-grid">
+                  <div>
+                    <h4>How to Fix</h4>
+                    <p>{selected.fix}</p>
+                    <pre>{`// Vulnerable Code
 $sql = "SELECT * FROM users WHERE username = '" . $_POST['username'] . "'";
 
 // Secure Code
 $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username");
 $stmt->bindParam(':username', $_POST['username']);
 $stmt->execute();`}</pre>
-                </div>
+                  </div>
 
-                <div className="rem-recommended">
-                  <h4>Recommended Actions</h4>
-                  {recommendedActions.map((action) => (
-                    <button className={completedActions.includes(action) ? "done" : ""} type="button" key={action} onClick={() => toggleRecommended(action)}>
-                      <CheckCircle size={16} /> {action}
-                    </button>
-                  ))}
-                  <div className="rem-meta-row">
-                    <span>Effort <b>{selected.effort}</b></span>
-                    <span>ETA <b>{selected.eta}</b></span>
+                  <div className="rem-recommended">
+                    <h4>Recommended Actions</h4>
+                    {recommendedActions.map((action) => (
+                      <button className={completedActions.includes(action) ? "done" : ""} type="button" key={action} onClick={() => toggleRecommended(action)}>
+                        <CheckCircle size={16} /> {action}
+                      </button>
+                    ))}
+                    <div className="rem-meta-row">
+                      <span>Effort <b>{selected.effort}</b></span>
+                      <span>ETA <b>{selected.eta}</b></span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </section>
-          )}
+            ) : (
+              <>
+                <div className="rem-issues-toolbar">
+                  <div className="rem-tabs">
+                    {["All Issues", "Fixable", "In Progress", "Resolved", "Ignored"].map((item) => (
+                      <button className={tab === item ? "active" : ""} key={item} type="button" onClick={() => setTab(item)}>
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="rem-controls">
+                    <button type="button" onClick={cycleSeverity}>
+                      <Filter size={15} /> {severityFilter} <ChevronDown size={14} />
+                    </button>
+                    <label>
+                      <Search size={16} />
+                      <input placeholder="Search vulnerabilities..." value={query} onChange={(event) => setQuery(event.target.value)} />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="rem-table-wrap">
+                  <div className="rem-issue-table">
+                    <div className="rem-issue-row rem-head">
+                      <span>Vulnerability</span><span>Severity</span><span>Affected Asset</span><span>Status</span><span>Fix Priority</span><span>Actions</span>
+                    </div>
+
+                    {paginatedIssues.map((issue) => (
+                      <div className="rem-issue-row" key={issue.id}>
+                        <button className="rem-vuln-cell" type="button" onClick={() => openIssue(issue)}>
+                          <IssueIcon issue={issue} />
+                          <strong>{issue.title}<small>{issue.text} <em>{issue.code}</em></small></strong>
+                        </button>
+                        <button className="rem-plain-btn" type="button" onClick={() => setSeverityFilter(issue.severity)}>
+                          <Pill tone={issue.severity.toLowerCase()}>{issue.severity}</Pill>
+                        </button>
+                        <button className="rem-asset-cell" type="button" onClick={() => navigate(`/dashboard/domains?domain=${issue.asset}`)}>
+                          <Globe size={18} />
+                          <strong>{issue.asset}<small>{issue.path}</small></strong>
+                        </button>
+                        <StatusSelect status={issue.status} onClick={() => updateStatus(issue, issue.status === "Open" ? "In Progress" : issue.status === "In Progress" ? "Resolved" : "Open")} />
+                        <span className={`rem-priority ${issue.priority.toLowerCase()}`}>
+                          {issue.priority === "High" ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                          {issue.priority}
+                        </span>
+                        <div className="rem-actions">
+                          <button type="button" onClick={() => openIssue(issue)}>View Details</button>
+                          <button aria-label="More actions" type="button" onClick={() => setActiveMenu(activeMenu === issue.id ? "" : issue.id)}>
+                            <MoreVertical size={16} />
+                          </button>
+                          {activeMenu === issue.id && (
+                            <div className="rem-row-menu">
+                              <button type="button" onClick={() => updateStatus(issue, "In Progress")}>Start Fix</button>
+                              <button type="button" onClick={() => updateStatus(issue, "Resolved")}>Mark Resolved</button>
+                              <button type="button" onClick={() => navigate(`/dashboard/vulnerabilities?domain=${issue.asset}`)}>Open Finding</button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {filteredIssues.length === 0 && <div className="rem-empty">No remediation items match your filters.</div>}
+                  </div>
+                </div>
+
+                <div className="rem-pagination">
+                  <p>Showing {startIssue} to {endIssue} of {totalIssues} vulnerabilities</p>
+                  <div>
+                    <button
+                      type="button"
+                      disabled={currentPage === 1}
+                      onClick={() => {
+                        setCurrentPage((page) => Math.max(1, page - 1));
+                        setActiveMenu("");
+                      }}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button className="active" type="button">{currentPage}</button>
+                    <span>of {totalPages}</span>
+                    <button
+                      type="button"
+                      disabled={currentPage === totalPages}
+                      onClick={() => {
+                        setCurrentPage((page) => Math.min(totalPages, page + 1));
+                        setActiveMenu("");
+                      }}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </section>
         </div>
 
         <aside className="rem-side-column">

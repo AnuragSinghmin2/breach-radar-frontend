@@ -32,6 +32,14 @@ const included = [
 const statusFilters = ["All", "Completed", "In Progress", "Failed"];
 const REPORTS_PER_PAGE = 5;
 
+function isCompleted(report) {
+  return report?.status === "Completed";
+}
+
+function reportGeneratedLines(report) {
+  return String(report?.generated || "Not generated yet").split("\n");
+}
+
 function Badge({ tone, children }) {
   return <span className={`reports-badge ${tone}`}>{children}</span>;
 }
@@ -63,26 +71,6 @@ function statusTone(status) {
   return "red";
 }
 
-function reportText(report) {
-  const counts = report.vulns
-    ? `Critical: ${report.vulns[0]}, High: ${report.vulns[1]}, Medium: ${report.vulns[2]}, Low: ${report.vulns[3]}`
-    : "Findings are not available yet.";
-
-  return [
-    "PentestRadar Security Report",
-    `Report ID: ${report.id}`,
-    `Domain: ${report.domain}`,
-    `Scan Type: ${report.scanType}`,
-    `Status: ${report.status}`,
-    `Security Score: ${report.score || "-"}/100`,
-    `Generated: ${report.generated.replaceAll("\n", " ")}`,
-    `Findings: ${counts}`,
-    "",
-    "Included sections:",
-    ...included.map((item) => `- ${item}`),
-  ].join("\n");
-}
-
 export default function Reports() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -93,6 +81,8 @@ export default function Reports() {
   const [selected, setSelected] = useState(null);
   const [activeMenu, setActiveMenu] = useState("");
   const [message, setMessage] = useState("");
+  const [downloadingId, setDownloadingId] = useState("");
+  const [generating, setGenerating] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [builderOpen, setBuilderOpen] = useState(window.location.hash === "#new-report");
   const [draft, setDraft] = useState({
@@ -213,21 +203,40 @@ export default function Reports() {
     setStatusFilter(statusFilters[next]);
   }
 
-  function downloadReport(report = selected) {
-    if (!report) return;
-    const blob = new Blob([reportText(report)], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${report.id.replace("#", "")}-${report.domain}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
-    setMessage(`${report.id} downloaded.`);
+  async function downloadReport(report = selected) {
+    if (!report?._id || !isCompleted(report)) {
+      setMessage("Only completed reports are ready for PDF download.");
+      return;
+    }
+
+    try {
+      setDownloadingId(report._id);
+      setMessage(`Preparing PDF for ${report.id}...`);
+      const blob = await reportApi.downloadReportPdf(report._id);
+      const url = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${report.id.replace("#", "")}-${report.domain}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      setMessage(`${report.id} PDF downloaded.`);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to download report PDF.");
+    } finally {
+      setDownloadingId("");
+    }
   }
 
-  function shareReport(report = selected) {
+  async function shareReport(report = selected) {
     if (!report) return;
-    setMessage(`Share link copied for ${report.id}: pentestradar.local/reports/${report.id.replace("#", "")}`);
+    const shareUrl = `${window.location.origin}/dashboard/reports?domain=${encodeURIComponent(report.domain)}`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setMessage(`Share link copied for ${report.id}.`);
+    } catch {
+      setMessage(`Share link: ${shareUrl}`);
+    }
   }
 
   function toggleSection(section) {
@@ -245,7 +254,19 @@ export default function Reports() {
     async (event) => {
       event?.preventDefault();
 
+      if (!draft.domain) {
+        setMessage("Select a domain before generating a report.");
+        return;
+      }
+
+      if (!draft.sections.length) {
+        setMessage("Select at least one report section.");
+        return;
+      }
+
       try {
+        setGenerating(true);
+        setMessage(`Generating report for ${draft.domain}...`);
         const data = await reportApi.generateReport({
           domain: draft.domain,
           scanType: draft.scanType,
@@ -263,6 +284,8 @@ export default function Reports() {
         setMessage(`${report.id} generated for ${draft.domain}.`);
       } catch (error) {
         setMessage(error.response?.data?.message || "Failed to generate report.");
+      } finally {
+        setGenerating(false);
       }
     },
     [draft, refreshReports]
@@ -334,7 +357,7 @@ export default function Reports() {
               </div>
 
               {paginatedReports.map((report) => (
-                <div className="reports-row" key={report.id}>
+                <div className={`reports-row ${selected?.id === report.id ? "selected" : ""}`} key={report.id}>
                   <button className="reports-name-cell" type="button" onClick={() => setSelected(report)}>
                     <span className="reports-pdf-icon">PDF</span>
                     <strong title={report.title}>
@@ -346,7 +369,7 @@ export default function Reports() {
                     className="reports-domain-btn"
                     type="button"
                     title={report.domain}
-                    onClick={() => navigate(`/dashboard/domains?domain=${report.domain}`)}
+                    onClick={() => navigate(`/dashboard/domains?domain=${encodeURIComponent(report.domain)}`)}
                   >
                     {report.domain}
                   </button>
@@ -359,7 +382,7 @@ export default function Reports() {
                   </button>
                   <Score value={report.score} />
                   <span className="reports-generated">
-                    {report.generated.split("\n").slice(0, 2).map((line) => (
+                    {reportGeneratedLines(report).slice(0, 2).map((line) => (
                       <small key={line}>{line}</small>
                     ))}
                   </span>
@@ -367,6 +390,8 @@ export default function Reports() {
                     <button
                       type="button"
                       aria-label={`Download ${report.id}`}
+                      title={isCompleted(report) ? "Download PDF" : "Report is not completed yet"}
+                      disabled={!isCompleted(report) || downloadingId === report._id}
                       onClick={() => downloadReport(report)}
                     >
                       <Download size={16} />
@@ -388,7 +413,7 @@ export default function Reports() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => navigate(`/dashboard/scans?domain=${report.domain}`)}
+                          onClick={() => navigate(`/dashboard/scans?domain=${encodeURIComponent(report.domain)}`)}
                         >
                           Re-run Scan
                         </button>
@@ -400,7 +425,18 @@ export default function Reports() {
 
               {filteredReports.length === 0 && (
                 <div className="reports-empty">
-                  {loading ? "Loading reports..." : "No reports match your filters."}
+                  <FileText size={24} />
+                  <strong>{loading ? "Loading reports..." : "No reports found"}</strong>
+                  <span>
+                    {query || statusFilter !== "All"
+                      ? "Try clearing search or changing the status filter."
+                      : "Generate a report from a verified domain to see it here."}
+                  </span>
+                  {!loading && (
+                    <button type="button" onClick={() => setBuilderOpen(true)}>
+                      Generate Report
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -457,6 +493,7 @@ export default function Reports() {
                       setDraft((current) => ({ ...current, domain: event.target.value }))
                     }
                   >
+                    {!domainOptions.length && <option value="">No domains available</option>}
                     {domainOptions.map((domain) => (
                       <option value={domain} key={domain}>
                         {domain}
@@ -511,8 +548,12 @@ export default function Reports() {
                     </button>
                   ))}
                 </div>
-                <button className="reports-primary-action" type="submit">
-                  <FileText size={16} /> Generate Report
+                <button
+                  className="reports-primary-action"
+                  type="submit"
+                  disabled={generating || !draft.domain || !draft.sections.length}
+                >
+                  <FileText size={16} /> {generating ? "Generating..." : "Generate Report"}
                 </button>
               </form>
             )}
@@ -526,7 +567,7 @@ export default function Reports() {
                     <small>
                       {selected.domain}
                       <br />
-                      {selected.generated.split("\n").slice(0, 2).join(", ")}
+                      {reportGeneratedLines(selected).slice(0, 2).join(", ")}
                     </small>
                   </div>
                   <div className="reports-meta">
@@ -552,16 +593,17 @@ export default function Reports() {
                     </p>
                     <p>
                       <span>File Size</span>
-                      <b>{selected.generated.split("\n")[2]}</b>
+                      <b>{reportGeneratedLines(selected)[2] || "PDF"}</b>
                     </p>
                   </div>
                 </div>
                 <button
                   className="reports-primary-action"
                   type="button"
+                  disabled={!selected?._id || !isCompleted(selected) || downloadingId === selected?._id}
                   onClick={() => downloadReport(selected)}
                 >
-                  <Download size={16} /> Download PDF
+                  <Download size={16} /> {downloadingId === selected?._id ? "Preparing PDF..." : "Download PDF"}
                 </button>
                 <button
                   className="reports-secondary-action"
@@ -573,7 +615,7 @@ export default function Reports() {
                 <button
                   className="reports-secondary-action"
                   type="button"
-                  onClick={() => navigate(`/dashboard/scans?domain=${selected.domain}`)}
+                  onClick={() => navigate(`/dashboard/scans?domain=${encodeURIComponent(selected.domain)}`)}
                 >
                   <CalendarClock size={16} /> Open Scan
                 </button>
@@ -600,7 +642,7 @@ export default function Reports() {
                       type="button"
                       key={tone}
                       onClick={() =>
-                        navigate(`/dashboard/vulnerabilities?domain=${selected?.domain || ""}&severity=${tone}`)
+                        navigate(`/dashboard/vulnerabilities?domain=${encodeURIComponent(selected?.domain || "")}&severity=${tone}`)
                       }
                     >
                       <i className={tone} /> {tone[0].toUpperCase() + tone.slice(1)}{" "}

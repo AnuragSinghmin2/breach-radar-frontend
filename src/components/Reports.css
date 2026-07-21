@@ -198,6 +198,10 @@
   font-size: clamp(11px, 0.78vw, 12px);
 }
 
+.reports-row.selected {
+  background: rgba(0, 214, 143, 0.06);
+}
+
 .reports-head {
   min-height: 50px;
   color: #aeb8c7;
@@ -454,6 +458,12 @@
   cursor: pointer;
 }
 
+.reports-actions button:disabled,
+.reports-primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .reports-row-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -525,9 +535,40 @@
 
 .reports-empty {
   color: #aeb8c7;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
   font-size: 13px;
-  padding: 22px;
+  padding: 34px 22px;
   text-align: center;
+}
+
+.reports-empty svg {
+  color: #00d68f;
+}
+
+.reports-empty strong {
+  color: #f8fafc;
+  font-size: 15px;
+}
+
+.reports-empty span {
+  max-width: 340px;
+  line-height: 1.5;
+}
+
+.reports-empty button {
+  min-height: 34px;
+  border: 1px solid rgba(0, 214, 143, 0.42);
+  border-radius: 6px;
+  background: rgba(0, 214, 143, 0.1);
+  color: #00d68f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  margin-top: 6px;
+  padding: 0 12px;
 }
 
 .reports-pagination {

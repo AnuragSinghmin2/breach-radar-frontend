@@ -1,46 +1,53 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDashboard } from "../context/DashboardContext";
-import { vulnerabilityApi } from "../services/api";
+import { getErrorMessage, scanApi, vulnerabilityApi } from "../services/api";
+import {
+  createDomainSecurityReportPdf,
+  getDomainReportFilename,
+} from "../utils/domainReportPdf";
 import { formatScanTime, severityTone } from "../utils/format";
 import {
-  ArrowDown,
-  ArrowRight,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Eye,
   Globe2,
+  Loader2,
   MoreVertical,
   Search,
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
-  ShieldX,
   X,
 } from "lucide-react";
 import "./table.css";
 
 const ITEMS_PER_PAGE = 6;
+const SCORE_RING_SIZE = 64;
+const SCORE_RING_STROKE = 6;
+const SCAN_POLL_INTERVAL_MS = 2500;
+const SCAN_POLL_ATTEMPTS = 60;
 
 
 function mapVulnerability(item) {
-
- 
-
   return {
     id: item._id,
-    name: item.name,
-    desc: item.desc,
-    severity: item.severity,
-    domain: item.domainId?.domain || "",
-    status: item.status,
+    name: item.name || "Untitled finding",
+    desc: item.desc || "",
+    severity: item.severity || "Medium",
+    domain: item.domainId?.domain || "N/A",
+    status: item.status || "Open",
+    detectedAt: item.detectedAt || "",
     detected: formatScanTime(item.detectedAt),
     tone: item.tone || severityTone(item.severity),
-    cwe: item.cwe,
-    path: item.path,
-    impact: item.impact,
-    fix: item.fix,
+    cwe: item.cwe || "-",
+    cve: item.cve || item.cves || "-",
+    path: item.path || "-",
+    affectedUrl: item.affectedUrl || item.url || item.path || "-",
+    impact: item.impact || "No impact details available.",
+    fix: item.fix || "No remediation guidance available.",
+    technicalDetails: item.technicalDetails || item.evidence || item.findings || item.responseHeaders || "",
+    source: item.source || item.scannerSource || item.scanner || "Scanner",
+    cvss: item.cvssScore || item.cvss || "",
+    references: item.references || [],
   };
 }
 
@@ -48,7 +55,12 @@ const severityOrder = ["Critical", "High", "Medium", "Low"];
 const statusOptions = ["All Status", "Open", "In Progress", "Resolved"];
 
 function Badge({ tone, children }) {
-  return <span className={`vuln-badge ${tone}`}>{children}</span>;
+  return (
+    <span className={`vuln-severity-badge-pill ${tone}`}>
+      <i className="vuln-pill-dot" />
+      {children}
+    </span>
+  );
 }
 
 function statusTone(status) {
@@ -57,11 +69,91 @@ function statusTone(status) {
   return "open";
 }
 
+function unwrapVulnerabilityResponse(data) {
+  return data?.vulnerability || data?.data || data;
+}
+
+function textValue(...values) {
+  const value = values.find((item) => item !== undefined && item !== null && item !== "");
+  if (Array.isArray(value)) return value.filter(Boolean).join("\n");
+  if (typeof value === "object") return JSON.stringify(value, null, 2);
+  return value || "-";
+}
+
+function formatReferences(value) {
+  const refs = Array.isArray(value) ? value : value ? [value] : [];
+  return refs
+    .map((item) => {
+      if (!item) return "";
+      if (typeof item === "string") return item;
+      return item.url || item.href || item.title || item.name || "";
+    })
+    .filter(Boolean);
+}
+
+function scoreFromVulnerabilities(severityCounts) {
+  const penalty =
+    (severityCounts.Critical || 0) * 18 +
+    (severityCounts.High || 0) * 10 +
+    (severityCounts.Medium || 0) * 5 +
+    (severityCounts.Low || 0) * 2;
+
+  return Math.max(0, Math.min(100, 100 - penalty));
+}
+
+function scoreValue(value) {
+  return Math.round(Math.max(0, Math.min(100, Number(value) || 0)));
+}
+
+function CircularSecurityScore({ value }) {
+  const score = scoreValue(value);
+  const radius = (SCORE_RING_SIZE - SCORE_RING_STROKE) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+
+  return (
+    <div className="vuln-score-ring" aria-label={`Security score ${score} out of 100`}>
+      <svg width={SCORE_RING_SIZE} height={SCORE_RING_SIZE} viewBox={`0 0 ${SCORE_RING_SIZE} ${SCORE_RING_SIZE}`}>
+        <circle
+          className="vuln-score-ring-track"
+          cx={SCORE_RING_SIZE / 2}
+          cy={SCORE_RING_SIZE / 2}
+          r={radius}
+          strokeWidth={SCORE_RING_STROKE}
+        />
+        <circle
+          className="vuln-score-ring-progress"
+          cx={SCORE_RING_SIZE / 2}
+          cy={SCORE_RING_SIZE / 2}
+          r={radius}
+          strokeWidth={SCORE_RING_STROKE}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <span>
+        <strong>{score}</strong>
+        <small>/100</small>
+      </span>
+    </div>
+  );
+}
+
+function DomainMetric({ tone = "total", value, label }) {
+  return (
+    <div className={`vuln-domain-metric ${tone}`}>
+      <strong>{value}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
+
 export default function VulnerabilitiesTable() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { vulnerabilities: contextVulnerabilities, loading: contextLoading, refreshDomains, refreshStats } =
+  const { domains, vulnerabilities: contextVulnerabilities, loading: contextLoading, refreshDomains, refreshStats } =
     useDashboard();
+  const selectedDomainParam = searchParams.get("domain") || "";
   const [items, setItems] = useState([]);
   const [query, setQuery] = useState("");
   const [severityFilter, setSeverityFilter] = useState(
@@ -74,14 +166,17 @@ export default function VulnerabilitiesTable() {
   const [activeMenu, setActiveMenu] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
-   const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [expandedDomain, setExpandedDomain] = useState("");
+  const [refreshingDomain, setRefreshingDomain] = useState("");
+  const [downloadingDomain, setDownloadingDomain] = useState("");
+  const hasFetched = useRef(false);
 
   const loadVulnerabilities = useCallback(async () => {
     try {
       const data = await vulnerabilityApi.getVulnerabilities();
       const mapped = data.map(mapVulnerability);
       setItems(mapped);
-      setSelected((current) => current || mapped[0] || null);
     } catch (error) {
       setMessage(error.response?.data?.message || "Failed to load vulnerabilities.");
     } finally {
@@ -92,28 +187,28 @@ export default function VulnerabilitiesTable() {
   useEffect(() => {
     if (contextVulnerabilities.length > 0) {
       const mapped = contextVulnerabilities.map(mapVulnerability);
-      setItems(mapped);
-      setSelected((current) => current || mapped[0] || null);
-      setLoading(false);
+      queueMicrotask(() => {
+        setItems(mapped);
+        setLoading(false);
+        hasFetched.current = true;
+      });
       return;
     }
 
-    if (!contextLoading) {
+    if (!contextLoading && !hasFetched.current) {
+      hasFetched.current = true;
       loadVulnerabilities();
     }
   }, [contextLoading, contextVulnerabilities, loadVulnerabilities]);
 
-  const stats = useMemo(() => {
-    const count = (severity) => items.filter((item) => item.severity === severity).length;
-
-    return [
-      { label: "Critical", value: count("Critical"), detail: "open findings", tone: "critical", icon: ShieldX },
-      { label: "High", value: count("High"), detail: "open findings", tone: "high", icon: ShieldAlert },
-      { label: "Medium", value: count("Medium"), detail: "open findings", tone: "medium", icon: Shield },
-      { label: "Low", value: count("Low"), detail: "open findings", tone: "low", icon: ShieldCheck },
-      { label: "Total", value: items.length, detail: "all severities", tone: "total", icon: Shield },
-    ];
-  }, [items]);
+  useEffect(() => {
+    const param = searchParams.get("severity");
+    if (!param) return;
+    const normalized = param[0].toUpperCase() + param.slice(1).toLowerCase();
+    if (severityOrder.includes(normalized)) {
+      queueMicrotask(() => setSeverityFilter(normalized));
+    }
+  }, [searchParams]);
 
   const filteredItems = useMemo(() => {
     const cleanQuery = query.trim().toLowerCase();
@@ -124,47 +219,178 @@ export default function VulnerabilitiesTable() {
         item.desc.toLowerCase().includes(cleanQuery) ||
         item.domain.toLowerCase().includes(cleanQuery) ||
         item.cwe.toLowerCase().includes(cleanQuery);
+      const matchesDomain =
+        !selectedDomainParam || item.domain.toLowerCase() === selectedDomainParam.toLowerCase();
       const matchesSeverity = severityFilter === "All" || item.severity === severityFilter;
       const matchesStatus = statusFilter === "All Status" || item.status === statusFilter;
 
-      return matchesQuery && matchesSeverity && matchesStatus;
+      return matchesDomain && matchesQuery && matchesSeverity && matchesStatus;
     });
-  }, [items, query, severityFilter, statusFilter]);
-  const totalItems = filteredItems.length;
-const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+  }, [items, query, selectedDomainParam, severityFilter, statusFilter]);
 
-const paginatedItems = useMemo(() => {
-  const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  return filteredItems.slice(start, start + ITEMS_PER_PAGE);
-}, [filteredItems, currentPage]);
+  const domainScoreMap = useMemo(
+    () =>
+      domains.reduce((acc, item) => {
+        acc[item.domain?.toLowerCase()] = item.score;
+        return acc;
+      }, {}),
+    [domains]
+  );
 
-useEffect(() => {
-  setCurrentPage(1);
-}, [query, severityFilter, statusFilter]);
+  const domainGroups = useMemo(() => {
+    const groups = filteredItems.reduce((acc, item) => {
+      if (!acc[item.domain]) {
+        acc[item.domain] = {
+          domain: item.domain,
+          items: [],
+          severityCounts: { Critical: 0, High: 0, Medium: 0, Low: 0 },
+          openCount: 0,
+          resolvedCount: 0,
+          lastDetectedAt: "",
+          lastDetected: "N/A",
+          score: 0,
+        };
+      }
 
-const startItem = totalItems === 0 ? 0 : (currentPage - 1) * ITEMS_PER_PAGE + 1;
-const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
+      const group = acc[item.domain];
+      group.items.push(item);
+      group.severityCounts[item.severity] = (group.severityCounts[item.severity] || 0) + 1;
+      if (item.status === "Open") group.openCount += 1;
+      if (item.status === "Resolved") group.resolvedCount += 1;
 
-  const domainBars = useMemo(() => {
-    const byDomain = items.reduce((acc, item) => {
-      acc[item.domain] = (acc[item.domain] || 0) + 1;
+      const currentTime = item.detectedAt ? new Date(item.detectedAt).getTime() : 0;
+      const lastTime = group.lastDetectedAt ? new Date(group.lastDetectedAt).getTime() : 0;
+      if (currentTime > lastTime) {
+        group.lastDetectedAt = item.detectedAt;
+        group.lastDetected = item.detected;
+      }
+
       return acc;
     }, {});
-    const max = Math.max(...Object.values(byDomain));
 
-    return Object.entries(byDomain)
-      .sort((a, b) => b[1] - a[1])
-      .map(([domain, value]) => {
-        const mostSevere = severityOrder.find((severity) =>
-          items.some((item) => item.domain === domain && item.severity === severity)
-        );
-        return [domain, value, mostSevere?.toLowerCase() || "green", `${Math.max(20, (value / max) * 100)}%`];
+    return Object.values(groups)
+      .map((group) => ({
+        ...group,
+        score:
+          domainScoreMap[group.domain.toLowerCase()] ??
+          scoreFromVulnerabilities(group.severityCounts),
+      }))
+      .sort((a, b) => {
+        const aTime = a.lastDetectedAt ? new Date(a.lastDetectedAt).getTime() : 0;
+        const bTime = b.lastDetectedAt ? new Date(b.lastDetectedAt).getTime() : 0;
+        return bTime - aTime || a.domain.localeCompare(b.domain);
       });
-  }, [items]);
+  }, [domainScoreMap, filteredItems]);
+
+  const totalItems = domainGroups.length;
+  const totalVulnerabilityItems = filteredItems.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedGroups = useMemo(() => {
+    const start = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
+    return domainGroups.slice(start, start + ITEMS_PER_PAGE);
+  }, [domainGroups, safeCurrentPage]);
+
+  useEffect(() => {
+    queueMicrotask(() => setCurrentPage(1));
+  }, [query, selectedDomainParam, severityFilter, statusFilter]);
+
+  const startItem = totalItems === 0 ? 0 : (safeCurrentPage - 1) * ITEMS_PER_PAGE + 1;
+  const endItem = Math.min(safeCurrentPage * ITEMS_PER_PAGE, totalItems);
+
+  useEffect(() => {
+    if (!activeMenu) return;
+    function handleClickOutside(event) {
+      if (!event.target.closest(".vuln-actions-cell") && !event.target.closest(".vuln-domain-actions")) {
+        setActiveMenu("");
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [activeMenu]);
 
   function cycleStatus() {
     const next = (statusOptions.indexOf(statusFilter) + 1) % statusOptions.length;
     setStatusFilter(statusOptions[next]);
+  }
+
+  function toggleDomain(domain) {
+    setExpandedDomain((current) => (current === domain ? "" : domain));
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+  }
+
+  async function waitForScanCompletion(scanId) {
+    for (let attempt = 0; attempt < SCAN_POLL_ATTEMPTS; attempt += 1) {
+      await delay(SCAN_POLL_INTERVAL_MS);
+      const latest = await scanApi.getScanStatus(scanId);
+      if (latest.status === "Completed") return latest;
+      if (latest.status === "Failed") {
+        throw new Error(latest.errorDetail || "Domain refresh scan failed.");
+      }
+    }
+    throw new Error("Domain refresh is still running. Please try again shortly.");
+  }
+
+  async function refreshDomain(group) {
+    if (refreshingDomain || downloadingDomain) return;
+
+    setRefreshingDomain(group.domain);
+    setActiveMenu("");
+    setMessage(`Refreshing ${group.domain}...`);
+
+    try {
+      const { scan } = await scanApi.startScan({ domain: group.domain, scanType: "Full Scan" });
+      await waitForScanCompletion(scan._id);
+      const domainVulnerabilities = await vulnerabilityApi.getVulnerabilities({ domain: group.domain });
+      const mappedDomainItems = domainVulnerabilities.map(mapVulnerability);
+
+      setItems((current) => [
+        ...current.filter((item) => item.domain.toLowerCase() !== group.domain.toLowerCase()),
+        ...mappedDomainItems,
+      ]);
+      await Promise.all([refreshDomains(), refreshStats()]);
+      setMessage(`${group.domain} refreshed successfully.`);
+    } catch (error) {
+      setMessage(getErrorMessage(error, `Failed to refresh ${group.domain}.`));
+    } finally {
+      setRefreshingDomain("");
+    }
+  }
+
+  function downloadDomainReport(group) {
+    if (refreshingDomain || downloadingDomain) return;
+
+    setDownloadingDomain(group.domain);
+    setActiveMenu("");
+
+    try {
+      const domainVulnerabilities = items.filter(
+        (item) => item.domain.toLowerCase() === group.domain.toLowerCase()
+      );
+      const blob = createDomainSecurityReportPdf({
+        domain: { domain: group.domain, score: group.score },
+        vulnerabilities: domainVulnerabilities,
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = getDomainReportFilename(group.domain);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage(`Security report download started for ${group.domain}.`);
+    } catch (error) {
+      setMessage(error.message || `Failed to generate report for ${group.domain}.`);
+    } finally {
+      setDownloadingDomain("");
+    }
   }
 
   async function updateStatus(target, status) {
@@ -182,55 +408,12 @@ const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
     }
   }
 
-  function exportCsv() {
-    const csv = [
-      ["Vulnerability", "Domain", "Severity", "Status", "CWE", "Path"],
-      ...paginatedItems.map((item) => [item.name, item.domain, item.severity, item.status, item.cwe, item.path]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "vulnerabilities.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-    setMessage("Filtered vulnerability report exported.");
-  }
-
   const openCount = items.filter((item) => item.status === "Open").length;
   const progressCount = items.filter((item) => item.status === "In Progress").length;
   const resolvedCount = items.filter((item) => item.status === "Resolved").length;
-  const riskScore = Math.min(100, stats[0].value * 18 + stats[1].value * 10 + stats[2].value * 5 + stats[3].value * 2);
 
   return (
     <section className="vuln-page">
-      <div className="vuln-stats-grid">
-        {stats.map((item) => {
-          const Icon = item.icon;
-          const isDown = item.detail.startsWith("-");
-
-          return (
-            <button
-              className="vuln-stat-card"
-              type="button"
-              key={item.label}
-              onClick={() => setSeverityFilter(item.label === "Total" ? "All" : item.label)}
-            >
-              <span className={`vuln-stat-icon ${item.tone}`}>
-                <Icon size={31} />
-              </span>
-              <div>
-                <p>{item.label}</p>
-                <strong>{item.value}</strong>
-                <small className={isDown ? "down" : "up"}>{item.detail}</small>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
       {loading && <div className="vuln-message">Loading vulnerabilities...</div>}
       {message && <div className="vuln-message">{message}</div>}
 
@@ -238,123 +421,236 @@ const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
         <div className="vuln-left-column">
           <section className="vuln-panel vuln-table-panel">
             <div className="vuln-table-top">
-              <h3>All Vulnerabilities</h3>
-              <div className="vuln-controls">
-                <label>
-                  <Search size={16} />
-                  <input
-                    placeholder="Search vulnerabilities..."
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                  />
-                </label>
-                <button type="button" onClick={cycleStatus}>
-                  {statusFilter} <ChevronDown size={15} />
-                </button>
-              </div>
-            </div>
-
-            <div className="vuln-tabs">
-              {[
-                ["All", items.length],
-                ["Open", openCount],
-                ["In Progress", progressCount],
-                ["Resolved", resolvedCount],
-              ].map(([status, count]) => (
-                <button
-                  className={(status === "All" ? statusFilter === "All Status" : statusFilter === status) ? "active" : ""}
-                  type="button"
-                  key={status}
-                  onClick={() => setStatusFilter(status === "All" ? "All Status" : status)}
-                >
-                  {status} ({count})
-                </button>
-              ))}
-            </div>
-
-            <div className="vuln-table-wrap">
-              <div className="vuln-table">
-                <div className="vuln-row vuln-head">
-                  <span>Vulnerability</span>
-                  <span>Severity</span>
-                  <span>Domain</span>
-                  <span>Status</span>
-                  <span>Detected At</span>
-                  <span>Actions</span>
+              <div className="vuln-table-top-header">
+                <h3>{selectedDomainParam ? `${selectedDomainParam} Vulnerabilities` : "All Vulnerabilities"}</h3>
+                <div className="vuln-table-top-actions">
+                  <label className="vuln-search-wrapper">
+                    <Search size={16} />
+                    <input
+                      className="vuln-search-input"
+                      placeholder="Search vulnerabilities..."
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                    />
+                  </label>
+                  <button className="vuln-status-select-btn" type="button" onClick={cycleStatus}>
+                    {statusFilter} <ChevronDown size={15} />
+                  </button>
                 </div>
-
-                {paginatedItems.map((item) => (
-                  <div className="vuln-row" key={`${item.name}-${item.domain}`}>
-                    <button className="vuln-name-cell" type="button" onClick={() => setSelected(item)}>
-                      <span className={`vuln-bug-icon ${item.tone}`}>
-                        <ShieldAlert size={21} />
-                      </span>
-                      <strong>{item.name}<small>{item.desc}</small></strong>
-                    </button>
-                    <button className="vuln-plain-btn" type="button" onClick={() => setSeverityFilter(item.severity)}>
-                      <Badge tone={item.tone}>{item.severity}</Badge>
-                    </button>
-                    <button className="vuln-domain" type="button" onClick={() => navigate(`/dashboard/domains?domain=${item.domain}`)}>
-                      <Globe2 size={18} /> {item.domain}
-                    </button>
-                    <button className="vuln-plain-btn" type="button" onClick={() => setStatusFilter(item.status)}>
-                      <Badge tone={statusTone(item.status)}>{item.status}</Badge>
-                    </button>
-                    <span>{item.detected}</span>
-                    <div className="vuln-actions">
-                      <button type="button" aria-label={`View ${item.name}`} onClick={() => setSelected(item)}>
-                        <Eye size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={`More actions for ${item.name}`}
-                        onClick={() => setActiveMenu(activeMenu === `${item.name}-${item.domain}` ? "" : `${item.name}-${item.domain}`)}
-                      >
-                        <MoreVertical size={16} />
-                      </button>
-                      {activeMenu === `${item.name}-${item.domain}` && (
-                        <div className="vuln-row-menu">
-                          <button type="button" onClick={() => updateStatus(item, "In Progress")}>Start Fix</button>
-                          <button type="button" onClick={() => updateStatus(item, "Resolved")}>Mark Resolved</button>
-                          <button type="button" onClick={() => navigate(`/dashboard/remediation?issue=${encodeURIComponent(item.name)}`)}>Remediation</button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {filteredItems.length === 0 && (
-                  <div className="vuln-empty">No scan data available</div>
-                )}
               </div>
+
+              <div className="vuln-tabs">
+                {[
+                  ["All", items.length],
+                  ["Open", openCount],
+                  ["In Progress", progressCount],
+                  ["Resolved", resolvedCount],
+                ].map(([status, count]) => (
+                  <button
+                    className={(status === "All" ? statusFilter === "All Status" : statusFilter === status) ? "active" : ""}
+                    type="button"
+                    key={status}
+                    onClick={() => setStatusFilter(status === "All" ? "All Status" : status)}
+                  >
+                    {status} ({count})
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="vuln-domain-group-list">
+              {paginatedGroups.map((group) => {
+                const isExpanded = expandedDomain === group.domain;
+                const detailId = `vuln-domain-${group.domain.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+                const metrics = [
+                  { value: group.items.length, label: "Total" },
+                  { tone: "critical", value: group.severityCounts.Critical || 0, label: "Critical" },
+                  { tone: "high", value: group.severityCounts.High || 0, label: "High" },
+                  { tone: "medium", value: group.severityCounts.Medium || 0, label: "Medium" },
+                  { tone: "low", value: group.severityCounts.Low || 0, label: "Low" },
+                  { tone: "open", value: group.openCount, label: "Open" },
+                  { tone: "resolved", value: group.resolvedCount, label: "Resolved" },
+                ];
+
+                return (
+                  <article className="vuln-domain-card" key={group.domain}>
+                    <div
+                      className="vuln-domain-card-row"
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={isExpanded}
+                      aria-controls={detailId}
+                      onClick={() => toggleDomain(group.domain)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          toggleDomain(group.domain);
+                        }
+                      }}
+                    >
+                      <span className="vuln-expand-icon">
+                        <ChevronDown size={18} />
+                      </span>
+
+                      <span className="vuln-domain-card-asset">
+                        <span className="vuln-domain-icon">
+                          <Globe2 size={22} />
+                        </span>
+                        <span>
+                          <strong>{group.domain}</strong>
+                          <small>
+                            Last detected:
+                            <b>{group.lastDetected}</b>
+                          </small>
+                        </span>
+                      </span>
+
+                      <div className="vuln-domain-card-metrics">
+                        <div className="vuln-domain-score-metric">
+                          <CircularSecurityScore value={group.score} />
+                          <span>Security Score</span>
+                        </div>
+                        {metrics.map((metric) => (
+                          <DomainMetric
+                            key={metric.label}
+                            tone={metric.tone}
+                            value={metric.value}
+                            label={metric.label}
+                          />
+                        ))}
+                      </div>
+                      <div className="vuln-domain-actions">
+                        <button
+                          className="vuln-domain-menu-btn"
+                          type="button"
+                          aria-label={`More actions for ${group.domain}`}
+                          aria-expanded={activeMenu === `domain:${group.domain}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setActiveMenu(activeMenu === `domain:${group.domain}` ? "" : `domain:${group.domain}`);
+                          }}
+                        >
+                          {(refreshingDomain === group.domain || downloadingDomain === group.domain) ? (
+                            <Loader2 size={16} className="vuln-menu-spin" />
+                          ) : (
+                            <MoreVertical size={16} />
+                          )}
+                        </button>
+                        {activeMenu === `domain:${group.domain}` && (
+                          <div className="vuln-domain-menu" onClick={(event) => event.stopPropagation()}>
+                            <button
+                              type="button"
+                              disabled={Boolean(refreshingDomain || downloadingDomain)}
+                              onClick={() => refreshDomain(group)}
+                            >
+                              {refreshingDomain === group.domain && <Loader2 size={13} className="vuln-menu-spin" />}
+                              Refresh
+                            </button>
+                            <button
+                              type="button"
+                              disabled={Boolean(refreshingDomain || downloadingDomain)}
+                              onClick={() => downloadDomainReport(group)}
+                            >
+                              {downloadingDomain === group.domain && <Loader2 size={13} className="vuln-menu-spin" />}
+                              Download Report
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div
+                      className={`vuln-domain-accordion ${isExpanded ? "open" : ""}`}
+                      id={detailId}
+                    >
+                      <div className="vuln-domain-detail-list">
+                        <div className="vuln-domain-detail-head">
+                          <span>Vulnerability</span>
+                          <span>Severity</span>
+                          <span>Status</span>
+                          <span>Detected At</span>
+                          <span>Actions</span>
+                        </div>
+                        {group.items.map((item) => (
+                          <div className="vuln-domain-detail-item" key={item.id}>
+                            <button className="vuln-name-cell" type="button" onClick={() => setSelected(item)}>
+                              <span>
+                                <strong className="vuln-name-title">{item.name}</strong>
+                                <small className="vuln-desc-subtitle">{item.desc}</small>
+                              </span>
+                            </button>
+
+                            <button className="vuln-plain-btn" type="button" onClick={() => setSeverityFilter(item.severity)}>
+                              <Badge tone={item.tone}>{item.severity}</Badge>
+                            </button>
+
+                            <button className="vuln-plain-btn" type="button" onClick={() => setStatusFilter(item.status)}>
+                              <span className={`vuln-status-badge-pill ${statusTone(item.status)}`}>{item.status}</span>
+                            </button>
+
+                            <span className="vuln-detected-date">{item.detected}</span>
+
+                            <div className="vuln-actions-cell">
+                              <button className="vuln-action-icon-btn" type="button" aria-label={`View ${item.name}`} onClick={() => setSelected(item)}>
+                                <Eye size={16} />
+                              </button>
+                              <button
+                                className="vuln-action-icon-btn"
+                                type="button"
+                                aria-label={`More actions for ${item.name}`}
+                                onClick={() => setActiveMenu(activeMenu === item.id ? "" : item.id)}
+                              >
+                                <MoreVertical size={16} />
+                              </button>
+                              {activeMenu === item.id && (
+                                <div className="vuln-row-menu">
+                                  <button type="button" onClick={() => updateStatus(item, "In Progress")}>Start Fix</button>
+                                  <button type="button" onClick={() => updateStatus(item, "Resolved")}>Mark Resolved</button>
+                                  <button type="button" onClick={() => navigate(`/dashboard/remediation?issue=${encodeURIComponent(item.name)}`)}>Remediation</button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+
+              {domainGroups.length === 0 && (
+                <div className="vuln-empty-cell">No scan data available</div>
+              )}
             </div>
 
             <div className="vuln-pagination">
-             <p>
-  Showing {startItem} to {endItem} of {totalItems} vulnerabilities
-</p>
+              <p>
+                Showing {startItem} to {endItem} of {totalItems} domains ({totalVulnerabilityItems} vulnerabilities)
+              </p>
 
-<div>
-  <button
-    type="button"
-    disabled={currentPage === 1}
-    onClick={() => setCurrentPage((p) => p - 1)}
-  >
-    <ChevronLeft size={16} />
-  </button>
+              <div>
+                <button
+                  type="button"
+                  aria-label="Previous page"
+                  disabled={safeCurrentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                >
+                  <ChevronLeft size={16} />
+                </button>
 
-  <button className="active" type="button">
-    {currentPage}
-  </button>
+                <button className="active" type="button" aria-current="page">
+                  {safeCurrentPage}
+                </button>
 
-  <button
-    type="button"
-    disabled={currentPage === totalPages}
-    onClick={() => setCurrentPage((p) => p + 1)}
-  >
-    <ChevronRight size={16} />
-  </button>
-</div>
+                <button
+                  type="button"
+                  aria-label="Next page"
+                  disabled={safeCurrentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
           </section>
 
@@ -387,73 +683,7 @@ const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
               </div>
             </section>
           )}
-
-          <section className="vuln-guide-panel">
-            <span><ShieldCheck size={38} /></span>
-            <div>
-              <h3>Fix critical vulnerabilities first!</h3>
-              <p>Addressing critical issues can prevent the highest-impact attack paths.</p>
-            </div>
-            <button type="button" onClick={() => navigate("/dashboard/remediation")}>
-              View Remediation Guide <ArrowRight size={16} />
-            </button>
-          </section>
         </div>
-
-        <aside className="vuln-right-column">
-          <section className="vuln-panel">
-            <h3>Severity Distribution</h3>
-            <div className="vuln-distribution">
-              <div className="vuln-donut">
-                <strong>{items.length}</strong>
-                <span>Total</span>
-              </div>
-              <div className="vuln-legend">
-                {severityOrder.map((severity) => {
-                  const count = stats.find((item) => item.label === severity)?.value || 0;
-                  const percent = items.length ? ((count / items.length) * 100).toFixed(1) : "0.0";
-
-                  return (
-                    <button type="button" key={severity} onClick={() => setSeverityFilter(severity)}>
-                      <i className={severity.toLowerCase()} /> {severity} <span>{count} ({percent}%)</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          <section className="vuln-panel">
-            <div className="vuln-side-head">
-              <h3>Top Vulnerable Domains</h3>
-              <button type="button" onClick={() => navigate("/dashboard/domains")}>View All</button>
-            </div>
-            <div className="vuln-domain-bars">
-              {domainBars.map(([domain, value, tone, width]) => (
-                <button className="vuln-domain-bar" type="button" key={domain} onClick={() => setQuery(domain)}>
-                  <span>{domain}<b>{value}</b></span>
-                  <i><em className={tone} style={{ width }} /></i>
-                </button>
-              ))}
-              {domainBars.length === 0 && (
-                <div className="vuln-empty">No scan data available</div>
-              )}
-            </div>
-          </section>
-
-          <section className="vuln-panel vuln-risk-panel">
-            <h3>Risk Score</h3>
-            <div className="vuln-gauge">
-              <div className="vuln-gauge-arc" />
-              <strong>{riskScore} <small>/100</small></strong>
-            </div>
-            <div className="vuln-risk-label">
-              <ShieldAlert size={18} /> {riskScore >= 70 ? "High Risk" : "Moderate Risk"}
-            </div>
-            <p><ArrowDown size={14} /> Based on open findings <span>in this workspace</span></p>
-            <button type="button" onClick={exportCsv}>Export Risk Details <ArrowRight size={16} /></button>
-          </section>
-        </aside>
       </div>
     </section>
   );

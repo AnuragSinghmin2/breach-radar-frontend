@@ -247,9 +247,9 @@ export default function Monitoring() {
               }}
             >
               <span className={`monitor-stat-icon ${item.tone}`}>
-                <Icon size={30} />
+                <Icon size={18} strokeWidth={2.2} />
               </span>
-              <div>
+              <div className="monitor-stat-body">
                 <p>{item.label}</p>
                 <strong>{item.value}</strong>
                 <small className={item.good ? "good" : item.neutral ? "neutral" : "positive"}>

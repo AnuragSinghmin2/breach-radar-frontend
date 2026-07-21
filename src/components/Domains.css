@@ -1132,6 +1132,30 @@
   min-width: 0;
 }
 
+.download-filename-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(4, 11, 20, 0.65);
+  border: 1px solid rgba(59, 76, 97, 0.45);
+  border-radius: 6px;
+  color: #00d68f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  padding: 10px 14px;
+}
+
+.download-filename-input:focus {
+  outline: 1px solid rgba(0, 214, 143, 0.45);
+  outline-offset: 2px;
+}
+
+.download-helper-text {
+  margin-top: 8px;
+  color: #aeb8c7;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .copy-btn {
   background: transparent;
   border: 0;
@@ -1194,7 +1218,8 @@
 }
 
 .verify-action-btn,
-.verify-bypass-btn {
+.verify-bypass-btn,
+.download-html-btn {
   height: 38px;
   border-radius: 6px;
   font-size: 12.5px;
@@ -1208,17 +1233,20 @@
 }
 
 .verify-action-btn:active,
-.verify-bypass-btn:active {
+.verify-bypass-btn:active,
+.download-html-btn:active {
   transform: scale(0.98);
 }
 
-.verify-action-btn {
+.verify-action-btn,
+.download-html-btn {
   background: #00d68f;
   color: #03150f;
   border: 0;
 }
 
-.verify-action-btn:hover {
+.verify-action-btn:hover,
+.download-html-btn:hover {
   background: #02b378;
 }
 
