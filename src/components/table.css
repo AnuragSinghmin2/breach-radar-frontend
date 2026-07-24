@@ -1257,6 +1257,19 @@
   background: rgba(16, 185, 129, 0.15);
 }
 
+.vuln-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 20px;
+  overflow-y: auto;
+  background: rgba(2, 6, 12, 0.72);
+  backdrop-filter: blur(3px);
+}
+
 .vuln-detail-panel,
 .vuln-detail-view {
   padding: 20px;
@@ -1264,6 +1277,14 @@
   border: 1px solid var(--vuln-border);
   border-radius: 12px;
   position: relative;
+}
+
+.vuln-detail-overlay .vuln-detail-panel {
+  width: 100%;
+  max-width: 640px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
 }
 
 .vuln-detail-close,

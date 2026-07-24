@@ -310,6 +310,15 @@ export default function VulnerabilitiesTable() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, [activeMenu]);
 
+  useEffect(() => {
+    if (!selected) return;
+    function handleEscape(event) {
+      if (event.key === "Escape") setSelected(null);
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [selected]);
+
   function cycleStatus() {
     const next = (statusOptions.indexOf(statusFilter) + 1) % statusOptions.length;
     setStatusFilter(statusOptions[next]);
@@ -655,33 +664,41 @@ export default function VulnerabilitiesTable() {
           </section>
 
           {selected && (
-            <section className="vuln-detail-panel">
-              <button className="vuln-detail-close" type="button" aria-label="Close details" onClick={() => setSelected(null)}>
-                <X size={16} />
-              </button>
-              <div>
-                <Badge tone={selected.tone}>{selected.severity}</Badge>
-                <h3>{selected.name}</h3>
-                <p>{selected.desc}</p>
-              </div>
-              <div className="vuln-detail-grid">
-                <span><b>Asset</b>{selected.domain}</span>
-                <span><b>Path</b>{selected.path}</span>
-                <span><b>CWE</b>{selected.cwe}</span>
-                <span><b>Status</b>{selected.status}</span>
-              </div>
-              <div className="vuln-detail-copy">
-                <strong>Impact</strong>
-                <p>{selected.impact}</p>
-                <strong>Recommended fix</strong>
-                <p>{selected.fix}</p>
-              </div>
-              <div className="vuln-detail-actions">
-                <button type="button" onClick={() => updateStatus(selected, "In Progress")}>Start Fix</button>
-                <button type="button" onClick={() => navigate(`/dashboard/remediation?issue=${encodeURIComponent(selected.name)}`)}>Open Remediation</button>
-                <button type="button" onClick={() => updateStatus(selected, "Resolved")}>Mark Resolved</button>
-              </div>
-            </section>
+            <div
+              className="vuln-detail-overlay"
+              role="presentation"
+              onClick={(event) => {
+                if (event.target === event.currentTarget) setSelected(null);
+              }}
+            >
+              <section className="vuln-detail-panel" role="dialog" aria-modal="true">
+                <button className="vuln-detail-close" type="button" aria-label="Close details" onClick={() => setSelected(null)}>
+                  <X size={16} />
+                </button>
+                <div>
+                  <Badge tone={selected.tone}>{selected.severity}</Badge>
+                  <h3>{selected.name}</h3>
+                  <p>{selected.desc}</p>
+                </div>
+                <div className="vuln-detail-grid">
+                  <span><b>Asset</b>{selected.domain}</span>
+                  <span><b>Path</b>{selected.path}</span>
+                  <span><b>CWE</b>{selected.cwe}</span>
+                  <span><b>Status</b>{selected.status}</span>
+                </div>
+                <div className="vuln-detail-copy">
+                  <strong>Impact</strong>
+                  <p>{selected.impact}</p>
+                  <strong>Recommended fix</strong>
+                  <p>{selected.fix}</p>
+                </div>
+                <div className="vuln-detail-actions">
+                  <button type="button" onClick={() => updateStatus(selected, "In Progress")}>Start Fix</button>
+                  <button type="button" onClick={() => navigate(`/dashboard/remediation?issue=${encodeURIComponent(selected.name)}`)}>Open Remediation</button>
+                  <button type="button" onClick={() => updateStatus(selected, "Resolved")}>Mark Resolved</button>
+                </div>
+              </section>
+            </div>
           )}
         </div>
       </div>

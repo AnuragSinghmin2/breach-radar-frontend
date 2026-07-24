@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDashboard } from "../context/DashboardContext";
-import { reportApi } from "../services/api";
+import { reportApi, scanApi } from "../services/api";
 import { mapApiReport } from "../utils/reportMapper";
 import {
   CalendarClock,
@@ -12,7 +12,9 @@ import {
   Download,
   FileText,
   Filter,
+  Loader2,
   MoreVertical,
+  RefreshCw,
   Search,
   Send,
   ShieldCheck,
@@ -79,9 +81,11 @@ export default function Reports() {
   const [query, setQuery] = useState(initialDomain);
   const [statusFilter, setStatusFilter] = useState("All");
   const [selected, setSelected] = useState(null);
+  const [previewReport, setPreviewReport] = useState(null);
   const [activeMenu, setActiveMenu] = useState("");
   const [message, setMessage] = useState("");
   const [downloadingId, setDownloadingId] = useState("");
+  const [rerunningId, setRerunningId] = useState("");
   const [generating, setGenerating] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [builderOpen, setBuilderOpen] = useState(window.location.hash === "#new-report");
@@ -198,6 +202,26 @@ export default function Reports() {
     ];
   }, [reports]);
 
+  useEffect(() => {
+    if (!activeMenu) return;
+    function handleClickOutside(event) {
+      if (!event.target.closest(".reports-actions")) {
+        setActiveMenu("");
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [activeMenu]);
+
+  useEffect(() => {
+    if (!previewReport) return;
+    function handleEscape(event) {
+      if (event.key === "Escape") setPreviewReport(null);
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [previewReport]);
+
   function cycleStatus() {
     const next = (statusFilters.indexOf(statusFilter) + 1) % statusFilters.length;
     setStatusFilter(statusFilters[next]);
@@ -236,6 +260,34 @@ export default function Reports() {
       setMessage(`Share link copied for ${report.id}.`);
     } catch {
       setMessage(`Share link: ${shareUrl}`);
+    } finally {
+      setActiveMenu("");
+    }
+  }
+
+  function openPreview(report) {
+    setPreviewReport(report);
+    setActiveMenu("");
+  }
+
+  async function rerunReportScan(report) {
+    if (!report?.scanId) {
+      setMessage("No linked scan found to re-run for this report.");
+      setActiveMenu("");
+      return;
+    }
+
+    try {
+      setRerunningId(report._id);
+      setMessage(`Restarting scan for ${report.domain}...`);
+      await scanApi.rerunScan(report.scanId);
+      await refreshReports();
+      setMessage(`New scan started for ${report.domain}.`);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to re-run scan.");
+    } finally {
+      setRerunningId("");
+      setActiveMenu("");
     }
   }
 
@@ -405,7 +457,7 @@ export default function Reports() {
                     </button>
                     {activeMenu === report.id && (
                       <div className="reports-row-menu">
-                        <button type="button" onClick={() => setSelected(report)}>
+                        <button type="button" onClick={() => openPreview(report)}>
                           Preview
                         </button>
                         <button type="button" onClick={() => shareReport(report)}>
@@ -413,8 +465,14 @@ export default function Reports() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => navigate(`/dashboard/scans?domain=${encodeURIComponent(report.domain)}`)}
+                          disabled={rerunningId === report._id}
+                          onClick={() => rerunReportScan(report)}
                         >
+                          {rerunningId === report._id ? (
+                            <Loader2 size={14} className="reports-menu-spin" />
+                          ) : (
+                            <RefreshCw size={14} />
+                          )}
                           Re-run Scan
                         </button>
                       </div>
@@ -679,6 +737,98 @@ export default function Reports() {
           </section>
         </aside>
       </div>
+
+      {previewReport && (
+        <div
+          className="reports-preview-overlay"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setPreviewReport(null);
+          }}
+        >
+          <section className="reports-preview-modal" role="dialog" aria-modal="true">
+            <button
+              className="reports-preview-modal-close"
+              type="button"
+              aria-label="Close preview"
+              onClick={() => setPreviewReport(null)}
+            >
+              <X size={16} />
+            </button>
+
+            <div className="reports-preview-body">
+              <div className="reports-cover">
+                <ShieldCheck size={21} />
+                <b>PentestRadar</b>
+                <strong>{previewReport.title}</strong>
+                <small>
+                  {previewReport.domain}
+                  <br />
+                  {reportGeneratedLines(previewReport).slice(0, 2).join(", ")}
+                </small>
+              </div>
+              <div className="reports-meta">
+                <p>
+                  <span>Report ID</span>
+                  <b>{previewReport.id}</b>
+                </p>
+                <p>
+                  <span>Domain</span>
+                  <b>{previewReport.domain}</b>
+                </p>
+                <p>
+                  <span>Scan Type</span>
+                  <b>{previewReport.scanType}</b>
+                </p>
+                <p>
+                  <span>Status</span>
+                  <Badge tone={statusTone(previewReport.status)}>{previewReport.status}</Badge>
+                </p>
+                <p>
+                  <span>Owner</span>
+                  <b>{previewReport.owner}</b>
+                </p>
+                <p>
+                  <span>File Size</span>
+                  <b>{reportGeneratedLines(previewReport)[2] || "PDF"}</b>
+                </p>
+              </div>
+            </div>
+
+            <div className="reports-preview-modal-actions">
+              <button
+                className="reports-primary-action"
+                type="button"
+                disabled={!isCompleted(previewReport) || downloadingId === previewReport._id}
+                onClick={() => downloadReport(previewReport)}
+              >
+                <Download size={16} />{" "}
+                {downloadingId === previewReport._id ? "Preparing PDF..." : "Download PDF"}
+              </button>
+              <button
+                className="reports-secondary-action"
+                type="button"
+                onClick={() => shareReport(previewReport)}
+              >
+                <Send size={16} /> Share Report
+              </button>
+              <button
+                className="reports-secondary-action"
+                type="button"
+                disabled={rerunningId === previewReport._id}
+                onClick={() => rerunReportScan(previewReport)}
+              >
+                {rerunningId === previewReport._id ? (
+                  <Loader2 size={16} className="reports-menu-spin" />
+                ) : (
+                  <RefreshCw size={16} />
+                )}{" "}
+                Re-run Scan
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </section>
   );
 }

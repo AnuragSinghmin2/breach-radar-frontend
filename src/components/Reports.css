@@ -499,6 +499,80 @@
   outline: none;
 }
 
+.reports-row-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reports-menu-spin {
+  animation: reports-spin 0.9s linear infinite;
+}
+
+@keyframes reports-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.reports-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 20px;
+  overflow-y: auto;
+  background: rgba(2, 6, 12, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.reports-preview-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid rgba(42, 69, 96, 0.82);
+  border-radius: 14px;
+  background: #071321;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+}
+
+.reports-preview-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(42, 69, 96, 0.82);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #dbe3ee;
+  cursor: pointer;
+}
+
+.reports-preview-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.reports-preview-modal-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .reports-domain-btn,
 .reports-plain-btn {
   border: 0;

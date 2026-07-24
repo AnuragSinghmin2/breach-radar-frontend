@@ -212,6 +212,17 @@ export default function Domains() {
     }
   }, [currentPage, totalPages]);
 
+  useEffect(() => {
+    if (!activeMenu) return;
+    function handleClickOutside(event) {
+      if (!event.target.closest(".domain-actions")) {
+        setActiveMenu("");
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [activeMenu]);
+
   const startDomain = totalDomains === 0 ? 0 : (currentPage - 1) * DOMAINS_PER_PAGE + 1;
   const endDomain = Math.min(currentPage * DOMAINS_PER_PAGE, totalDomains);
 
