@@ -15,7 +15,13 @@ export function logAuthTrace(label, payload) {
   }
 }
 
-function decodeJwtPayload(token) {
+export function getTokenExpiryMs(token) {
+  const payload = decodeJwtPayload(token);
+  if (!payload?.exp) return null;
+  return payload.exp * 1000;
+}
+
+export function decodeJwtPayload(token) {
   if (!token) return null;
 
   try {

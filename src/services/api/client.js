@@ -3,6 +3,8 @@ import { isLocalDevHost, normalizeApiBaseUrl } from "../../utils/apiBase";
 import {
   clearAuthSession,
   getStoredAccessToken,
+  getStoredUser,
+  saveAuthSession,
   setStoredAccessToken,
 } from "../../utils/session";
 
@@ -127,8 +129,14 @@ apiClient.interceptors.response.use(
           refreshPromise = apiClient
             .post("/auth/refresh-token")
             .then((response) => {
-              setAccessToken(response.data.accessToken);
-              return response.data.accessToken;
+              const newToken = response.data.accessToken;
+              const storedUser = getStoredUser();
+              if (storedUser) {
+                saveAuthSession(newToken, storedUser);
+              } else {
+                setAccessToken(newToken);
+              }
+              return newToken;
             })
             .finally(() => {
               refreshPromise = null;

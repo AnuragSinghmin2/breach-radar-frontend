@@ -8,7 +8,7 @@ import {
 } from "../../utils/session";
 
 export async function login({ email, password, rememberMe = false }) {
-  const { data } = await apiClient.post("/auth/login", { email, password });
+  const { data } = await apiClient.post("/auth/login", { email, password, rememberMe });
   const user = normalizeAuthUser(data.user, data.accessToken);
 
   logAuthTrace("authService login response", data);
@@ -40,7 +40,14 @@ export async function logout() {
 
 export async function refreshToken() {
   const { data } = await apiClient.post("/auth/refresh-token");
-  setAccessToken(data.accessToken);
+  const storedUser = getStoredUser();
+
+  if (storedUser) {
+    saveAuthSession(data.accessToken, storedUser);
+  } else {
+    setAccessToken(data.accessToken);
+  }
+
   return data;
 }
 
