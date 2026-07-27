@@ -7,12 +7,12 @@ import {
   saveAuthSession,
 } from "../../utils/session";
 
-export async function login({ email, password }) {
+export async function login({ email, password, rememberMe = false }) {
   const { data } = await apiClient.post("/auth/login", { email, password });
   const user = normalizeAuthUser(data.user, data.accessToken);
 
   logAuthTrace("authService login response", data);
-  saveAuthSession(data.accessToken, user);
+  saveAuthSession(data.accessToken, user, { rememberMe });
   setAccessToken(data.accessToken);
 
   return { ...data, user };
@@ -23,7 +23,7 @@ export async function register({ email, password, name }) {
   const user = normalizeAuthUser(data.user, data.accessToken);
 
   logAuthTrace("authService register response", data);
-  saveAuthSession(data.accessToken, user);
+  saveAuthSession(data.accessToken, user, { rememberMe: true });
   setAccessToken(data.accessToken);
 
   return { ...data, user };

@@ -15,7 +15,7 @@ export async function uploadAvatar(file) {
   formData.append("avatar", file);
 
   const { data } = await apiClient.post("/users/avatar", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { "Content-Type": undefined },
   });
 
   return data;

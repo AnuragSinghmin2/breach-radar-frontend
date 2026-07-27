@@ -51,15 +51,11 @@ export default function SignUpPage() {
       email,
       password,
       confirmPassword,
+      acceptedTerms,
     });
 
     if (validationErrors.length > 0) {
       setError(validationErrors[0]);
-      return;
-    }
-
-    if (!acceptedTerms) {
-      setError("You must agree to the Terms and Conditions and Privacy Policy.");
       return;
     }
 
@@ -86,6 +82,15 @@ export default function SignUpPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleGoogleSignUp() {
+    if (!acceptedTerms) {
+      setError("You must agree to the Terms and Conditions and Privacy Policy.");
+      return;
+    }
+
+    window.location.href = "https://breach-radar-backend.onrender.com/api/v1/auth/google";
   }
 
   return (
@@ -162,21 +167,25 @@ export default function SignUpPage() {
         ></button>
       </div>
 
-      <label className="terms-check">
+      <label className={`terms-check${!acceptedTerms && error.includes("Terms") ? " terms-check-error" : ""}`}>
         <input
           type="checkbox"
           checked={acceptedTerms}
-          onChange={(e) => setAcceptedTerms(e.target.checked)}
+          required
+          onChange={(e) => {
+            setAcceptedTerms(e.target.checked);
+            if (e.target.checked) setError("");
+          }}
         />
         <span></span>
         <strong>
-          I agree to the <a href="/terms" target="_blank">Terms and Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+          I agree to the <a href="/terms" target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>Terms and Conditions</a> and <a href="/privacy" target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()}>Privacy Policy</a>
         </strong>
       </label>
 
       <AuthErrorMessage message={error} />
 
-      <button className="signin-submit" type="submit" disabled={loading}>
+      <button className="signin-submit" type="submit" disabled={loading || !acceptedTerms}>
         {loading ? "Creating Account..." : "Create Account"}
         <span></span>
       </button>
@@ -195,7 +204,7 @@ export default function SignUpPage() {
       </div>
 
       <div className="social-login">
-        <button type="button" onClick={() => window.location.href = 'https://breach-radar-backend.onrender.com/api/v1/auth/google'}>
+        <button type="button" disabled={!acceptedTerms} onClick={handleGoogleSignUp}>
           <span className="google">G</span>Google
         </button>
       </div>

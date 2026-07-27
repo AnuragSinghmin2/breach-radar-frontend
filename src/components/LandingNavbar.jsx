@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Monitor,
@@ -43,6 +44,29 @@ export default function LandingNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const navLinksRef = useRef(null);
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      if (!navLinksRef.current?.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setOpenDropdown(null);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   function goToSection(sectionId) {
     if (isHomePage) {
@@ -56,13 +80,19 @@ export default function LandingNavbar() {
 
   function handleSectionClick(event, sectionId) {
     event.preventDefault();
+    setOpenDropdown(null);
     goToSection(sectionId);
   }
 
   function handleMenuItemClick(event, href) {
+    setOpenDropdown(null);
     if (!href) return;
     event.preventDefault();
     navigate(href);
+  }
+
+  function handleDropdownToggle(title) {
+    setOpenDropdown((current) => (current === title ? null : title));
   }
 
   return (
@@ -72,13 +102,14 @@ export default function LandingNavbar() {
         href="/"
         onClick={(event) => {
           event.preventDefault();
+          setOpenDropdown(null);
           navigate("/");
         }}
       >
         <BrandLogo iconSize={26} />
       </a>
 
-      <div className="nav-links">
+      <div className="nav-links" ref={navLinksRef}>
         <a href="#features" onClick={(event) => handleSectionClick(event, "features")}>
           Features
         </a>
@@ -88,34 +119,51 @@ export default function LandingNavbar() {
         <a href="#pricing" onClick={(event) => handleSectionClick(event, "pricing")}>
           Pricing
         </a>
-        {navDropdowns.map((dropdown) => (
-          <div className="nav-dropdown" key={dropdown.title}>
-            <button className="dropdown-trigger" type="button">
-              {dropdown.title}
-            </button>
-            <div className="nav-menu">
-              {dropdown.items.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <a
-                    className="nav-menu-item"
-                    href={item.href || "#"}
-                    key={item.title}
-                    onClick={(event) => handleMenuItemClick(event, item.href)}
-                  >
-                    <span className="menu-icon">
-                      <IconComponent size={18} strokeWidth={1.8} />
-                    </span>
-                    <span>
-                      <strong>{item.title}</strong>
-                      <small>{item.text}</small>
-                    </span>
-                  </a>
-                );
-              })}
+        {navDropdowns.map((dropdown) => {
+          const isOpen = openDropdown === dropdown.title;
+
+          return (
+            <div
+              className={`nav-dropdown${isOpen ? " is-open" : ""}`}
+              key={dropdown.title}
+              onMouseEnter={() => setOpenDropdown(dropdown.title)}
+              onMouseLeave={() =>
+                setOpenDropdown((current) => (current === dropdown.title ? null : current))
+              }
+            >
+              <button
+                className="dropdown-trigger"
+                type="button"
+                aria-expanded={isOpen}
+                aria-haspopup="true"
+                onClick={() => handleDropdownToggle(dropdown.title)}
+              >
+                {dropdown.title}
+              </button>
+              <div className="nav-menu">
+                {dropdown.items.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <a
+                      className="nav-menu-item"
+                      href={item.href || "#"}
+                      key={item.title}
+                      onClick={(event) => handleMenuItemClick(event, item.href)}
+                    >
+                      <span className="menu-icon">
+                        <IconComponent size={18} strokeWidth={1.8} />
+                      </span>
+                      <span>
+                        <strong>{item.title}</strong>
+                        <small>{item.text}</small>
+                      </span>
+                    </a>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="nav-actions">

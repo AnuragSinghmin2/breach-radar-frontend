@@ -1,3 +1,5 @@
+import { getApiOrigin } from "./apiBase";
+
 export function getInitials(name = "", email = "") {
   const cleanName = name.trim();
   if (cleanName) {
@@ -11,13 +13,9 @@ export function getInitials(name = "", email = "") {
 export function resolveAvatarUrl(avatar = "") {
   if (!avatar) return "";
   if (/^https?:\/\//i.test(avatar)) return avatar;
+  if (!avatar.startsWith("/")) return avatar;
 
-  const apiBase = import.meta.env.VITE_API_BASE_URL || "/api/v1";
-  if (apiBase.startsWith("http")) {
-    return `${new URL(apiBase).origin}${avatar}`;
-  }
-
-  return avatar;
+  return `${getApiOrigin()}${avatar}`;
 }
 
 export function formatAccountDate(value) {

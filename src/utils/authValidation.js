@@ -20,7 +20,7 @@ export function validateLoginForm({ email, password }) {
   return errors;
 }
 
-export function validateRegisterForm({ name, email, password, confirmPassword }) {
+export function validateRegisterForm({ name, email, password, confirmPassword, acceptedTerms }) {
   const errors = [];
 
   if (!String(name || "").trim()) {
@@ -41,6 +41,10 @@ export function validateRegisterForm({ name, email, password, confirmPassword })
 
   if (password !== confirmPassword) {
     errors.push("Passwords do not match.");
+  }
+
+  if (!acceptedTerms) {
+    errors.push("You must agree to the Terms and Conditions and Privacy Policy.");
   }
 
   return errors;

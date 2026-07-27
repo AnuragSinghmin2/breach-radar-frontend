@@ -17,13 +17,13 @@ export function AuthProvider({ children }) {
 
   const isAuthenticated = Boolean(user && isSessionValid());
 
-  const applySession = useCallback((sessionUser, token) => {
+  const applySession = useCallback((sessionUser, token, options = {}) => {
     const normalizedUser = normalizeAuthUser(sessionUser, token);
 
     logAuthTrace("AuthContext applySession user", normalizedUser);
     logAuthTrace("AuthContext detected role", normalizedUser?.role);
     setUser(normalizedUser);
-    saveAuthSession(token, normalizedUser);
+    saveAuthSession(token, normalizedUser, options);
     setAccessToken(token);
   }, []);
 
@@ -34,8 +34,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const updateAuthenticatedUser = useCallback((nextUser) => {
-    setUser(nextUser);
-    saveAuthSession(getStoredAccessToken(), nextUser);
+    const normalizedUser = normalizeAuthUser(nextUser);
+    setUser(normalizedUser);
+    saveAuthSession(getStoredAccessToken(), normalizedUser);
   }, []);
 
   const refreshProfile = useCallback(async () => {
@@ -75,11 +76,11 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener("auth:logout", handleLogout);
   }, [clearSession]);
 
-  const login = useCallback(async (email, password) => {
-    const data = await authApi.login({ email, password });
+  const login = useCallback(async (email, password, rememberMe = false) => {
+    const data = await authApi.login({ email, password, rememberMe });
 
     logAuthTrace("login response", data);
-    applySession(data.user, data.accessToken);
+    applySession(data.user, data.accessToken, { rememberMe });
     return data;
   }, [applySession]);
 

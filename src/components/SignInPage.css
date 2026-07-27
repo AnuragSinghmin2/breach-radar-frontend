@@ -716,6 +716,19 @@
   text-decoration: none;
 }
 
+.terms-check-error span {
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+}
+
+.signin-submit:disabled,
+.social-login button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+
 .signup-card .divider {
   margin-top: 24px;
 }

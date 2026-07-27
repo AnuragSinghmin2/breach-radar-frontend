@@ -37,6 +37,22 @@ function decodeJwtPayload(token) {
   }
 }
 
+function getActiveAuthStorage() {
+  if (localStorage.getItem(ACCESS_TOKEN_KEY) || localStorage.getItem(USER_KEY)) {
+    return localStorage;
+  }
+  if (sessionStorage.getItem(ACCESS_TOKEN_KEY) || sessionStorage.getItem(USER_KEY)) {
+    return sessionStorage;
+  }
+  return null;
+}
+
+function resolveAuthStorage(rememberMe) {
+  if (rememberMe === true) return localStorage;
+  if (rememberMe === false) return sessionStorage;
+  return getActiveAuthStorage() || localStorage;
+}
+
 export function normalizeAuthUser(user, accessToken = getStoredAccessToken()) {
   if (!user) return null;
 
@@ -59,25 +75,45 @@ export function getUserHomePath(user) {
   return getRoleHomePath(user?.role);
 }
 
-export function saveAuthSession(accessToken, user) {
+export function saveAuthSession(accessToken, user, { rememberMe } = {}) {
   const normalizedUser = normalizeAuthUser(user, accessToken);
+  const storage = resolveAuthStorage(rememberMe);
 
-  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  localStorage.setItem(USER_KEY, JSON.stringify(normalizedUser));
-  logAuthTrace("stored user object", normalizedUser);
+  clearAuthSession();
+  storage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  storage.setItem(USER_KEY, JSON.stringify(normalizedUser));
+  logAuthTrace("stored user object", {
+    rememberMe: storage === localStorage,
+    user: normalizedUser,
+  });
+}
+
+export function setStoredAccessToken(token) {
+  if (!token) {
+    localStorage.removeItem(ACCESS_TOKEN_KEY);
+    sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+    return;
+  }
+
+  const storage = getActiveAuthStorage() || localStorage;
+  const other = storage === localStorage ? sessionStorage : localStorage;
+  other.removeItem(ACCESS_TOKEN_KEY);
+  storage.setItem(ACCESS_TOKEN_KEY, token);
 }
 
 export function clearAuthSession() {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+  sessionStorage.removeItem(USER_KEY);
 }
 
 export function getStoredAccessToken() {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  return localStorage.getItem(ACCESS_TOKEN_KEY) || sessionStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
 export function getStoredUser() {
-  const raw = localStorage.getItem(USER_KEY);
+  const raw = localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY);
   if (!raw) return null;
 
   try {

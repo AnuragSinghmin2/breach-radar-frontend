@@ -1,30 +1,10 @@
 import axios from "axios";
-
-function isLocalDevHost() {
-  return window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-}
-
-function normalizeApiBaseUrl(value) {
-  const configuredBaseUrl = (value || "").trim();
-
-  if (isLocalDevHost()) {
-    return "/api/v1";
-  }
-
-  const baseUrl = (configuredBaseUrl || "/api/v1").replace(/\/+$/, "");
-
-  if (!/^https?:\/\//i.test(baseUrl)) {
-    return baseUrl || "/api/v1";
-  }
-
-  const parsedUrl = new URL(baseUrl);
-  if (parsedUrl.pathname === "" || parsedUrl.pathname === "/") {
-    parsedUrl.pathname = "/api/v1";
-    return parsedUrl.toString().replace(/\/+$/, "");
-  }
-
-  return baseUrl;
-}
+import { isLocalDevHost, normalizeApiBaseUrl } from "../../utils/apiBase";
+import {
+  clearAuthSession,
+  getStoredAccessToken,
+  setStoredAccessToken,
+} from "../../utils/session";
 
 const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 const isPaymentEndpoint = (url = "") => url.includes("/payment") || url.includes("/billing");
@@ -61,7 +41,7 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-let accessToken = localStorage.getItem("accessToken") || null;
+let accessToken = getStoredAccessToken() || null;
 let refreshPromise = null;
 
 export function getAccessToken() {
@@ -70,15 +50,12 @@ export function getAccessToken() {
 
 export function setAccessToken(token) {
   accessToken = token;
-  if (token) {
-    localStorage.setItem("accessToken", token);
-  } else {
-    localStorage.removeItem("accessToken");
-  }
+  setStoredAccessToken(token);
 }
 
 export function clearAccessToken() {
-  setAccessToken(null);
+  accessToken = null;
+  setStoredAccessToken(null);
 }
 
 apiClient.interceptors.request.use((config) => {
@@ -88,6 +65,11 @@ apiClient.interceptors.request.use((config) => {
       baseURL: config.baseURL,
       url: config.url
     });
+  }
+
+  if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+    delete config.headers["content-type"];
   }
 
   if (accessToken) {
@@ -162,7 +144,7 @@ apiClient.interceptors.response.use(
         }
 
         clearAccessToken();
-        localStorage.removeItem("user");
+        clearAuthSession();
         window.dispatchEvent(new CustomEvent("auth:logout"));
         window.location.href = getLoginRedirectUrl();
         return Promise.reject(refreshError);
