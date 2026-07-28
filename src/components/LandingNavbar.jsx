@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
+  RefreshCw,
+  ShieldAlert,
   Monitor,
-  ShoppingBag,
   Code2,
+  Globe,
+  ListOrdered,
+  ClipboardCheck,
   BookOpen,
   FileCode,
   BookMarked,
@@ -17,9 +21,13 @@ const navDropdowns = [
   {
     title: "Solutions",
     items: [
-      { icon: Monitor, title: "Web Applications", text: "Scan apps, portals, and dashboards" },
-      { icon: ShoppingBag, title: "E-commerce", text: "Protect checkouts and storefronts" },
-      { icon: Code2, title: "API Security", text: "Find risks across public APIs" },
+      { icon: RefreshCw, title: "Continuous Security Testing", text: "Ongoing scans to catch new risks early" },
+      { icon: ShieldAlert, title: "Vulnerability Assessment", text: "Identify and rank security weaknesses" },
+      { icon: Monitor, title: "Web Application Security", text: "Scan apps, portals, and dashboards" },
+      { icon: Code2, title: "API Security Testing", text: "Find risks across public APIs" },
+      { icon: Globe, title: "External Attack Surface Monitoring", text: "Track exposed assets and entry points" },
+      { icon: ListOrdered, title: "Security Risk Prioritization", text: "Focus on the issues that matter most" },
+      { icon: ClipboardCheck, title: "Compliance & Security Audits", text: "Stay aligned with security standards" },
     ],
   },
   {
