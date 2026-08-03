@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { resolveAvatarUrl } from "../utils/profile";
 import BrandLogo from "./BrandLogo";
 import Footer from "./Footer";
+import AdminProfileMenu from "./AdminProfileMenu";
 import {
   Activity,
   Users,
@@ -80,6 +81,12 @@ export default function SuperAdminLayout() {
   } else if (location.pathname.startsWith("/super-admin/settings")) {
     title = "Super Admin Settings";
     subtitle = "Manage administrative profiles and security parameters";
+  } else if (location.pathname.startsWith("/super-admin/change-password")) {
+    title = "Change Password";
+    subtitle = "Update your admin account password";
+  } else if (location.pathname.startsWith("/super-admin/profile")) {
+    title = "My Profile";
+    subtitle = "Manage your admin account details and profile picture";
   }
 
   return (
@@ -245,6 +252,7 @@ export default function SuperAdminLayout() {
                 </button>
               </div>
 
+              <AdminProfileMenu user={user} onLogout={handleLogout} />
             </div>
           </div>
 

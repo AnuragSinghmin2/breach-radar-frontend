@@ -10,18 +10,23 @@
 .auth-footer {
   position: relative;
   z-index: 3;
-  padding: 18px clamp(22px, 4vw, 54px);
   border-color: rgba(198, 234, 227, 0.13);
   background: rgba(3, 9, 15, 0.92);
   backdrop-filter: blur(18px);
 }
 
 .auth-header {
+  padding: 18px 0;
   border-bottom: 1px solid rgba(198, 234, 227, 0.13);
+  overflow: visible;
 }
 
-.auth-navbar {
-  width: min(1180px, 100%);
+.auth-footer {
+  padding: 18px clamp(22px, 4vw, 54px);
+}
+
+.auth-header .navbar {
+  width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
 }
 
@@ -865,7 +870,11 @@
 
 @media (max-width: 680px) {
   .auth-header {
-    padding: 18px;
+    padding: 12px 0;
+  }
+
+  .auth-header .navbar {
+    width: min(100% - 22px, 1180px);
   }
 
   .auth-landing-footer {

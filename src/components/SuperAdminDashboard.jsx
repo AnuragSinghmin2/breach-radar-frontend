@@ -25,6 +25,7 @@ import {
   ResponsiveContainer,
   CartesianGrid
 } from "recharts";
+import { formatCurrency } from "../utils/format";
 import "./SuperAdmin.css";
 
 export default function SuperAdminDashboard() {
@@ -104,7 +105,7 @@ export default function SuperAdminDashboard() {
           <div className="sa-stat-icon" style={{ color: "#eab308", background: "rgba(234,179,8,0.1)" }}><DollarSign size={24} /></div>
           <div className="sa-stat-info">
             <span className="sa-stat-label">Total Revenue</span>
-            <span className="sa-stat-value">${stats.totalRevenue.toFixed(2)}</span>
+            <span className="sa-stat-value">{formatCurrency(stats.totalRevenue)}</span>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
 import { ChevronLeft, ChevronRight, DollarSign, CheckCircle, RotateCcw } from "lucide-react";
+import { formatCurrency } from "../utils/format";
 import "./SuperAdmin.css";
 
 const PAYMENTS_PER_PAGE = 8;
@@ -81,7 +82,7 @@ export default function SuperAdminPayments() {
           <div className="sa-stat-icon" style={{ color: "#eab308", background: "rgba(234,179,8,0.1)" }}><DollarSign size={24} /></div>
           <div className="sa-stat-info">
             <span className="sa-stat-label">Net ARR Revenue</span>
-            <span className="sa-stat-value">${summary.totalRevenue.toFixed(2)}</span>
+            <span className="sa-stat-value">{formatCurrency(summary.totalRevenue)}</span>
           </div>
         </div>
         <div className="sa-stat-card">
@@ -133,7 +134,7 @@ export default function SuperAdminPayments() {
                       <td style={{ fontFamily: "monospace", fontSize: "12px" }}>{p.transactionId}</td>
                       <td>{p.planName}</td>
                       <td style={{ color: isRefunded ? "#94a3b8" : "#22c55e", fontWeight: 700 }}>
-                        {isRefunded ? "-" : ""}${p.amount.toFixed(2)}
+                        {isRefunded ? "-" : ""}{formatCurrency(p.amount, p.currency || "INR")}
                       </td>
                       <td>{new Date(p.createdAt).toLocaleString()}</td>
                       <td>

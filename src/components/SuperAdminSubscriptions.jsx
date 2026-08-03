@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
 import { ChevronLeft, ChevronRight, Plus, Edit2, Trash2, UserCheck, UserX, Settings } from "lucide-react";
+import { formatCurrency } from "../utils/format";
 import "./SuperAdmin.css";
 
 const SUBSCRIPTIONS_PER_PAGE = 8;
@@ -249,7 +250,7 @@ export default function SuperAdminSubscriptions() {
                       <tr key={p._id}>
                         <td style={{ fontWeight: 700, color: "#f8fafc" }}>{p.name}</td>
                         <td style={{ color: "#eab308", fontWeight: 600 }}>
-                          {p.price === 0 && p.name === 'Enterprise' ? 'Custom' : `₹${p.price}`}
+                          {p.price === 0 && p.name === 'Enterprise' ? 'Custom' : formatCurrency(p.price, p.currency || "INR")}
                         </td>
                         <td>{p.domainLimit >= 999999 ? 'Unlimited' : p.domainLimit}</td>
                         <td>{p.scanLimit >= 999999 ? 'Unlimited' : p.scanLimit}</td>

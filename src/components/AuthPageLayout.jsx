@@ -1,7 +1,9 @@
-import { useNavigate } from "react-router-dom";
-import BrandLogo from "./BrandLogo";
+import { useState } from "react";
 import Footer from "./Footer";
+import LandingNavbar from "./LandingNavbar";
+import SupportModal from "./SupportModal";
 import "./SignInPage.css";
+import "./LandingPage.css";
 
 const benefits = [
   {
@@ -26,115 +28,15 @@ const benefits = [
   },
 ];
 
-const navDropdowns = [
-  {
-    title: "Solutions",
-    items: [
-      { icon: "web", title: "Web Applications", text: "Scan apps, portals, and dashboards" },
-      { icon: "shop", title: "E-commerce", text: "Protect checkouts and storefronts" },
-      { icon: "api", title: "API Security", text: "Find risks across public APIs" },
-    ],
-  },
-  {
-    title: "Resources",
-    items: [
-      { icon: "blog", title: "Blog", text: "Security updates and product notes" },
-      { icon: "docs", title: "Documentation", text: "Guides, setup, and API reference" },
-      { icon: "guide", title: "Security Guide", text: "Best practices for safer releases" },
-    ],
-  },
-  {
-    title: "Company",
-    items: [
-      { icon: "about", title: "About Us", text: "Meet the PentestRadar team" },
-      { icon: "careers", title: "Careers", text: "Build security tools with us" },
-      { icon: "contact", title: "Contact Us", text: "Talk to sales or support" },
-    ],
-  },
-];
-
 export default function AuthPageLayout({ children }) {
-  const navigate = useNavigate();
-
-  function goToLandingSection(sectionId) {
-    navigate(`/#${sectionId}`);
-    window.setTimeout(() => {
-      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  }
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   return (
     <div className="auth-page">
       <header className="auth-header">
-        <nav className="navbar auth-navbar" aria-label="Primary navigation">
-          <a
-            className="brand"
-            href="/"
-            onClick={(event) => {
-              event.preventDefault();
-              navigate("/");
-            }}
-          >
-            <BrandLogo iconSize={26} />
-          </a>
-
-          <div className="nav-links">
-            <a
-              href="/#features"
-              onClick={(event) => {
-                event.preventDefault();
-                goToLandingSection("features");
-              }}
-            >
-              Features
-            </a>
-            <a
-              href="/#how-it-works"
-              onClick={(event) => {
-                event.preventDefault();
-                goToLandingSection("how-it-works");
-              }}
-            >
-              How It Works
-            </a>
-            <a
-              href="/#pricing"
-              onClick={(event) => {
-                event.preventDefault();
-                goToLandingSection("pricing");
-              }}
-            >
-              Pricing
-            </a>
-            {navDropdowns.map((dropdown) => (
-              <div className="nav-dropdown" key={dropdown.title}>
-                <button className="dropdown-trigger" type="button">
-                  {dropdown.title}
-                </button>
-                <div className="nav-menu">
-                  {dropdown.items.map((item) => (
-                    <a className="nav-menu-item" href="#" key={item.title}>
-                      <span className={`menu-icon ${item.icon}`}></span>
-                      <span>
-                        <strong>{item.title}</strong>
-                        <small>{item.text}</small>
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="nav-actions">
-            <button className="login" type="button" onClick={() => navigate("/login")}>
-              Log in
-            </button>
-            <button className="start-btn small" type="button" onClick={() => navigate("/register")}>
-              Get Started
-            </button>
-          </div>
-        </nav>
+        <div className="auth-navbar">
+          <LandingNavbar onOpenSupport={() => setIsSupportOpen(true)} />
+        </div>
       </header>
 
       <main className="signin-page">
@@ -181,6 +83,8 @@ export default function AuthPageLayout({ children }) {
       </main>
 
       <Footer />
+
+      <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </div>
   );
 }

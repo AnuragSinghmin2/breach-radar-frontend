@@ -29,7 +29,6 @@
 .nav-actions,
 .hero-actions,
 .proof-grid,
-.trusted .logos,
 .dash-header,
 .dash-tools,
 .panel-head {
@@ -134,6 +133,12 @@
   right: 0;
   bottom: 100%;
   height: 18px;
+}
+
+.nav-menu.is-wide {
+  width: 560px;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 10px;
 }
 
 .nav-dropdown.is-open .nav-menu {
@@ -393,6 +398,29 @@ button {
   color: #001f13;
   background: linear-gradient(135deg, #0ef08a, #20ff9d);
   box-shadow: 0 0 30px rgba(20, 250, 146, 0.26);
+}
+
+.nav-support-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 5px;
+  border: 1px solid rgba(184, 229, 221, 0.24);
+  background: transparent;
+  color: #cfe9df;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.nav-support-btn:hover {
+  color: #20ff9d;
+  border-color: #16e095;
+  background: rgba(22, 224, 149, 0.08);
+  transform: translateY(-1px);
 }
 
 .start-btn:hover:not(:disabled) {
@@ -945,6 +973,7 @@ button {
   padding-top: 18px;
   text-align: center;
   padding-bottom: 60px;
+  overflow: hidden;
 }
 
 .trusted p {
@@ -952,21 +981,75 @@ button {
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.trusted .logos {
-  justify-content: space-between;
-  gap: 22px;
-  margin-top: 22px;
-  color: #8ea09c;
-  font-size: 15px;
+.trusted-marquee {
+  width: min(1120px, calc(100vw - 32px));
+  margin: 22px auto 0;
+  overflow: hidden;
+  border: 1px solid rgba(22, 224, 149, 0.14);
+  border-radius: 18px;
+  background:
+    linear-gradient(90deg, rgba(4, 21, 20, 0.92), rgba(2, 12, 16, 0.84)),
+    rgba(3, 13, 15, 0.74);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 20px 50px rgba(0, 0, 0, 0.18);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.trusted-marquee-track {
+  --trusted-gap: 16px;
+  --trusted-half-gap: 8px;
+  display: flex;
+  width: max-content;
+  gap: var(--trusted-gap);
+  padding: 16px 0;
+  animation: trusted-marquee 34s linear infinite;
+  will-change: transform;
+}
+
+.trusted-marquee:hover .trusted-marquee-track {
+  animation-play-state: paused;
+}
+
+.trusted-domain-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(22, 224, 149, 0.3);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+    rgba(4, 18, 19, 0.76);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 28px rgba(0, 0, 0, 0.2);
+  color: #c9e3dc;
+  font-size: clamp(12px, 1.8vw, 15px);
   font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+  backdrop-filter: blur(14px);
+  transition: border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
-.trusted .logos span::before {
-  content: 'o';
-  margin-right: 8px;
-  color: #b5c3c0;
+.trusted-domain-badge:hover {
+  border-color: rgba(28, 239, 145, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 26px rgba(22, 224, 149, 0.22);
+  color: #effff9;
+  transform: translateY(-1px);
+}
+
+@keyframes trusted-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - var(--trusted-half-gap)));
+  }
 }
 
 .features-section {
@@ -2005,6 +2088,14 @@ button {
     gap: 8px;
   }
 
+  .nav-support-btn {
+    padding: 0 10px;
+  }
+
+  .nav-support-btn span {
+    display: none;
+  }
+
   .login {
     display: none;
   }
@@ -2081,13 +2172,6 @@ button {
 
   .table-row {
     min-width: 560px;
-  }
-
-  .trusted .logos {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px 18px;
-    text-align: left;
   }
 
   .features-shell {
@@ -2205,8 +2289,26 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .trusted .logos {
-    grid-template-columns: 1fr;
+  .trusted {
+    padding-bottom: 44px;
+  }
+
+  .trusted-marquee {
+    width: min(100vw - 20px, 1120px);
+    margin-top: 18px;
+    border-radius: 14px;
+  }
+
+  .trusted-marquee-track {
+    --trusted-gap: 12px;
+    --trusted-half-gap: 6px;
+    padding: 12px 0;
+    animation-duration: 28s;
+  }
+
+  .trusted-domain-badge {
+    min-height: 38px;
+    padding: 0 14px;
   }
 
   .feature-card {

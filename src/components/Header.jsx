@@ -3,12 +3,12 @@ import "./Header.css";
 import { Bell, Download, FileText, Menu, Moon, Plus, Sun } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getInitials, resolveAvatarUrl } from "../utils/profile";
+import UserProfileMenu from "./UserProfileMenu";
 
 export default function Header({ toggleSidebar }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [theme, setTheme] = useState("dark");
   const currentPath = location.pathname.replace(/^\/dashboard/, "") || "/dashboard";
 
@@ -72,6 +72,11 @@ export default function Header({ toggleSidebar }) {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  async function handleLogout() {
+    await logout();
+    navigate("/login", { replace: true });
+  }
+
   function downloadReport() {
     const csv = [
       ["Domain", "Critical", "High", "Medium", "Low", "Score"],
@@ -129,8 +134,6 @@ export default function Header({ toggleSidebar }) {
   }
 
   const ThemeIcon = theme === "dark" ? Moon : Sun;
-  const avatarUrl = resolveAvatarUrl(user?.profile?.avatar);
-  const initials = getInitials(user?.profile?.name, user?.email);
 
   return (
     <div className="header">
@@ -169,14 +172,7 @@ export default function Header({ toggleSidebar }) {
           <ActionIcon size={16} /> {actionText}
         </button>
 
-        <button
-          className="user-avatar"
-          type="button"
-          aria-label="Open profile settings"
-          onClick={() => navigate("/dashboard/settings/profile")}
-        >
-          {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initials}</span>}
-        </button>
+        <UserProfileMenu user={user} onLogout={handleLogout} />
       </div>
     </div>
   );

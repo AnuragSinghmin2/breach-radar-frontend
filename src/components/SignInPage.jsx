@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage, teamApi } from "../services/api";
@@ -30,6 +30,28 @@ function AuthErrorMessage({ message }) {
   );
 }
 
+function AuthSuccessMessage({ message }) {
+  if (!message) return null;
+
+  return (
+    <div
+      className="auth-success-message"
+      style={{
+        color: "#20ef94",
+        backgroundColor: "rgba(32,239,148,0.1)",
+        border: "1px solid rgba(32,239,148,0.25)",
+        padding: "0.75rem",
+        borderRadius: "0.375rem",
+        marginBottom: "1rem",
+        fontSize: "0.875rem",
+        textAlign: "center",
+      }}
+    >
+      {message}
+    </div>
+  );
+}
+
 export default function SignInPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,6 +62,13 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(location.state?.toastMessage || "");
+
+  useEffect(() => {
+    if (!successMessage) return undefined;
+    const timer = window.setTimeout(() => setSuccessMessage(""), 5000);
+    return () => window.clearTimeout(timer);
+  }, [successMessage]);
 
   function getGoogleAuthUrl() {
     if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
@@ -105,6 +134,8 @@ export default function SignInPage() {
         <div className="form-lock"></div>
         <h2>Welcome Back!</h2>
         <p>Login to your account and continue securing your digital assets.</p>
+
+        <AuthSuccessMessage message={successMessage} />
 
         <label className="field-label" htmlFor="email">
           Email Address

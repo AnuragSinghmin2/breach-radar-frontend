@@ -1,54 +1,61 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-  RefreshCw,
-  ShieldAlert,
-  Monitor,
   Code2,
-  Globe,
-  ListOrdered,
-  ClipboardCheck,
   BookOpen,
-  FileCode,
-  BookMarked,
   Info,
-  Briefcase,
-  Mail,
+  Radar,
+  ShieldAlert,
+  Globe,
+  ScanEye,
+  TrendingUp,
+  ClipboardCheck,
+  FileText,
+  FileSpreadsheet,
+  FileCheck2,
+  ListChecks,
+  Award,
+  HeartHandshake,
 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 
 const navDropdowns = [
   {
     title: "Solutions",
+    wide: true,
     items: [
-      { icon: RefreshCw, title: "Continuous Security Testing", text: "Ongoing scans to catch new risks early" },
-      { icon: ShieldAlert, title: "Vulnerability Assessment", text: "Identify and rank security weaknesses" },
-      { icon: Monitor, title: "Web Application Security", text: "Scan apps, portals, and dashboards" },
+      { icon: Radar, title: "Continuous Security Testing", text: "Ongoing scans that never sleep" },
+      { icon: ShieldAlert, title: "Vulnerability Assessment", text: "Identify and rank real-world risks" },
+      { icon: Globe, title: "Web Application Security", text: "Scan apps, portals, and dashboards" },
       { icon: Code2, title: "API Security Testing", text: "Find risks across public APIs" },
-      { icon: Globe, title: "External Attack Surface Monitoring", text: "Track exposed assets and entry points" },
-      { icon: ListOrdered, title: "Security Risk Prioritization", text: "Focus on the issues that matter most" },
-      { icon: ClipboardCheck, title: "Compliance & Security Audits", text: "Stay aligned with security standards" },
+      { icon: ScanEye, title: "External Attack Surface Monitoring", text: "Track every exposed asset live" },
+      { icon: TrendingUp, title: "Security Risk Prioritization", text: "Focus fixes on what matters most" },
+      { icon: ClipboardCheck, title: "Compliance & Security Audits", text: "Stay audit-ready around the clock" },
     ],
   },
   {
     title: "Resources",
+    wide: true,
     items: [
-      { icon: BookOpen, title: "Blog", text: "Security updates and product notes" },
-      { icon: FileCode, title: "Documentation", text: "Guides, setup, and API reference" },
-      { icon: BookMarked, title: "Security Guide", text: "Best practices for safer releases" },
+      { icon: FileText, title: "Product Brochure", text: "Overview of features and plans" },
+      { icon: FileSpreadsheet, title: "Datasheets", text: "Technical specs at a glance" },
+      { icon: FileCheck2, title: "Compliance Reports", text: "Audit-ready compliance summaries" },
+      { icon: ListChecks, title: "Security Checklists", text: "Step-by-step hardening guides" },
+      { icon: BookOpen, title: "Case Studies", text: "Real results from real customers" },
     ],
   },
   {
     title: "Company",
     items: [
       { icon: Info, title: "About Us", text: "Meet the PentestRadar team", href: "/about" },
-      { icon: Briefcase, title: "Careers", text: "Build security tools with us" },
-      { icon: Mail, title: "Contact Us", text: "Talk to sales or support" },
+      { icon: BookOpen, title: "Case Studies", text: "Real results from real customers" },
+      { icon: Award, title: "Awards & Recognition", text: "Milestones we're proud of" },
+      { icon: HeartHandshake, title: "Support", text: "Ways to back our mission", action: "support" },
     ],
   },
 ];
 
-export default function LandingNavbar() {
+export default function LandingNavbar({ onOpenSupport }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -92,11 +99,18 @@ export default function LandingNavbar() {
     goToSection(sectionId);
   }
 
-  function handleMenuItemClick(event, href) {
+  function handleMenuItemClick(event, item) {
     setOpenDropdown(null);
-    if (!href) return;
+
+    if (item.action === "support") {
+      event.preventDefault();
+      onOpenSupport?.();
+      return;
+    }
+
+    if (!item.href) return;
     event.preventDefault();
-    navigate(href);
+    navigate(item.href);
   }
 
   function handleDropdownToggle(title) {
@@ -148,7 +162,7 @@ export default function LandingNavbar() {
               >
                 {dropdown.title}
               </button>
-              <div className="nav-menu">
+              <div className={`nav-menu${dropdown.wide ? " is-wide" : ""}`}>
                 {dropdown.items.map((item) => {
                   const IconComponent = item.icon;
                   return (
@@ -156,7 +170,7 @@ export default function LandingNavbar() {
                       className="nav-menu-item"
                       href={item.href || "#"}
                       key={item.title}
-                      onClick={(event) => handleMenuItemClick(event, item.href)}
+                      onClick={(event) => handleMenuItemClick(event, item)}
                     >
                       <span className="menu-icon">
                         <IconComponent size={18} strokeWidth={1.8} />

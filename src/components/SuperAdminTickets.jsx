@@ -1,7 +1,34 @@
 import { useEffect, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { MessageSquare, Check, UserPlus, Send, CornerDownRight } from "lucide-react";
+import { Check, ExternalLink, Image, Paperclip, Send, UserPlus } from "lucide-react";
+import { getApiOrigin } from "../utils/apiBase";
 import "./SuperAdmin.css";
+
+function resolveAttachmentUrl(attachment = "") {
+  const rawAttachment = typeof attachment === "string" ? attachment : attachment?.url || "";
+  if (!rawAttachment) return "";
+  if (/^https?:\/\//i.test(rawAttachment)) return rawAttachment;
+
+  const normalizedAttachment = (rawAttachment.startsWith("/") ? rawAttachment : `/${rawAttachment}`)
+    .replace(/^\/uploads\/support\//, "/uploads/support-tickets/");
+  return `${getApiOrigin()}${normalizedAttachment}`;
+}
+
+function getAttachmentName(attachment = "") {
+  if (!attachment) return "";
+  if (typeof attachment === "object") {
+    return attachment.originalName || attachment.storedName || "Attachment";
+  }
+  return String(attachment).split("/").pop() || "Attachment";
+}
+
+function isImageAttachment(attachment = "") {
+  const value = typeof attachment === "object"
+    ? `${attachment.mimeType || ""} ${attachment.url || attachment.originalName || attachment.storedName || ""}`
+    : String(attachment);
+
+  return /image\/|\.jpe?g($|\?)|\.png($|\?)|\.webp($|\?)/i.test(value);
+}
 
 export default function SuperAdminTickets() {
   const [tickets, setTickets] = useState([]);
@@ -68,6 +95,10 @@ export default function SuperAdminTickets() {
     }
   };
 
+  const attachmentUrl = resolveAttachmentUrl(activeTicket?.attachment);
+  const attachmentName = getAttachmentName(activeTicket?.attachment);
+  const showImagePreview = isImageAttachment(activeTicket?.attachment);
+
   return (
     <div className="sa-container">
       <div className="sa-dashboard-grid">
@@ -110,19 +141,19 @@ export default function SuperAdminTickets() {
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: "11px", textTransform: "uppercase", fontWeight: 700, color: t.priority === "critical" ? "#ff4545" : t.priority === "high" ? "#f97316" : "#cbd5e1" }}>
+                        <span style={{ fontSize: "11px", textTransform: "uppercase", fontWeight: 700, color: t.priority === "High" ? "#ff4545" : t.priority === "Medium" ? "#f97316" : "#cbd5e1" }}>
                           {t.priority} priority
                         </span>
-                        <span className={`sa-badge ${t.status === "closed" ? "sa-badge-active" : t.status === "assigned" ? "sa-badge-admin" : "sa-badge-suspended"}`}>
+                        <span className={`sa-badge ${t.status === "Closed" || t.status === "Resolved" ? "sa-badge-active" : t.status === "In Progress" ? "sa-badge-admin" : "sa-badge-suspended"}`}>
                           {t.status}
                         </span>
                       </div>
-                      <h4 style={{ margin: 0, color: "#f8fafc", fontSize: "14px" }}>{t.title}</h4>
+                      <h4 style={{ margin: 0, color: "#f8fafc", fontSize: "14px" }}>{t.subject}</h4>
                       <p style={{ fontSize: "12px", color: "#94a3b8", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
-                        {t.description}
+                        {t.message}
                       </p>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
-                        <span>From: {t.userId?.email || "Unknown"}</span>
+                        <span>From: {t.name ? `${t.name} (${t.email})` : t.email || "Unknown"}</span>
                         <span>Assigned to: {t.assignedTo?.profile?.name || "Unassigned"}</span>
                       </div>
                     </div>
@@ -140,16 +171,18 @@ export default function SuperAdminTickets() {
               {/* Active Ticket Header */}
               <div style={{ borderBottom: "1px solid rgba(42, 69, 96, 0.5)", paddingBottom: "16px", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "start" }}>
                 <div>
-                  <h3 style={{ margin: 0, color: "#f8fafc" }}>{activeTicket.title}</h3>
-                  <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "6px" }}>{activeTicket.description}</p>
+                  <h3 style={{ margin: 0, color: "#f8fafc" }}>{activeTicket.subject}</h3>
+                  <p style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
+                    {activeTicket.name} · {activeTicket.email}{activeTicket.company ? ` · ${activeTicket.company}` : ""}
+                  </p>
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
-                  {activeTicket.status !== "assigned" && activeTicket.status !== "closed" && (
+                  {activeTicket.status !== "In Progress" && activeTicket.status !== "Closed" && activeTicket.status !== "Resolved" && (
                     <button className="sa-btn sa-btn-secondary" onClick={() => handleAssign(activeTicket._id)}>
                       <UserPlus size={14} /> Claim
                     </button>
                   )}
-                  {activeTicket.status !== "closed" && (
+                  {activeTicket.status !== "Closed" && activeTicket.status !== "Resolved" && (
                     <button className="sa-btn" onClick={() => handleResolve(activeTicket._id)}>
                       <Check size={14} /> Resolve
                     </button>
@@ -157,36 +190,72 @@ export default function SuperAdminTickets() {
                 </div>
               </div>
 
-              {/* Chat Messages */}
+              {/* Chat Messages: the backend only stores the original message + an appended adminNotes trail (no per-message array) */}
               <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px", padding: "10px", maxHeight: "380px" }}>
-                {activeTicket.messages?.map((msg, idx) => {
-                  // If senderId matches user profile, it's support message. Let's color accordingly
-                  const isAgent = msg.senderId === activeTicket.assignedTo?._id || msg.senderName === "PentestRadar Super Admin" || msg.senderName === "Breach Radar Super Admin" || msg.senderName === "Support Agent" || msg.senderName.includes("Super Admin");
-                  return (
-                    <div
-                      key={idx}
-                      style={{
-                        alignSelf: isAgent ? "flex-end" : "flex-start",
-                        background: isAgent ? "rgba(0, 214, 143, 0.1)" : "#071321",
-                        border: `1px solid ${isAgent ? "#00d68f" : "rgba(42, 69, 96, 0.4)"}`,
-                        borderRadius: "8px",
-                        padding: "10px 14px",
-                        maxWidth: "80%",
-                        display: "flex",
-                        flexDirection: "column"
-                      }}
-                    >
-                      <span style={{ fontSize: "10px", color: "#00d68f", fontWeight: 700, marginBottom: "4px" }}>
-                        {msg.senderName}
-                      </span>
-                      <p style={{ fontSize: "13px", color: "#cbd5e1", margin: 0 }}>{msg.message}</p>
+                <div
+                  style={{
+                    alignSelf: "flex-start",
+                    background: "#071321",
+                    border: "1px solid rgba(42, 69, 96, 0.4)",
+                    borderRadius: "8px",
+                    padding: "10px 14px",
+                    maxWidth: "80%",
+                    display: "flex",
+                    flexDirection: "column"
+                  }}
+                >
+                  <span style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 700, marginBottom: "4px" }}>
+                    {activeTicket.name || "Customer"}
+                  </span>
+                  <p style={{ fontSize: "13px", color: "#cbd5e1", margin: 0, whiteSpace: "pre-wrap" }}>{activeTicket.message}</p>
+                  {attachmentUrl && (
+                    <div style={{ marginTop: "12px", borderTop: "1px solid rgba(42, 69, 96, 0.45)", paddingTop: "10px" }}>
+                      {showImagePreview && (
+                        <a href={attachmentUrl} target="_blank" rel="noreferrer" style={{ display: "block", marginBottom: "8px" }}>
+                          <img
+                            src={attachmentUrl}
+                            alt={attachmentName}
+                            style={{ maxWidth: "220px", maxHeight: "160px", width: "100%", objectFit: "cover", borderRadius: "6px", border: "1px solid rgba(148, 163, 184, 0.25)" }}
+                          />
+                        </a>
+                      )}
+                      <a
+                        href={attachmentUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#00d68f", fontSize: "12px", fontWeight: 700, textDecoration: "none" }}
+                      >
+                        {showImagePreview ? <Image size={14} /> : <Paperclip size={14} />}
+                        {attachmentName}
+                        <ExternalLink size={12} />
+                      </a>
                     </div>
-                  );
-                })}
+                  )}
+                </div>
+                {activeTicket.adminNotes && activeTicket.adminNotes.split("\n\n").filter(Boolean).map((note, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      alignSelf: "flex-end",
+                      background: "rgba(0, 214, 143, 0.1)",
+                      border: "1px solid #00d68f",
+                      borderRadius: "8px",
+                      padding: "10px 14px",
+                      maxWidth: "80%",
+                      display: "flex",
+                      flexDirection: "column"
+                    }}
+                  >
+                    <span style={{ fontSize: "10px", color: "#00d68f", fontWeight: 700, marginBottom: "4px" }}>
+                      Support Agent
+                    </span>
+                    <p style={{ fontSize: "13px", color: "#cbd5e1", margin: 0, whiteSpace: "pre-wrap" }}>{note}</p>
+                  </div>
+                ))}
               </div>
 
               {/* Reply Form */}
-              {activeTicket.status !== "closed" ? (
+              {activeTicket.status !== "Closed" && activeTicket.status !== "Resolved" ? (
                 <form onSubmit={handleSendReply} style={{ display: "flex", gap: "10px", marginTop: "16px", borderTop: "1px solid rgba(42, 69, 96, 0.4)", paddingTop: "16px" }}>
                   <input
                     type="text"

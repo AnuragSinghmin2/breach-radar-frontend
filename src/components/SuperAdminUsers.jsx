@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
 import { ChevronLeft, ChevronRight, Edit2, Trash2, UserX, UserCheck } from "lucide-react";
+import { formatCurrency } from "../utils/format";
 import "./SuperAdmin.css";
 
 const USERS_PER_PAGE = 8;
@@ -301,7 +302,7 @@ export default function SuperAdminUsers() {
                   >
                     <option value="Free">Free Plan</option>
                     {plans.map(p => (
-                      <option key={p._id} value={p.name}>{p.name} (${p.price}/mo)</option>
+                      <option key={p._id} value={p.name}>{p.name} ({formatCurrency(p.price, p.currency || "INR")}/mo)</option>
                     ))}
                   </select>
                 </div>

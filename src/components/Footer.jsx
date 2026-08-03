@@ -42,7 +42,7 @@ const footerGroups = [
   },
 ];
 
-export default function Footer() {
+export default function Footer({ showSupport = false, onOpenSupport }) {
   const navigate = useNavigate();
 
   const handleNavigation = (path) => {
@@ -95,6 +95,12 @@ export default function Footer() {
                 {link.label}
               </button>
             ))}
+
+            {showSupport && group.title === "Company" && (
+              <button type="button" onClick={onOpenSupport}>
+                Support
+              </button>
+            )}
           </div>
         ))}
       </div>

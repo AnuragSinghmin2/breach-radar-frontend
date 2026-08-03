@@ -19,3 +19,8 @@ export async function updateScanPreferences(payload) {
   const { data } = await apiClient.put("/settings/scan-preferences", payload);
   return data;
 }
+
+export async function resetWorkspace(payload) {
+  const { data } = await apiClient.post("/settings/reset-workspace", payload);
+  return data;
+}

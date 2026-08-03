@@ -37,6 +37,8 @@ import SuperAdminTickets from "./components/SuperAdminTickets";
 import SuperAdminAuditLogs from "./components/SuperAdminAuditLogs";
 import SuperAdminSystemHealth from "./components/SuperAdminSystemHealth";
 import SuperAdminSettings from "./components/SuperAdminSettings";
+import AdminProfilePage from "./components/AdminProfilePage";
+import AdminChangePasswordPage from "./components/AdminChangePasswordPage";
 
 function LegacyDashboardRedirect() {
   const location = useLocation();
@@ -141,6 +143,8 @@ function App() {
         <Route path="audit-logs" element={<SuperAdminAuditLogs />} />
         <Route path="system-health" element={<SuperAdminSystemHealth />} />
         <Route path="settings" element={<SuperAdminSettings />} />
+        <Route path="profile" element={<AdminProfilePage />} />
+        <Route path="change-password" element={<AdminChangePasswordPage />} />
         <Route path="*" element={<Navigate to="/super-admin" replace />} />
       </Route>
 

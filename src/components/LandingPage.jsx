@@ -9,6 +9,8 @@ import {
 import BrandLogo from "./BrandLogo";
 import Footer from "./Footer";
 import LandingNavbar from "./LandingNavbar";
+import SupportModal from "./SupportModal";
+import TrustedCompaniesMarquee from "./TrustedCompaniesMarquee";
 import "./LandingPage.css";
 
 const metrics = [
@@ -274,6 +276,7 @@ function DashboardMockup() {
 export default function LandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   // Demo section state
   const [demoStep, setDemoStep] = useState(1);
@@ -373,7 +376,7 @@ export default function LandingPage() {
   return (
     <main className="scan-page">
       <div className="scan-shell">
-        <LandingNavbar />
+        <LandingNavbar onOpenSupport={() => setIsSupportOpen(true)} />
 
         <section className="hero-section">
           <div className="hero-copy">
@@ -426,17 +429,7 @@ export default function LandingPage() {
           <DashboardMockup />
         </section>
 
-        <section className="trusted" aria-label="Trusted by companies">
-          <p>Trusted by 1000+ companies worldwide</p>
-          <div className="logos">
-            <span>Breach Radar</span>
-            <span>Dork Radar</span>
-            <span>360 Flash Drive</span>
-            <span>SAS Hospital</span>
-            <span>Cybersena.in</span>
-            <span>Priya Hospital</span>
-          </div>
-        </section>
+        <TrustedCompaniesMarquee />
 
         <section className="features-section" id="features" aria-labelledby="features-title">
           <div className="features-shell">
@@ -770,8 +763,10 @@ export default function LandingPage() {
             <span>Made with love for a more secure web</span>
           </div>
         </div>
-        <Footer />
+        <Footer showSupport onOpenSupport={() => setIsSupportOpen(true)} />
       </div>
+
+      <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </main>
   );
 }

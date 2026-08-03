@@ -17,5 +17,4 @@ export * as securityApi from "./securityService";
 export * as apiAccessApi from "./apiAccessService";
 export * as integrationsApi from "./integrationsService";
 export * as activityLogApi from "./activityLogService";
-
-
+export * as supportApi from "./supportService";

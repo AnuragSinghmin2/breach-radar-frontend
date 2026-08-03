@@ -1,5 +1,6 @@
 import {
   Activity,
+  AlertTriangle,
   ArrowRight,
   BarChart3,
   Bell,
@@ -14,6 +15,7 @@ import {
   CreditCard,
   Crown,
   Download,
+  Eraser,
   ExternalLink,
   Eye,
   FileText,
@@ -35,7 +37,7 @@ import {
   Webhook,
   Wrench,
 } from "lucide-react";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { billingApi, getErrorMessage, teamApi, userApi, settingsApi, notificationApi, securityApi, apiAccessApi, integrationsApi, activityLogApi } from "../services/api";
@@ -2315,7 +2317,23 @@ function ScanPreferencesSettings() {
   );
 }
 
+function clearAllBrowserCookies() {
+  const cookies = document.cookie ? document.cookie.split(";") : [];
+  const hostname = window.location.hostname;
+
+  cookies.forEach((cookie) => {
+    const eqPos = cookie.indexOf("=");
+    const name = (eqPos > -1 ? cookie.substr(0, eqPos) : cookie).trim();
+    if (!name) return;
+
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${hostname}`;
+  });
+}
+
 function SecuritySettings() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -2325,6 +2343,11 @@ function SecuritySettings() {
   const [sessions, setSessions] = useState([]);
   const [events, setEvents] = useState([]);
   const [sessionsPage, setSessionsPage] = useState(1);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetConfirmation, setResetConfirmation] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [showClearDataModal, setShowClearDataModal] = useState(false);
+  const [clearingData, setClearingData] = useState(false);
 
   const loadSecurityEvents = async () => {
     const data = await activityLogApi.getLogs({ limit: 5, type: "Security" });
@@ -2460,6 +2483,55 @@ function SecuritySettings() {
     return date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   };
 
+  const closeResetModal = () => {
+    if (resetLoading) return;
+    setShowResetModal(false);
+    setResetConfirmation("");
+  };
+
+  const handleWorkspaceReset = async () => {
+    try {
+      setResetLoading(true);
+      setError("");
+      const result = await settingsApi.resetWorkspace({ confirmation: resetConfirmation });
+      sessionStorage.setItem("workspaceResetToast", result?.message || "Workspace reset successfully.");
+      setShowResetModal(false);
+      setResetConfirmation("");
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to reset workspace."));
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const closeClearDataModal = () => {
+    if (clearingData) return;
+    setShowClearDataModal(false);
+  };
+
+  const handleClearBrowserData = async () => {
+    setClearingData(true);
+    try {
+      try {
+        await logout();
+      } catch {
+        // Backend logout call failed (e.g. offline) — still wipe local browser data below.
+      }
+
+      clearAllBrowserCookies();
+      localStorage.clear();
+      sessionStorage.clear();
+    } finally {
+      setClearingData(false);
+      setShowClearDataModal(false);
+      navigate("/login", {
+        replace: true,
+        state: { toastMessage: "Browser data cleared successfully." },
+      });
+    }
+  };
+
   if (loading) {
     return <div style={{ padding: "40px", textRendering: "optimizeLegibility", textAlign: "center", color: "#94a3b8" }}>Loading security preferences...</div>;
   }
@@ -2540,6 +2612,57 @@ function SecuritySettings() {
         </aside>
       </div>
 
+      <section className="settings-panel security-danger-zone-panel">
+        <div className="security-danger-zone-title">
+          <span className="security-danger-zone-icon">
+            <AlertTriangle size={20} />
+          </span>
+          <div>
+            <h3>Danger Zone</h3>
+            <p>These actions are irreversible or affect your active session. Review each one carefully before continuing.</p>
+          </div>
+        </div>
+
+        <div className="security-danger-card-list">
+          <article className="security-danger-card is-warning">
+            <div className="security-danger-card-icon is-warning">
+              <Eraser size={20} />
+            </div>
+            <div className="security-danger-card-body">
+              <h4>Clear Browser Data</h4>
+              <p>Remove cookies, local storage, session storage and cached browser data from this browser. Your account and workspace data will remain safe.</p>
+            </div>
+            <button
+              type="button"
+              className="security-danger-button is-warning"
+              onClick={() => setShowClearDataModal(true)}
+            >
+              <Eraser size={16} /> Clear Browser Data
+            </button>
+          </article>
+
+          <article className="security-danger-card is-critical">
+            <div className="security-danger-card-icon is-critical">
+              <Trash2 size={20} />
+            </div>
+            <div className="security-danger-card-body">
+              <h4>Reset Workspace</h4>
+              <p>Permanently clear all data inside this workspace without deleting your account.</p>
+            </div>
+            <button
+              type="button"
+              className="security-danger-button is-critical"
+              onClick={() => {
+                setError("");
+                setShowResetModal(true);
+              }}
+            >
+              <Trash2 size={16} /> Reset Workspace
+            </button>
+          </article>
+        </div>
+      </section>
+
       <div className="security-bottom-grid">
         <section className="settings-panel security-sessions-panel">
           <div className="settings-panel-title">
@@ -2607,6 +2730,118 @@ function SecuritySettings() {
           </div>
         </section>
       </div>
+
+      {showClearDataModal && (
+        <div className="settings-danger-modal-backdrop" onClick={closeClearDataModal}>
+          <div
+            className="settings-danger-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="clear-browser-data-title"
+          >
+            <div className="settings-danger-modal-header is-warning">
+              <div className="settings-danger-modal-icon is-warning">
+                <Eraser size={18} />
+              </div>
+              <div>
+                <h3 id="clear-browser-data-title">Clear Browser Data</h3>
+                <p>This will sign you out and remove locally stored data from this browser only.</p>
+              </div>
+            </div>
+
+            <div className="settings-danger-modal-columns">
+              <div className="settings-danger-modal-col">
+                <h5>Will be cleared</h5>
+                <div className="settings-danger-modal-list">
+                  {["Cookies", "Local Storage", "Session Storage", "Cached preferences", "Theme settings", "Auth token"].map((item) => (
+                    <span key={item} className="is-clear">
+                      <Check size={14} />
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="settings-danger-modal-col">
+                <h5>Will stay safe</h5>
+                <div className="settings-danger-modal-list">
+                  {["Domains", "Scans", "Vulnerabilities", "Reports", "Subscription", "Billing", "Account"].map((item) => (
+                    <span key={item} className="is-safe">
+                      <ShieldCheck size={14} />
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="settings-danger-actions">
+              <button type="button" onClick={closeClearDataModal} disabled={clearingData}>
+                Cancel
+              </button>
+              <button type="button" className="is-warning" onClick={handleClearBrowserData} disabled={clearingData}>
+                {clearingData ? "Clearing..." : "Clear & Sign Out"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showResetModal && (
+        <div className="settings-danger-modal-backdrop" onClick={closeResetModal}>
+          <div
+            className="settings-danger-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-workspace-title"
+          >
+            <div className="settings-danger-modal-header is-critical">
+              <div className="settings-danger-modal-icon is-critical">
+                <Trash2 size={18} />
+              </div>
+              <div>
+                <h3 id="reset-workspace-title">Reset Workspace</h3>
+                <p>This action will permanently delete all your workspace data.</p>
+              </div>
+            </div>
+
+            <div className="settings-danger-modal-list">
+              {["Domains", "Scans", "Vulnerabilities", "Reports", "Monitoring Data", "Alerts", "Dashboard Statistics"].map((item) => (
+                <span key={item} className="is-clear">
+                  <Check size={14} />
+                  {item}
+                </span>
+              ))}
+            </div>
+
+            <label className="settings-danger-confirmation">
+              <span>Type RESET to continue</span>
+              <input
+                type="text"
+                value={resetConfirmation}
+                onChange={(event) => setResetConfirmation(event.target.value)}
+                placeholder="RESET"
+                autoFocus
+              />
+            </label>
+
+            <div className="settings-danger-actions">
+              <button type="button" onClick={closeResetModal} disabled={resetLoading}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="is-critical"
+                onClick={handleWorkspaceReset}
+                disabled={resetLoading || resetConfirmation.trim().toUpperCase() !== "RESET"}
+              >
+                {resetLoading ? "Resetting..." : "Reset Workspace"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

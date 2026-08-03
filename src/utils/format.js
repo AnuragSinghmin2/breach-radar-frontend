@@ -19,6 +19,15 @@ export function formatDate(date) {
   }).format(new Date(date));
 }
 
+export function formatCurrency(amount, currency = "INR") {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(amount) || 0);
+}
+
 export function formatDay(date) {
   return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
