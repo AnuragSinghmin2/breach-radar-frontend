@@ -21,6 +21,10 @@ import Monitoring from "./components/Monitoring";
 import Remediation from "./components/Remediation";
 import VulnerabilitiesTable from "./components/VulnerabilitiesTable";
 import HomePage from "./pages/HomePage";
+import CaseStudiesPage from "./pages/CaseStudiesPage";
+import AwardsRecognitionPage from "./pages/AwardsRecognitionPage";
+import SolutionFeaturePage from "./pages/SolutionFeaturePage";
+import ResourceDetailPage from "./pages/ResourceDetailPage";
 import DashboardPage from "./pages/DashboardPage";
 import RegisterPage from "./pages/RegisterPage";
 import InviteAcceptPage from "./pages/InviteAcceptPage";
@@ -58,6 +62,13 @@ function App() {
 <Route path="/privacy" element={<PrivacyPolicyPage />} />
 <Route path="/refund-policy" element={<RefundPolicyPage />} />
 <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+      <Route path="/solutions/:slug" element={<SolutionFeaturePage />} />
+      <Route path="/case-studies" element={<CaseStudiesPage />} />
+      <Route path="/resources/:slug" element={<ResourceDetailPage />} />
+      <Route
+        path="/awards-recognition"
+        element={<AwardsRecognitionPage />}
+      />
       <Route path="/invite/:token" element={<InviteAcceptPage />} />
 
       <Route

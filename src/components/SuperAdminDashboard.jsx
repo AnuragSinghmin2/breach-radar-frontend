@@ -5,7 +5,7 @@ import {
   Globe,
   Scan,
   ShieldAlert,
-  DollarSign,
+  IndianRupee,
   Layers,
   Activity,
   HeartPulse,
@@ -57,6 +57,52 @@ export default function SuperAdminDashboard() {
 
   const { stats, charts, recentUsers, recentScans, ticketsOverview, systemHealth } = data;
 
+  const statCards = [
+    {
+      title: "Total Users",
+      value: stats.totalUsers,
+      growth: "12%",
+      tone: "cyan",
+      icon: UsersIcon,
+    },
+    {
+      title: "Total Domains",
+      value: stats.totalDomains,
+      growth: "9%",
+      tone: "green",
+      icon: Globe,
+    },
+    {
+      title: "Total Scans",
+      value: stats.totalScans,
+      growth: "18%",
+      tone: "purple",
+      icon: Scan,
+    },
+    {
+      title: "Vulnerabilities",
+      value: stats.totalVulnerabilities,
+      growth: "7%",
+      tone: "red",
+      icon: ShieldAlert,
+    },
+    {
+      title: "Total Revenue",
+      value: formatCurrency(stats.totalRevenue, "INR"),
+      growth: "15%",
+      tone: "gold",
+      icon: IndianRupee,
+      valueClassName: "sa-stat-value-currency",
+    },
+    {
+      title: "Active Subs",
+      value: stats.activeSubscriptions,
+      growth: "6%",
+      tone: "blue",
+      icon: Layers,
+    },
+  ];
+
   // Pie chart severity data
   const severityData = [
     { name: "Critical", value: charts.severityDistribution.Critical || 0, color: "#ff4545" },
@@ -68,54 +114,22 @@ export default function SuperAdminDashboard() {
   return (
     <div className="sa-container">
       {/* 1. Statistics Cards */}
-      <div className="sa-sa sa-stats-grid">
-        <div className="sa-stat-card">
-          <div className="sa-stat-icon"><UsersIcon size={24} /></div>
-          <div className="sa-stat-info">
-            <span className="sa-stat-label">Total Users</span>
-            <span className="sa-stat-value">{stats.totalUsers}</span>
-          </div>
-        </div>
-
-        <div className="sa-stat-card">
-          <div className="sa-stat-icon"><Globe size={24} /></div>
-          <div className="sa-stat-info">
-            <span className="sa-stat-label">Total Domains</span>
-            <span className="sa-stat-value">{stats.totalDomains}</span>
-          </div>
-        </div>
-
-        <div className="sa-stat-card">
-          <div className="sa-stat-icon"><Scan size={24} /></div>
-          <div className="sa-stat-info">
-            <span className="sa-stat-label">Total Scans</span>
-            <span className="sa-stat-value">{stats.totalScans}</span>
-          </div>
-        </div>
-
-        <div className="sa-stat-card">
-          <div className="sa-stat-icon" style={{ color: "#ff4545", background: "rgba(239,68,68,0.1)" }}><ShieldAlert size={24} /></div>
-          <div className="sa-stat-info">
-            <span className="sa-stat-label">Vulnerabilities</span>
-            <span className="sa-stat-value">{stats.totalVulnerabilities}</span>
-          </div>
-        </div>
-
-        <div className="sa-stat-card">
-          <div className="sa-stat-icon" style={{ color: "#eab308", background: "rgba(234,179,8,0.1)" }}><DollarSign size={24} /></div>
-          <div className="sa-stat-info">
-            <span className="sa-stat-label">Total Revenue</span>
-            <span className="sa-stat-value">{formatCurrency(stats.totalRevenue)}</span>
-          </div>
-        </div>
-
-        <div className="sa-stat-card">
-          <div className="sa-stat-icon" style={{ color: "#60a5fa", background: "rgba(96,165,250,0.1)" }}><Layers size={24} /></div>
-          <div className="sa-stat-info">
-            <span className="sa-stat-label">Active Subs</span>
-            <span className="sa-stat-value">{stats.activeSubscriptions}</span>
-          </div>
-        </div>
+      <div className="sa-stats-grid">
+        {statCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <article className={`sa-stat-card sa-stat-${card.tone}`} key={card.title}>
+              <div className="sa-stat-icon">
+                <Icon size={28} strokeWidth={1.9} />
+              </div>
+              <div className="sa-stat-info">
+                <span className="sa-stat-label">{card.title}</span>
+                <span className={`sa-stat-value ${card.valueClassName || ""}`}>{card.value}</span>
+              </div>
+              <span className="sa-stat-growth">{"\u2191"} {card.growth} from last 7 days</span>
+            </article>
+          );
+        })}
       </div>
 
       {/* 2. Charts Section */}
