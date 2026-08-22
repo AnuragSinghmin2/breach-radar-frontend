@@ -10,7 +10,9 @@ import "./CaseStudiesPage.css";
 
 export default function CaseStudiesPage() {
   const navigate = useNavigate();
-  useLayoutEffect(()=>window.scrollTo(0,0),[]);
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <main className="case-page">
       <div className="case-shell">

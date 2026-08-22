@@ -36,7 +36,9 @@ const checkLabels = {
   headers: "Security Headers",
   ports: "Port Exposure",
   malware: "Malware Signals",
-  compliance: "Compliance Mapping",
+  apiSecurity: "API Security (BOLA)",
+  cloudInfrastructure: "Exposed Admin Panels",
+  fileUpload: "File Upload Checks",
 };
 
 const SCAN_HISTORY_PAGE_SIZE = 10;
@@ -137,6 +139,10 @@ export default function Scans() {
     ports: false,
     malware: true,
     compliance: false,
+    businessLogic: true,
+    apiSecurity: true,
+    cloudInfrastructure: true,
+    fileUpload: true,
   });
 
   const selectedScan = SCAN_TYPE_META[selectedType];

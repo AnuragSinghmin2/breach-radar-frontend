@@ -1026,6 +1026,9 @@ function PlanBillingSettings() {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savingPlan, setSavingPlan] = useState("");
+  const [selectedPaymentGateway, setSelectedPaymentGateway] = useState("razorpay");
+  const [paypalVerifying, setPaypalVerifying] = useState(false);
+  const [showPaymentMethodSelect, setShowPaymentMethodSelect] = useState(false);
 
   // Modal states
   const [modalType, setModalType] = useState(null); // 'upgrade', 'downgrade'
@@ -1080,6 +1083,55 @@ function PlanBillingSettings() {
   useEffect(() => {
     loadBilling();
     loadTimeline();
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        if (showPaymentMethodSelect) {
+          setShowPaymentMethodSelect(false);
+        } else {
+          setModalType(null);
+          setCancelModalOpen(false);
+        }
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [showPaymentMethodSelect]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paypalSuccess = params.get("paypal-success");
+    const paypalCancel = params.get("paypal-cancel");
+    const orderId = params.get("token");
+
+    if (paypalSuccess === "true" && orderId) {
+      async function verifyPaypal() {
+        setPaypalVerifying(true);
+        setMessage({ type: "info", text: "Verifying PayPal payment. Please wait..." });
+        try {
+          const res = await billingApi.capturePaypalPayment({ orderId });
+          const nextBilling = await billingApi.getBilling();
+          setBilling(nextBilling);
+          notifyBillingSummaryRefresh();
+          loadTimeline();
+          setMessage({ type: "success", text: `${res.planName || "Professional"} plan activated successfully!` });
+        } catch (err) {
+          console.error("PayPal verification failed:", err);
+          setMessage({ type: "error", text: getErrorMessage(err, "PayPal payment verification failed.") });
+        } finally {
+          setPaypalVerifying(false);
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+        }
+      }
+      verifyPaypal();
+    } else if (paypalCancel === "true") {
+      setMessage({ type: "error", text: "PayPal payment was cancelled by user." });
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
   }, []);
 
   async function saveAlertSettings(e) {
@@ -1188,6 +1240,7 @@ function PlanBillingSettings() {
       setSelectedPlanForModal(plan);
       setBillingCycleSelection(billingCycle);
       setModalType("upgrade");
+      setShowPaymentMethodSelect(false);
     }
   };
 
@@ -1271,13 +1324,15 @@ function PlanBillingSettings() {
     });
   };
 
-  async function executeUpgrade(e) {
-    e.preventDefault();
+  async function executeUpgrade(e, gatewayOverride) {
+    if (e && e.preventDefault) e.preventDefault();
+    const gateway = gatewayOverride || selectedPaymentGateway;
     console.log("Payment button clicked", {
       planId: selectedPlanForModal?.id || selectedPlanForModal?.name,
       billingCycle: billingCycleSelection,
       pageProtocol: window.location.protocol,
-      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "/api/v1"
+      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || "/api/v1",
+      gateway
     });
     if (window.location.protocol === "https:" && String(import.meta.env.VITE_API_BASE_URL || "").startsWith("http://")) {
       console.error("Payment failed", { step: "mixed-content-risk", message: "HTTPS frontend cannot call an HTTP API in production browsers." });
@@ -1288,6 +1343,22 @@ function PlanBillingSettings() {
     setSavingPlan(selectedPlanForModal.name);
     setMessage(null);
     try {
+      if (gateway === "paypal") {
+        const orderPayload = {
+          planId: selectedPlanForModal.id || selectedPlanForModal.name,
+          billingCycle: billingCycleSelection,
+          returnBaseUrl: window.location.href.split('?')[0]
+        };
+        console.log("PayPal Order API called", orderPayload);
+        const response = await billingApi.createPaypalOrder(orderPayload);
+        if (response?.approvalUrl) {
+          window.location.href = response.approvalUrl;
+        } else {
+          throw new Error("PayPal approval URL is missing in the response.");
+        }
+        return;
+      }
+
       const orderPayload = {
         planId: selectedPlanForModal.id || selectedPlanForModal.name,
         billingCycle: billingCycleSelection
@@ -1503,10 +1574,15 @@ function PlanBillingSettings() {
       });
     } catch (err) {
       console.error("Payment failed", { step: "initiate", error: err, response: err.response?.data });
-      setMessage({ type: "error", text: getErrorMessage(err, "Failed to initiate payment flow.") });
+      setMessage({ type: "error", text: "Unable to initialize payment. Please try again." });
       setSavingPlan("");
     }
   }
+
+  const handleExecutePayment = async (gateway) => {
+    setSelectedPaymentGateway(gateway);
+    await executeUpgrade(null, gateway);
+  };
 
   async function executeDowngrade() {
     setSavingPlan(selectedPlanForModal.name);
@@ -1694,7 +1770,9 @@ function PlanBillingSettings() {
               <FileText size={18} />
               <strong>{invoice.invoiceNumber}<small>{formatBillingDate(invoice.date)}</small></strong>
               <span>{invoice.amountLabel || formatMoney(invoice.amount + invoice.tax, invoice.currency)}</span>
-              <b>{invoice.status}</b>
+              <span className={`invoice-status-badge ${invoice.status.toLowerCase()}`}>
+                {invoice.status}
+              </span>
               <button type="button" onClick={() => downloadInvoice(invoice)}>
                 <Download size={15} /> Download PDF
               </button>
@@ -1706,56 +1784,137 @@ function PlanBillingSettings() {
 
       {/* 1. UPGRADE CHECKOUT MODAL */}
       {modalType === "upgrade" && selectedPlanForModal && (
-        <div className="team-modal-backdrop">
-          <div className="team-confirm-modal billing-modal">
-            <h3>Upgrade Plan: {selectedPlanForModal.displayName}</h3>
-            <p>Complete payment details below to subscribe to the {selectedPlanForModal.displayName} plan.</p>
-            
-            <div className="billing-modal-features">
-              <h4>Limits included:</h4>
-              <ul>
-                <li><Check size={12} /> {selectedPlanForModal.domainLimit >= 999999 ? "Unlimited" : selectedPlanForModal.domainLimit} Domains</li>
-                <li><Check size={12} /> {selectedPlanForModal.scanLimit >= 999999 ? "Unlimited" : selectedPlanForModal.scanLimit} Scans/month</li>
-                <li><Check size={12} /> {selectedPlanForModal.seatLimit >= 999999 ? "Unlimited" : selectedPlanForModal.seatLimit} Team seats</li>
-                {(selectedPlanForModal.features || []).slice(0, 3).map((f) => (
-                  <li key={f}><Check size={12} /> {f}</li>
-                ))}
-              </ul>
+        showPaymentMethodSelect ? (
+          /* Step 2: Choose Payment Method Modal */
+          <div className="team-modal-backdrop" onClick={() => setShowPaymentMethodSelect(false)}>
+            <div className="team-confirm-modal billing-modal payment-method-modal" onClick={(e) => e.stopPropagation()}>
+              <h3>Choose Payment Method</h3>
+              <p className="billing-modal-subtitle">Select your preferred payment method.</p>
+
+              {message && message.type === "error" && (
+                <div className="payment-error-alert" style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", borderRadius: "6px", padding: "10px", color: "#ef4444", fontSize: "12px", width: "100%", textAlign: "center", marginBottom: "12px" }}>
+                  {message.text}
+                </div>
+              )}
+
+              <div className="payment-options-grid">
+                {/* Pay with PayPal card */}
+                <div className="payment-option-card">
+                  <div className="logo-capsule">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" />
+                  </div>
+                  <strong className="payment-option-title">PayPal</strong>
+                  <span className="payment-option-desc">International Payments</span>
+                  <span className="payment-option-subdesc">Secure payment through PayPal</span>
+                  
+                  <button 
+                    type="button" 
+                    className="pay-btn paypal-theme-btn"
+                    disabled={savingPlan}
+                    onClick={() => handleExecutePayment("paypal")}
+                  >
+                    {savingPlan && selectedPaymentGateway === "paypal" ? "Processing payment..." : "Pay with PayPal"}
+                  </button>
+                </div>
+
+                {/* Pay with Razorpay card */}
+                <div className="payment-option-card">
+                  <div className="logo-capsule" style={{ padding: "8px 14px" }}>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg" alt="Razorpay" />
+                  </div>
+                  <strong className="payment-option-title">Razorpay</strong>
+                  <span className="payment-option-desc">UPI • Cards • Net Banking</span>
+                  <span className="payment-option-subdesc">Secure payment through Razorpay</span>
+                  
+                  <button 
+                    type="button" 
+                    className="pay-btn razorpay-theme-btn"
+                    disabled={savingPlan}
+                    onClick={() => handleExecutePayment("razorpay")}
+                  >
+                    {savingPlan && selectedPaymentGateway === "razorpay" ? "Processing payment..." : "Pay with Razorpay"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="payment-back-row">
+                <button type="button" className="back-btn" onClick={() => setShowPaymentMethodSelect(false)} disabled={savingPlan}>
+                  Back
+                </button>
+              </div>
             </div>
-
-            <div className="billing-cycle-toggle" style={{ marginTop: 0, marginBottom: "16px" }}>
-              <button className={billingCycleSelection === "monthly" ? "active" : ""} type="button" onClick={() => setBillingCycleSelection("monthly")}>
-                Monthly
-              </button>
-              <button className={billingCycleSelection === "yearly" ? "active" : ""} type="button" onClick={() => setBillingCycleSelection("yearly")}>
-                Yearly
-              </button>
-            </div>
-
-            <div style={{ background: "rgba(0, 214, 143, 0.05)", border: "1px solid rgba(0, 214, 143, 0.2)", padding: "12px", borderRadius: "6px", marginBottom: "16px" }}>
-              <span style={{ fontSize: "11px", color: "#aeb8c7" }}>Amount to Pay:</span>
-              <h4 style={{ margin: "4px 0 0 0", color: "#00d68f", fontSize: "20px" }}>
-                {formatMoney(billingCycleSelection === "monthly" ? selectedPlanForModal.monthly : selectedPlanForModal.yearly)}
-                <small style={{ fontSize: "11px", color: "#aeb8c7", fontWeight: "normal" }}>
-                  /{billingCycleSelection === "monthly" ? "mo" : "yr"}
-                </small>
-              </h4>
-            </div>
-
-             <form onSubmit={executeUpgrade} style={{ display: "grid", gap: "12px" }}>
-               <div style={{ color: "#aeb8c7", fontSize: "13px", lineHeight: "1.5", margin: "5px 0 15px 0" }}>
-                 Secure transactions are processed directly via Razorpay. Click "Proceed to Pay" to launch the payment screen and complete your transaction.
-               </div>
-
-               <div className="billing-modal-actions">
-                 <button className="secondary" type="button" onClick={() => setModalType(null)} disabled={savingPlan}>Cancel</button>
-                 <button className="primary" type="submit" disabled={savingPlan}>
-                   {savingPlan ? "Loading Checkout..." : "Proceed to Pay"}
-                 </button>
-               </div>
-             </form>
           </div>
-        </div>
+        ) : (
+          /* Step 1: Upgrade Plan Modal */
+          <div className="team-modal-backdrop" onClick={() => setModalType(null)}>
+            <div className="team-confirm-modal billing-modal" onClick={(e) => e.stopPropagation()}>
+              <h3>Upgrade Plan: {selectedPlanForModal.displayName}</h3>
+              <p className="billing-modal-subtitle">Complete payment details below to subscribe to the {selectedPlanForModal.displayName} plan.</p>
+              
+              <div className="billing-modal-features">
+                <div className="limits-label-col">
+                  <strong>Limits</strong>
+                  <span>included:</span>
+                </div>
+                <ul className="billing-features-grid">
+                  {selectedPlanForModal.name === "Enterprise" ? (
+                    <>
+                      <li><Check size={12} className="emerald-check" /> Unlimited Domains</li>
+                      <li><Check size={12} className="emerald-check" /> Unlimited Scans/month</li>
+                      <li><Check size={12} className="emerald-check" /> Priority Support</li>
+                      <li><Check size={12} className="emerald-check" /> Unlimited Team seats</li>
+                      <li><Check size={12} className="emerald-check" /> Unlimited User Seats</li>
+                      <li><Check size={12} className="emerald-check" /> Compliance Reports</li>
+                      <li className="two-line-limit"><Check size={12} className="emerald-check" /> <span>Unlimited Verified<br/>Domains</span></li>
+                      <li><Check size={12} className="emerald-check" /> Unlimited Scans</li>
+                      <li><Check size={12} className="emerald-check" /> API Access</li>
+                    </>
+                  ) : (
+                    <>
+                      <li><Check size={12} className="emerald-check" /> {selectedPlanForModal.domainLimit >= 999999 ? "Unlimited" : selectedPlanForModal.domainLimit} Domains</li>
+                      <li><Check size={12} className="emerald-check" /> {selectedPlanForModal.scanLimit >= 999999 ? "Unlimited" : selectedPlanForModal.scanLimit} Scans/month</li>
+                      <li><Check size={12} className="emerald-check" /> {selectedPlanForModal.seatLimit >= 999999 ? "Unlimited" : selectedPlanForModal.seatLimit} Team seats</li>
+                      {(selectedPlanForModal.features || []).slice(0, 6).map((f) => (
+                        <li key={f}><Check size={12} className="emerald-check" /> {f}</li>
+                      ))}
+                    </>
+                  )}
+                </ul>
+              </div>
+
+              <div className="billing-cycle-toggle" style={{ marginTop: 0, marginBottom: "16px" }}>
+                <button className={billingCycleSelection === "monthly" ? "active" : ""} type="button" onClick={() => setBillingCycleSelection("monthly")}>
+                  Monthly
+                </button>
+                <button className={billingCycleSelection === "yearly" ? "active" : ""} type="button" onClick={() => setBillingCycleSelection("yearly")}>
+                  Yearly
+                </button>
+              </div>
+
+              <div className="billing-amount-summary-box">
+                <span className="summary-label">Amount to Pay:</span>
+                <h4 className="summary-value">
+                  {formatMoney(billingCycleSelection === "monthly" ? selectedPlanForModal.monthly : selectedPlanForModal.yearly)}
+                  <small className="summary-suffix">
+                    /{billingCycleSelection === "monthly" ? "mo" : "yr"}
+                  </small>
+                </h4>
+              </div>
+
+              <div className="security-info-row">
+                <ShieldCheck size={16} className="security-icon" />
+                <span className="security-text">🔒 Secure checkout</span>
+              </div>
+
+              <div className="billing-modal-actions">
+                <button className="secondary" type="button" onClick={() => setModalType(null)}>Cancel</button>
+                <button className="primary" type="button" onClick={() => setShowPaymentMethodSelect(true)}>
+                  Proceed to Pay
+                </button>
+              </div>
+            </div>
+          </div>
+        )
       )}
 
       {/* 2. DOWNGRADE WARNING & BLOCKED MODAL */}
@@ -1858,7 +2017,7 @@ function PlanBillingSettings() {
                     <td>{txn.metadata?.planName || activePlan?.name || "Professional"}</td>
                     <td>{txn.amountLabel || formatMoney(txn.amount, txn.currency)}</td>
                     <td>
-                      <span className={`team-status ${txn.status === 'succeeded' ? 'active' : txn.status === 'pending' ? 'pending' : 'suspended'}`}>
+                      <span className={`txn-status-badge ${txn.status === 'succeeded' ? 'succeeded' : txn.status === 'pending' ? 'pending' : 'failed'}`}>
                         {txn.status}
                       </span>
                     </td>
@@ -1965,6 +2124,18 @@ function PlanBillingSettings() {
           {!timeline.length && !loadingTimeline && <p style={{ color: '#64748b' }}>No timeline events recorded.</p>}
         </div>
       </section>
+
+      {/* PayPal Verifying Loading Backdrop */}
+      {paypalVerifying && (
+        <div className="team-modal-backdrop" style={{ zIndex: 99999 }}>
+          <div className="team-confirm-modal" style={{ textAlign: "center", padding: "30px" }}>
+            <div className="sa-empty" style={{ color: "#00d68f", fontSize: "16px", marginBottom: "10px" }}>
+              Verifying PayPal Payment...
+            </div>
+            <p style={{ color: "#aeb8c7", fontSize: "13px" }}>Please do not close this window or refresh the page.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

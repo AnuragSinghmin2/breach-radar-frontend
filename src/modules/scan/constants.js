@@ -19,6 +19,10 @@ export const DEFAULT_CHECKS = {
   ports: false,
   malware: true,
   compliance: false,
+  businessLogic: true,
+  apiSecurity: true,
+  cloudInfrastructure: true,
+  fileUpload: true,
 };
 
 export const SCAN_TYPE_META = {

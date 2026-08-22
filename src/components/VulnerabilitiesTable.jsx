@@ -48,6 +48,8 @@ function mapVulnerability(item) {
     source: item.source || item.scannerSource || item.scanner || "Scanner",
     cvss: item.cvssScore || item.cvss || "",
     references: item.references || [],
+    category: item.category || "",
+    subCategory: item.subCategory || "",
   };
 }
 
@@ -678,6 +680,11 @@ export default function VulnerabilitiesTable() {
                 <div>
                   <Badge tone={selected.tone}>{selected.severity}</Badge>
                   <h3>{selected.name}</h3>
+                  {(selected.category || selected.subCategory) && (
+                    <p className="vuln-detail-category">
+                      {[selected.category, selected.subCategory].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
                   <p>{selected.desc}</p>
                 </div>
                 <div className="vuln-detail-grid">
@@ -685,12 +692,31 @@ export default function VulnerabilitiesTable() {
                   <span><b>Path</b>{selected.path}</span>
                   <span><b>CWE</b>{selected.cwe}</span>
                   <span><b>Status</b>{selected.status}</span>
+                  {selected.cvss !== "" && <span><b>CVSS Score</b>{selected.cvss}</span>}
                 </div>
                 <div className="vuln-detail-copy">
                   <strong>Impact</strong>
                   <p>{selected.impact}</p>
                   <strong>Recommended fix</strong>
                   <p>{selected.fix}</p>
+                  {selected.technicalDetails && (
+                    <>
+                      <strong>Evidence</strong>
+                      <p className="vuln-detail-evidence">{selected.technicalDetails}</p>
+                    </>
+                  )}
+                  {selected.references.length > 0 && (
+                    <>
+                      <strong>References</strong>
+                      <ul className="vuln-detail-references">
+                        {selected.references.map((ref) => (
+                          <li key={ref}>
+                            <a href={ref} target="_blank" rel="noopener noreferrer">{ref}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
                 </div>
                 <div className="vuln-detail-actions">
                   <button type="button" onClick={() => updateStatus(selected, "In Progress")}>Start Fix</button>

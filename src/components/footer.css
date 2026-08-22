@@ -5,7 +5,7 @@
   grid-template-columns: minmax(220px, 1.1fr) minmax(520px, 2.4fr) minmax(360px, 1.45fr);
   gap: 42px;
   align-items: start;
-  padding: 24px 32px 28px;
+  padding: 32px 32px 28px;
   border-top: 1px solid rgba(28, 47, 66, 0.75);
   background:
     radial-gradient(circle at 88% 18%, rgba(0, 214, 143, 0.06), transparent 30%),
@@ -74,10 +74,11 @@
   outline: none;
 }
 
+/* Footer Links & Navigation */
 .ss-footer-links {
   display: grid;
-  grid-template-columns: repeat(4, minmax(110px, 1fr));
-  gap: 34px;
+  grid-template-columns: repeat(5, minmax(90px, 1fr));
+  gap: 28px;
 }
 
 .ss-footer-links h4 {

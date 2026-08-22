@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaGithub, FaLinkedinIn, FaTwitter, FaYoutube } from "react-icons/fa";
 import BrandLogo from "./BrandLogo";
 import "./footer.css";
@@ -10,8 +10,8 @@ const footerGroups = [
       { label: "Features", path: "/#features" },
       { label: "How It Works", path: "/#how-it-works" },
       { label: "Pricing", path: "/#pricing" },
-      { label: "Changelog", path: "/#changelog" },
-    ],
+      { label: "Changelog", path: "/#changelog" }
+    ]
   },
   {
     title: "Solutions",
@@ -19,8 +19,15 @@ const footerGroups = [
       { label: "Web Applications", path: "/#solutions" },
       { label: "API Security", path: "/#solutions" },
       { label: "Compliance", path: "/#solutions" },
-      { label: "Integrations", path: "/#integrations" },
-    ],
+      { label: "Integrations", path: "/#integrations" }
+    ]
+  },
+  {
+    title: "Security",
+    links: [
+      { label: "Security Scanners", path: "/security-scanners" },
+      { label: "View Demo Report", path: "/sample-report.pdf", isExternal: true }
+    ]
   },
   {
     title: "Resources",
@@ -28,8 +35,8 @@ const footerGroups = [
       { label: "Documentation", path: "/#documentation" },
       { label: "Blog", path: "/#blog" },
       { label: "Security Guide", path: "/#guide" },
-      { label: "Help Center", path: "/#help" },
-    ],
+      { label: "Help Center", path: "/#help" }
+    ]
   },
   {
     title: "Company",
@@ -37,19 +44,44 @@ const footerGroups = [
       { label: "About Us", path: "/about" },
       { label: "Refund Policy", path: "/refund-policy" },
       { label: "Privacy Policy", path: "/privacy" },
-      { label: "Terms of Service", path: "/terms-of-service" },
-    ],
-  },
+      { label: "Terms of Service", path: "/terms-of-service" }
+    ]
+  }
 ];
 
 export default function Footer({ showSupport = false, onOpenSupport }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleNavigation = (path) => {
-    navigate(path);
+  const handleNavigation = (link) => {
+    if (link.label === "Help Center" && onOpenSupport) {
+      onOpenSupport();
+      return;
+    }
+
+    if (link.isExternal) {
+      window.open(link.path, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    if (link.path.startsWith("/#")) {
+      const targetHash = link.path.substring(1); // e.g. '#features'
+      if (location.pathname === "/") {
+        const element = document.getElementById(targetHash.substring(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+      } else {
+        navigate("/" + targetHash);
+        return;
+      }
+    }
+
+    navigate(link.path);
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: "smooth"
     });
   };
 
@@ -90,7 +122,7 @@ export default function Footer({ showSupport = false, onOpenSupport }) {
               <button
                 key={link.label}
                 type="button"
-                onClick={() => handleNavigation(link.path)}
+                onClick={() => handleNavigation(link)}
               >
                 {link.label}
               </button>

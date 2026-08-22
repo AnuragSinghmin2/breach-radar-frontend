@@ -1,0 +1,1122 @@
+%PDF-1.4
+% Binary
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R] /Count 15 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Type /ExtGState /ca 0.08 /CA 0.08 >>
+endobj
+6 0 obj
+<< /Length 4481 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 24 Tf 0.00 0.84 0.56 rg 46.00 791.89 Td (PENTESTRADAR) Tj ET
+BT /F1 10 Tf 0.39 0.45 0.55 rg 46.00 763.89 Td (Security Assessment Report) Tj ET
+BT /F2 18 Tf 0.06 0.09 0.16 rg 419.68 791.89 Td (SECURITY REPORT) Tj ET
+0.80 0.84 0.88 RG 1 w 46.00 736.89 m 549.28 736.89 l S
+BT /F2 16 Tf 0.06 0.09 0.16 rg 46.00 711.89 Td (easypdfeditor.online) Tj ET
+BT /F2 15 Tf 0.02 0.08 0.16 rg 46.00 691.89 Td (Domain) Tj ET
+0.00 0.65 0.45 RG 1.4 w 46.00 678.89 m 549.28 678.89 l S
+0.96 0.98 1.00 rg 46.00 626.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 56.00 655.89 Td (Domain) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 56.00 635.89 Td (easypdfeditor.online) Tj ET
+0.96 0.98 1.00 rg 174.32 626.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 184.32 655.89 Td (Generated Date) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 184.32 635.89 Td (11 August 2026) Tj ET
+0.96 0.98 1.00 rg 302.64 626.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 312.64 655.89 Td (Generated Time) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 312.64 635.89 Td (12:30:45 pm) Tj ET
+0.96 0.98 1.00 rg 430.96 626.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 440.96 655.89 Td (Security Score) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 440.96 635.89 Td (30/100) Tj ET
+BT /F2 15 Tf 0.02 0.08 0.16 rg 46.00 592.89 Td (SUMMARY) Tj ET
+0.00 0.65 0.45 RG 1.4 w 46.00 579.89 m 549.28 579.89 l S
+0.96 0.98 1.00 rg 46.00 527.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 56.00 556.89 Td (Total Vulnerabilities) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 56.00 536.89 Td (38) Tj ET
+0.96 0.98 1.00 rg 174.32 527.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 184.32 556.89 Td (Critical) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 184.32 536.89 Td (0) Tj ET
+0.96 0.98 1.00 rg 302.64 527.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 312.64 556.89 Td (High) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 312.64 536.89 Td (6) Tj ET
+0.96 0.98 1.00 rg 430.96 527.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 440.96 556.89 Td (Medium) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 440.96 536.89 Td (12) Tj ET
+0.96 0.98 1.00 rg 46.00 471.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 56.00 500.89 Td (Low) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 56.00 480.89 Td (20) Tj ET
+0.96 0.98 1.00 rg 174.32 471.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 184.32 500.89 Td (Open) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 184.32 480.89 Td (38) Tj ET
+0.96 0.98 1.00 rg 302.64 471.89 118.32 46.00 re f
+BT /F2 8 Tf 0.39 0.45 0.55 rg 312.64 500.89 Td (Resolved) Tj ET
+BT /F2 17 Tf 0.02 0.08 0.16 rg 312.64 480.89 Td (0) Tj ET
+BT /F2 15 Tf 0.02 0.08 0.16 rg 46.00 437.89 Td (Vulnerability Details) Tj ET
+0.00 0.65 0.45 RG 1.4 w 46.00 424.89 m 549.28 424.89 l S
+0.95 0.97 0.99 rg 46.00 386.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 402.89 Td (VULNERABILITY #1) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 372.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 372.89 Td (Session Cookie Missing HttpOnly Flag) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 359.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 359.89 Td (High) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 346.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 346.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 333.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 333.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 320.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 320.89 Td (/) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 307.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 307.89 Td (CWE-1004) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 294.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 294.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 281.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 266.89 Td (The session cookie "XSRF-TOKEN" is missing the HttpOnly attribute.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 246.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 231.89 Td (Cross-Site Scripting \(XSS\) attacks can be used by an attacker to steal the session cookie.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 211.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 196.89 Td (Set the HttpOnly attribute on session cookies.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 1 of 15) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 5542 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+0.95 0.97 0.99 rg 46.00 771.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 787.89 Td (VULNERABILITY #2) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 757.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 757.89 Td (No Password Strength Meter Detected) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 744.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 744.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 731.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 731.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 718.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 718.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 705.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 705.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 692.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 692.89 Td (-) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 679.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 679.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 666.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 651.89 Td (No visual password strength indicator was detected on the registration form at /register.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 631.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 616.89 Td (Without real-time feedback, users are less likely to choose stronger passwords voluntarily.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 596.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 581.89 Td (Add a password strength meter \(e.g. zxcvbn\) to guide users toward stronger passwords at registration.) Tj ET
+0.95 0.97 0.99 rg 46.00 531.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 547.89 Td (VULNERABILITY #3) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 517.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 517.89 Td (Weak Password Policy) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 504.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 504.89 Td (High) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 491.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 491.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 478.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 478.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 465.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 465.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 452.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 452.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 439.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 439.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 426.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 411.89 Td (The registration form at /register appears to enforce few or no password complexity requirements) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 399.89 Td (\(missing: minimum length, uppercase letter, lowercase letter, number, special character\).) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 379.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 364.89 Td (A weak password policy makes user accounts significantly easier to compromise via brute-force,) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 352.89 Td (dictionary, or credential-stuffing attacks.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 332.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 317.89 Td (Adopt a password policy requiring at least 8 characters with a mix of uppercase, lowercase, numbers, and) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 305.89 Td (special characters - or adopt NIST 800-63B guidance \(long passphrases + breached-password screening\).) Tj ET
+0.95 0.97 0.99 rg 46.00 255.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 271.89 Td (VULNERABILITY #4) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 241.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 241.89 Td (Special Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 228.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 228.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 215.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 215.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 202.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 202.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 189.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 189.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 176.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 176.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 163.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 163.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 150.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 135.89 Td (The registration form at /register does not appear to require a special character in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 115.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 100.89 Td (Passwords without a required special character have a smaller character space, reducing brute-force) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 88.89 Td (resistance.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 2 of 15) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 5252 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Require at least one special character in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 728.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 744.89 Td (VULNERABILITY #5) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 714.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 714.89 Td (Numeric Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 701.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 701.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 688.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 688.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 675.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 675.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 662.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 662.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 649.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 649.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 636.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 636.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 623.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 608.89 Td (The registration form at /register does not appear to require a number in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (Passwords without a required number have a smaller character space, reducing brute-force resistance.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Require at least one number in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 488.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 504.89 Td (VULNERABILITY #6) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 474.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 474.89 Td (Lowercase Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 461.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 461.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 448.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 448.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 435.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 435.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 422.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 422.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 409.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 409.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 396.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 396.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 383.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 368.89 Td (The registration form at /register does not appear to require a lowercase letter in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 348.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 333.89 Td (Passwords without a required lowercase letter have a smaller character space, reducing brute-force) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 321.89 Td (resistance.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 301.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 286.89 Td (Require at least one lowercase letter in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 236.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 252.89 Td (VULNERABILITY #7) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 222.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 222.89 Td (Uppercase Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 209.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 209.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 196.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 196.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 183.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 183.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 170.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 170.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 157.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 157.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 144.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 144.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 131.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 116.89 Td (The registration form at /register does not appear to require a uppercase letter in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 96.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 81.89 Td (Passwords without a required uppercase letter have a smaller character space, reducing brute-force) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 3 of 15) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 5016 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 793.89 Td (resistance.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 773.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 758.89 Td (Require at least one uppercase letter in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 708.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 724.89 Td (VULNERABILITY #8) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 694.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 694.89 Td (No Minimum Password Length Detected) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 681.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 681.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 668.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 668.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 655.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 655.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 642.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 642.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 629.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 629.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 616.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 616.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 603.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 588.89 Td (No minimum length requirement could be passively detected on the registration form at /register.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 568.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 553.89 Td (Without an enforced minimum length, users may set very short, easily guessable passwords.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 533.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 518.89 Td (Enforce a minimum password length of at least 8 characters, both client- and server-side.) Tj ET
+0.95 0.97 0.99 rg 46.00 468.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 484.89 Td (VULNERABILITY #9) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 454.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 454.89 Td (Session Cookie Missing HttpOnly Flag) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 441.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 441.89 Td (High) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 428.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 428.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 415.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 415.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 402.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 402.89 Td (/) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 389.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 389.89 Td (CWE-1004) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 376.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 376.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 363.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 348.89 Td (The session cookie "XSRF-TOKEN" is missing the HttpOnly attribute.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 328.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 313.89 Td (Cross-Site Scripting \(XSS\) attacks can be used by an attacker to steal the session cookie.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 293.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 278.89 Td (Set the HttpOnly attribute on session cookies.) Tj ET
+0.95 0.97 0.99 rg 46.00 228.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 244.89 Td (VULNERABILITY #10) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 214.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 214.89 Td (No Password Strength Meter Detected) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 201.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 201.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 188.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 188.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 175.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 175.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 162.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 162.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 149.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 149.89 Td (-) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 136.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 136.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 123.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 108.89 Td (No visual password strength indicator was detected on the registration form at /register.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 4 of 15) Tj ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 4387 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Without real-time feedback, users are less likely to choose stronger passwords voluntarily.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 758.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 743.89 Td (Add a password strength meter \(e.g. zxcvbn\) to guide users toward stronger passwords at registration.) Tj ET
+0.95 0.97 0.99 rg 46.00 693.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 709.89 Td (VULNERABILITY #11) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 679.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 679.89 Td (Missing HttpOnly) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 666.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 666.89 Td (High) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 653.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 653.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 640.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 640.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 627.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 627.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 614.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 614.89 Td (CWE-1004) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 601.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 601.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (The "XSRF-TOKEN" cookie does not set the HttpOnly flag.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Cookies without HttpOnly can be read by client-side JavaScript, making them stealable via XSS.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 518.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 503.89 Td (Add the HttpOnly attribute to prevent client-side script access to the cookie.) Tj ET
+0.95 0.97 0.99 rg 46.00 453.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 469.89 Td (VULNERABILITY #12) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 439.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 439.89 Td (Weak Password Policy) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 426.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 426.89 Td (High) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 413.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 413.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 400.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 400.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 387.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 387.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 374.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 374.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 361.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 361.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 348.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 333.89 Td (The registration form at /register appears to enforce few or no password complexity requirements) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 321.89 Td (\(missing: minimum length, uppercase letter, lowercase letter, number, special character\).) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 301.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 286.89 Td (A weak password policy makes user accounts significantly easier to compromise via brute-force,) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 274.89 Td (dictionary, or credential-stuffing attacks.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 254.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 239.89 Td (Adopt a password policy requiring at least 8 characters with a mix of uppercase, lowercase, numbers, and) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 227.89 Td (special characters - or adopt NIST 800-63B guidance \(long passphrases + breached-password screening\).) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 5 of 15) Tj ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 5379 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+0.95 0.97 0.99 rg 46.00 771.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 787.89 Td (VULNERABILITY #13) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 757.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 757.89 Td (Exposed Admin Login Page) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 744.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 744.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 731.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 731.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 718.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 718.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 705.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 705.89 Td (/admin/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 692.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 692.89 Td (CWE-200) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 679.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 679.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 666.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 651.89 Td (A login form was found at /admin/login \("Admin Login - Easy Pdf Editor"\), exposing an email field and a) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 639.89 Td (password field.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 619.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 604.89 Td (Publicly discoverable admin login pages are a common target for credential stuffing and brute-force) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 592.89 Td (attacks.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 572.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 557.89 Td (Restrict admin login access by IP allowlist/VPN, enforce MFA, and consider moving it off a guessable) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 545.89 Td (path.) Tj ET
+0.95 0.97 0.99 rg 46.00 495.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 511.89 Td (VULNERABILITY #14) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 481.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 481.89 Td (Special Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 468.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 468.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 455.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 455.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 442.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 442.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 429.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 429.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 416.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 416.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 403.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 403.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 390.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 375.89 Td (The registration form at /register does not appear to require a special character in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 355.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 340.89 Td (Passwords without a required special character have a smaller character space, reducing brute-force) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 328.89 Td (resistance.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 308.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 293.89 Td (Require at least one special character in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 243.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 259.89 Td (VULNERABILITY #15) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 229.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 229.89 Td (Login Page Detected) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 216.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 216.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 203.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 203.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 190.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 190.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 177.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 177.89 Td (/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 164.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 164.89 Td (-) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 151.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 151.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 138.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 123.89 Td (A login form was found at /login \("Login - Easy Pdf Editor"\), exposing an email field and a password) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 111.89 Td (field.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 91.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 76.89 Td (Discovered authentication surface should be checked for rate limiting, CAPTCHA, and MFA enforcement.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 6 of 15) Tj ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 4219 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Ensure the login endpoint enforces rate limiting, account lockout, and offers MFA.) Tj ET
+0.95 0.97 0.99 rg 46.00 728.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 744.89 Td (VULNERABILITY #16) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 714.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 714.89 Td (Numeric Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 701.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 701.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 688.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 688.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 675.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 675.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 662.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 662.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 649.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 649.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 636.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 636.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 623.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 608.89 Td (The registration form at /register does not appear to require a number in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (Passwords without a required number have a smaller character space, reducing brute-force resistance.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Require at least one number in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 488.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 504.89 Td (VULNERABILITY #17) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 474.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 474.89 Td (No MFA Signal Found on Login Page) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 461.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 461.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 448.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 448.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 435.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 435.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 422.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 422.89 Td (/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 409.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 409.89 Td (CWE-308) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 396.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 396.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 383.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 368.89 Td (No text, form field, or known MFA-provider script referencing multi-factor authentication was found on) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 356.89 Td (the login page at /login.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 336.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 321.89 Td (Absence of any MFA signal on the primary login page suggests MFA may not be offered, increasing exposure) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 309.89 Td (to credential-stuffing and brute-force attacks - though MFA occurring on a later step cannot be ruled out) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 297.89 Td (by this passive check alone.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 277.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 262.89 Td (Offer Multi-Factor Authentication \(TOTP authenticator, SMS, or WebAuthn\) and confirm this finding) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 250.89 Td (manually if MFA is implemented behind a secondary login step.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 7 of 15) Tj ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 5226 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+0.95 0.97 0.99 rg 46.00 771.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 787.89 Td (VULNERABILITY #18) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 757.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 757.89 Td (Lowercase Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 744.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 744.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 731.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 731.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 718.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 718.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 705.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 705.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 692.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 692.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 679.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 679.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 666.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 651.89 Td (The registration form at /register does not appear to require a lowercase letter in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 631.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 616.89 Td (Passwords without a required lowercase letter have a smaller character space, reducing brute-force) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 604.89 Td (resistance.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 584.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 569.89 Td (Require at least one lowercase letter in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 519.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 535.89 Td (VULNERABILITY #19) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 505.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 505.89 Td (Uppercase Character Not Required) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 492.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 492.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 479.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 479.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 466.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 466.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 453.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 453.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 440.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 440.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 427.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 427.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 414.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 399.89 Td (The registration form at /register does not appear to require a uppercase letter in the password.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 379.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 364.89 Td (Passwords without a required uppercase letter have a smaller character space, reducing brute-force) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 352.89 Td (resistance.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 332.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 317.89 Td (Require at least one uppercase letter in the password policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 267.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 283.89 Td (VULNERABILITY #20) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 253.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 253.89 Td (Missing Clickjacking Protection on Login Page) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 240.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 240.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 227.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 227.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 214.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 214.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 201.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 201.89 Td (/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 188.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 188.89 Td (CWE-1021) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 175.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 175.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 162.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 147.89 Td (The login page at /login does not send X-Frame-Options or Content-Security-Policy frame-ancestors) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 135.89 Td (headers.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 115.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 100.89 Td (Attackers can iframe the login page to perform clickjacking attacks and steal credentials.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 8 of 15) Tj ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Length 5098 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Set the 'X-Frame-Options: DENY' or 'SAMEORIGIN' header, or frame-ancestors in CSP.) Tj ET
+0.95 0.97 0.99 rg 46.00 728.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 744.89 Td (VULNERABILITY #21) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 714.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 714.89 Td (No Minimum Password Length Detected) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 701.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 701.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 688.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 688.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 675.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 675.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 662.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 662.89 Td (/register) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 649.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 649.89 Td (CWE-521) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 636.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 636.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 623.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 608.89 Td (No minimum length requirement could be passively detected on the registration form at /register.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (Without an enforced minimum length, users may set very short, easily guessable passwords.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Enforce a minimum password length of at least 8 characters, both client- and server-side.) Tj ET
+0.95 0.97 0.99 rg 46.00 488.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 504.89 Td (VULNERABILITY #22) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 474.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 474.89 Td (Missing DMARC Record) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 461.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 461.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 448.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 448.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 435.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 435.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 422.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 422.89 Td (easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 409.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 409.89 Td (CWE-200) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 396.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 396.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 383.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 368.89 Td (No DMARC policy TXT record was found.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 348.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 333.89 Td (Reduced visibility and policy enforcement for email spoofing.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 313.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 298.89 Td (Publish a DMARC TXT record at _dmarc.<domain>.) Tj ET
+0.95 0.97 0.99 rg 46.00 248.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 264.89 Td (VULNERABILITY #23) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 234.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 234.89 Td (Missing HttpOnly) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 221.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 221.89 Td (High) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 208.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 208.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 195.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 195.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 182.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 182.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 169.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 169.89 Td (CWE-1004) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 156.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 156.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 143.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 128.89 Td (The "XSRF-TOKEN" cookie does not set the HttpOnly flag.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 108.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 93.89 Td (Cookies without HttpOnly can be read by client-side JavaScript, making them stealable via XSS.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 9 of 15) Tj ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 22 0 R >>
+endobj
+24 0 obj
+<< /Length 3879 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Add the HttpOnly attribute to prevent client-side script access to the cookie.) Tj ET
+0.95 0.97 0.99 rg 46.00 728.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 744.89 Td (VULNERABILITY #24) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 714.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 714.89 Td (Technology Disclosure Header) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 701.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 701.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 688.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 688.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 675.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 675.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 662.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 662.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 649.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 649.89 Td (CWE-200) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 636.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 636.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 623.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 608.89 Td (X-Powered-By exposes "PHP/8.3.31".) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (Attackers gain hints about backend stack and version.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Remove X-Powered-By from production responses.) Tj ET
+0.95 0.97 0.99 rg 46.00 488.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 504.89 Td (VULNERABILITY #25) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 474.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 474.89 Td (Exposed Admin Login Page) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 461.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 461.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 448.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 448.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 435.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 435.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 422.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 422.89 Td (/admin/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 409.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 409.89 Td (CWE-200) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 396.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 396.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 383.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 368.89 Td (A login form was found at /admin/login \("Admin Login - Easy Pdf Editor"\), exposing an email field and a) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 356.89 Td (password field.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 336.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 321.89 Td (Publicly discoverable admin login pages are a common target for credential stuffing and brute-force) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 309.89 Td (attacks.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 289.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 274.89 Td (Restrict admin login access by IP allowlist/VPN, enforce MFA, and consider moving it off a guessable) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 262.89 Td (path.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 10 of 15) Tj ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 24 0 R >>
+endobj
+26 0 obj
+<< /Length 5104 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+0.95 0.97 0.99 rg 46.00 771.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 787.89 Td (VULNERABILITY #26) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 757.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 757.89 Td (Missing Content-Security-Policy) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 744.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 744.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 731.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 731.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 718.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 718.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 705.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 705.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 692.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 692.89 Td (CWE-79) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 679.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 679.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 666.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 651.89 Td (Response did not include the content-security-policy header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 631.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 616.89 Td (Reduced protection against XSS and content injection.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 596.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 581.89 Td (Define a restrictive Content-Security-Policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 531.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 547.89 Td (VULNERABILITY #27) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 517.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 517.89 Td (Login Page Detected) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 504.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 504.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 491.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 491.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 478.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 478.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 465.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 465.89 Td (/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 452.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 452.89 Td (-) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 439.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 439.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 426.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 411.89 Td (A login form was found at /login \("Login - Easy Pdf Editor"\), exposing an email field and a password) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 399.89 Td (field.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 379.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 364.89 Td (Discovered authentication surface should be checked for rate limiting, CAPTCHA, and MFA enforcement.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 344.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 329.89 Td (Ensure the login endpoint enforces rate limiting, account lockout, and offers MFA.) Tj ET
+0.95 0.97 0.99 rg 46.00 279.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 295.89 Td (VULNERABILITY #28) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 265.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 265.89 Td (Missing X-Content-Type-Options) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 252.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 252.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 239.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 239.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 226.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 226.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 213.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 213.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 200.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 200.89 Td (CWE-693) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 187.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 187.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 174.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 159.89 Td (Response did not include the x-content-type-options header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 139.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 124.89 Td (Browsers may MIME-sniff responses unexpectedly.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 104.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 89.89 Td (Set X-Content-Type-Options to nosniff.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 11 of 15) Tj ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 26 0 R >>
+endobj
+28 0 obj
+<< /Length 5484 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+0.95 0.97 0.99 rg 46.00 771.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 787.89 Td (VULNERABILITY #29) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 757.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 757.89 Td (No MFA Signal Found on Login Page) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 744.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 744.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 731.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 731.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 718.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 718.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 705.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 705.89 Td (/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 692.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 692.89 Td (CWE-308) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 679.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 679.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 666.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 651.89 Td (No text, form field, or known MFA-provider script referencing multi-factor authentication was found on) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 639.89 Td (the login page at /login.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 619.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 604.89 Td (Absence of any MFA signal on the primary login page suggests MFA may not be offered, increasing exposure) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 592.89 Td (to credential-stuffing and brute-force attacks - though MFA occurring on a later step cannot be ruled out) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 580.89 Td (by this passive check alone.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 560.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 545.89 Td (Offer Multi-Factor Authentication \(TOTP authenticator, SMS, or WebAuthn\) and confirm this finding) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 533.89 Td (manually if MFA is implemented behind a secondary login step.) Tj ET
+0.95 0.97 0.99 rg 46.00 483.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 499.89 Td (VULNERABILITY #30) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 469.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 469.89 Td (Missing X-Frame-Options) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 456.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 456.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 443.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 443.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 430.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 430.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 417.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 417.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 404.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 404.89 Td (CWE-1021) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 391.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 391.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 378.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 363.89 Td (Response did not include the x-frame-options header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 343.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 328.89 Td (The site may be embedded in clickjacking attacks.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 308.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 293.89 Td (Set X-Frame-Options to DENY or SAMEORIGIN.) Tj ET
+0.95 0.97 0.99 rg 46.00 243.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 259.89 Td (VULNERABILITY #31) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 229.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 229.89 Td (Missing Clickjacking Protection on Login Page) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 216.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 216.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 203.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 203.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 190.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 190.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 177.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 177.89 Td (/login) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 164.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 164.89 Td (CWE-1021) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 151.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 151.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 138.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 123.89 Td (The login page at /login does not send X-Frame-Options or Content-Security-Policy frame-ancestors) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 111.89 Td (headers.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 91.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 76.89 Td (Attackers can iframe the login page to perform clickjacking attacks and steal credentials.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 12 of 15) Tj ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 28 0 R >>
+endobj
+30 0 obj
+<< /Length 4944 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Set the 'X-Frame-Options: DENY' or 'SAMEORIGIN' header, or frame-ancestors in CSP.) Tj ET
+0.95 0.97 0.99 rg 46.00 728.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 744.89 Td (VULNERABILITY #32) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 714.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 714.89 Td (Missing HSTS Header) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 701.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 701.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 688.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 688.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 675.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 675.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 662.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 662.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 649.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 649.89 Td (CWE-319) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 636.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 636.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 623.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 608.89 Td (Response did not include the strict-transport-security header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (Browsers may not enforce HTTPS-only connections.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Set Strict-Transport-Security with an appropriate max-age.) Tj ET
+0.95 0.97 0.99 rg 46.00 488.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 504.89 Td (VULNERABILITY #33) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 474.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 474.89 Td (Missing DMARC Record) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 461.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 461.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 448.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 448.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 435.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 435.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 422.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 422.89 Td (easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 409.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 409.89 Td (CWE-200) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 396.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 396.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 383.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 368.89 Td (No DMARC policy TXT record was found.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 348.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 333.89 Td (Reduced visibility and policy enforcement for email spoofing.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 313.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 298.89 Td (Publish a DMARC TXT record at _dmarc.<domain>.) Tj ET
+0.95 0.97 0.99 rg 46.00 248.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 264.89 Td (VULNERABILITY #34) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 234.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 234.89 Td (Technology Disclosure Header) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 221.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 221.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 208.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 208.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 195.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 195.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 182.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 182.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 169.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 169.89 Td (CWE-200) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 156.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 156.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 143.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 128.89 Td (X-Powered-By exposes "PHP/8.3.31".) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 108.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 93.89 Td (Attackers gain hints about backend stack and version.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 13 of 15) Tj ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 30 0 R >>
+endobj
+32 0 obj
+<< /Length 4940 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Remove X-Powered-By from production responses.) Tj ET
+0.95 0.97 0.99 rg 46.00 728.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 744.89 Td (VULNERABILITY #35) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 714.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 714.89 Td (Missing Content-Security-Policy) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 701.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 701.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 688.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 688.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 675.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 675.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 662.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 662.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 649.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 649.89 Td (CWE-79) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 636.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 636.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 623.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 608.89 Td (Response did not include the content-security-policy header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (Reduced protection against XSS and content injection.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Define a restrictive Content-Security-Policy.) Tj ET
+0.95 0.97 0.99 rg 46.00 488.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 504.89 Td (VULNERABILITY #36) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 474.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 474.89 Td (Missing X-Content-Type-Options) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 461.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 461.89 Td (Low) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 448.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 448.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 435.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 435.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 422.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 422.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 409.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 409.89 Td (CWE-693) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 396.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 396.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 383.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 368.89 Td (Response did not include the x-content-type-options header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 348.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 333.89 Td (Browsers may MIME-sniff responses unexpectedly.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 313.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 298.89 Td (Set X-Content-Type-Options to nosniff.) Tj ET
+0.95 0.97 0.99 rg 46.00 248.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 264.89 Td (VULNERABILITY #37) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 234.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 234.89 Td (Missing X-Frame-Options) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 221.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 221.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 208.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 208.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 195.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 195.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 182.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 182.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 169.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 169.89 Td (CWE-1021) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 156.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 156.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 143.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 128.89 Td (Response did not include the x-frame-options header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 108.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 93.89 Td (The site may be embedded in clickjacking attacks.) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 14 of 15) Tj ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 32 0 R >>
+endobj
+34 0 obj
+<< /Length 2142 >>
+stream
+q /GS1 gs 0.00 0.65 0.45 rg 0.8192 -0.5736 0.5736 0.8192 297.64 420.94 cm BT /F2 52 Tf -200 -18 Td (pentestradar.com) Tj ET Q
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 793.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 778.89 Td (Set X-Frame-Options to DENY or SAMEORIGIN.) Tj ET
+0.95 0.97 0.99 rg 46.00 728.89 503.28 26.00 re f
+BT /F2 12 Tf 0.02 0.08 0.16 rg 58.00 744.89 Td (VULNERABILITY #38) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 714.89 Td (Name:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 714.89 Td (Missing HSTS Header) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 701.89 Td (Severity:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 701.89 Td (Medium) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 688.89 Td (Status:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 688.89 Td (Open) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 675.89 Td (Detected Date:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 675.89 Td (10 Aug 2026, 12:15 pm) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 662.89 Td (Affected URL:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 662.89 Td (https://easypdfeditor.online) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 649.89 Td (CWE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 649.89 Td (CWE-319) Tj ET
+BT /F2 9 Tf 0.25 0.31 0.39 rg 58.00 636.89 Td (CVE:) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 150.00 636.89 Td (-) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 623.89 Td (Description) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 608.89 Td (Response did not include the strict-transport-security header.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 588.89 Td (Impact) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 573.89 Td (Browsers may not enforce HTTPS-only connections.) Tj ET
+BT /F2 10 Tf 0.02 0.08 0.16 rg 58.00 553.89 Td (Recommended Fix) Tj ET
+BT /F1 9.5 Tf 0.13 0.18 0.28 rg 58.00 538.89 Td (Set Strict-Transport-Security with an appropriate max-age.) Tj ET
+0.83 0.86 0.91 RG 1 w 46.00 510.89 m 549.28 510.89 l S
+BT /F1 9 Tf 0.58 0.63 0.69 rg 135.64 488.89 Td (Generated by PentestRadar \(pentestradar.com\) - Confidential Security Report) Tj ET
+BT /F1 9 Tf 0.39 0.45 0.55 rg 265.64 28 Td (Page 15 of 15) Tj ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ExtGState << /GS1 5 0 R >> >> /Contents 34 0 R >>
+endobj
+xref
+0 36
+0000000000 65535 f 
+0000000018 00000 n 
+0000000067 00000 n 
+0000000222 00000 n 
+0000000292 00000 n 
+0000000367 00000 n 
+0000000423 00000 n 
+0000004956 00000 n 
+0000005126 00000 n 
+0000010720 00000 n 
+0000010890 00000 n 
+0000016195 00000 n 
+0000016367 00000 n 
+0000021436 00000 n 
+0000021608 00000 n 
+0000026048 00000 n 
+0000026220 00000 n 
+0000031652 00000 n 
+0000031824 00000 n 
+0000036096 00000 n 
+0000036268 00000 n 
+0000041547 00000 n 
+0000041719 00000 n 
+0000046870 00000 n 
+0000047042 00000 n 
+0000050974 00000 n 
+0000051146 00000 n 
+0000056303 00000 n 
+0000056475 00000 n 
+0000062012 00000 n 
+0000062184 00000 n 
+0000067181 00000 n 
+0000067353 00000 n 
+0000072346 00000 n 
+0000072518 00000 n 
+0000074713 00000 n 
+trailer
+<< /Size 36 /Root 1 0 R /Info << /Title (easypdfeditor.online Security Report) >> >>
+startxref
+74885
+%%EOF

@@ -15,6 +15,77 @@
   align-items: stretch;
 }
 
+/* 1.1 Dashboard Specific Stats Cards Grid */
+.sa-dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.sa-dashboard-stats-grid .sa-stat-card {
+  min-height: 108px;
+  grid-template-rows: 1fr;
+  align-items: center;
+  gap: 0 12px;
+  padding: 16px 12px;
+}
+
+.sa-dashboard-stats-grid .sa-stat-icon {
+  align-self: center;
+}
+
+.sa-dashboard-stats-grid .sa-stat-info {
+  align-self: center;
+}
+
+.sa-dashboard-stats-grid .sa-stat-label {
+  font-size: clamp(10px, 0.75vw, 12px);
+}
+
+.sa-dashboard-stats-grid .sa-stat-value {
+  font-size: clamp(22px, 1.6vw, 32px);
+}
+
+.sa-dashboard-stats-grid .sa-stat-value-currency {
+  font-size: clamp(15px, 1.1vw, 22px);
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .sa-dashboard-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sa-dashboard-stats-grid .sa-stat-card {
+    padding: 16px 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sa-dashboard-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sa-dashboard-stats-grid .sa-stat-card {
+    padding: 14px 10px;
+    min-height: 98px;
+  }
+  .sa-dashboard-stats-grid .sa-stat-label {
+    font-size: 11px;
+  }
+  .sa-dashboard-stats-grid .sa-stat-value {
+    font-size: 26px;
+  }
+  .sa-dashboard-stats-grid .sa-stat-value-currency {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .sa-dashboard-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .sa-stat-card {
   --sa-stat-rgb: 34, 211, 238;
   position: relative;
@@ -563,5 +634,105 @@
 @media (max-width: 420px) {
   .sa-stats-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* 9. Export Users Dropdown and Toast Styling */
+.sa-export-container {
+  position: relative;
+  display: inline-block;
+}
+
+.sa-export-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 100;
+  width: 200px;
+  background: #0b1220;
+  border: 1px solid rgba(0, 214, 143, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sa-export-dropdown button {
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.sa-export-dropdown button:hover {
+  background: rgba(0, 214, 143, 0.1);
+  color: #00d68f;
+}
+
+.sa-export-dropdown button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sa-btn-export:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Toast Notification */
+.sa-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #0b1220;
+  border: 1px solid rgba(0, 214, 143, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: sa-toast-in 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sa-toast span {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sa-toast-success {
+  border-color: rgba(0, 214, 143, 0.5);
+  box-shadow: 0 0 15px rgba(0, 214, 143, 0.15);
+}
+
+.sa-toast-error {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+}
+
+.sa-toast-error span {
+  color: #fca5a5;
+}
+
+@keyframes sa-toast-in {
+  from {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }

@@ -1331,6 +1331,41 @@
   margin: 0;
 }
 
+.vuln-detail-category {
+  color: var(--vuln-accent, #7dd3fc);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 2px 0 6px 0 !important;
+}
+
+.vuln-detail-evidence {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 12px !important;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--vuln-border);
+  border-radius: 6px;
+  padding: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.vuln-detail-references {
+  list-style: none;
+  margin: 0 0 10px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vuln-detail-references a {
+  color: var(--vuln-accent, #7dd3fc);
+  font-size: 12px;
+  word-break: break-all;
+}
+
 .vuln-detail-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
