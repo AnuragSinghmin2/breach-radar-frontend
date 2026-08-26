@@ -10,9 +10,8 @@ RUN npm ci
 # Copy the rest of the application source code
 COPY . .
 
-# Expose build-time environment variable to Vite
-ARG VITE_API_BASE_URL
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+# Expose build-time environment variable to Vite with default production URL
+ARG VITE_API_BASE_URL=https://breach-radar-backend-539618567961.europe-west1.run.app/api/v1
 
 # Build the app for production
 RUN npm run build
