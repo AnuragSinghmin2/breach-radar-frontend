@@ -3,6 +3,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
+      '--build-arg', 'VITE_API_BASE_URL=https://breach-radar-backend-539618567961.europe-west1.run.app/api/v1',
       '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/breach-radar/breach-radar-frontend:$COMMIT_SHA',
       '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/breach-radar/breach-radar-frontend:latest',
       '-f', 'Dockerfile',
