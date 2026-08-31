@@ -29,16 +29,24 @@ export default function Dashboard() {
   const { scans, recentVulnerabilities, notifications, loading } = useDashboard();
 
   const data = useMemo(() => buildActivityData(scans), [scans]);
-  const recentScans = useMemo(
-    () =>
-      scans.slice(0, 5).map((scan) => ({
-        id: scan._id,
-        name: scan.domainId?.domain || "Unknown domain",
-        status: scan.status,
-        score: scan.domainId?.score ?? scan.riskScore ?? "-",
-      })),
-    [scans]
-  );
+  const recentScans = useMemo(() => {
+    const sorted = [...scans].sort((a, b) => {
+      const isActA = a.status === "In Progress" || a.status === "Queued";
+      const isActB = b.status === "In Progress" || b.status === "Queued";
+
+      if (isActA && !isActB) return -1;
+      if (!isActA && isActB) return 1;
+
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    return sorted.slice(0, 5).map((scan) => ({
+      id: scan._id,
+      name: scan.domainId?.domain || "Unknown domain",
+      status: scan.status,
+      score: scan.domainId?.score ?? scan.riskScore ?? "-",
+    }));
+  }, [scans]);
 
   const vulnerabilities = useMemo(
     () =>

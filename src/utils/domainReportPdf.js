@@ -295,19 +295,63 @@ function writeMetricGrid(pdf, metrics) {
   const gap = 10;
   const cols = 4;
   const cardWidth = (CONTENT_WIDTH - gap * (cols - 1)) / cols;
-  const cardHeight = 46;
 
-  metrics.forEach((metric, index) => {
-    const col = index % cols;
-    const row = Math.floor(index / cols);
-    const x = MARGIN_X + col * (cardWidth + gap);
-    const y = pdf.y + row * (cardHeight + gap);
-    pdf.rect(x, PAGE_HEIGHT - y - cardHeight + 10, cardWidth, cardHeight, "0.96 0.98 1.00");
-    pdf.text(metric.label, x + 10, PAGE_HEIGHT - y - 7, { size: 8, font: "F2", color: "0.39 0.45 0.55" });
-    pdf.text(String(metric.value), x + 10, PAGE_HEIGHT - y - 27, { size: 17, font: "F2", color: "0.02 0.08 0.16" });
-  });
+  function getWrappedLinesAndSize(value, maxWidth) {
+    let size = 17;
+    let lines = wrapText(value, size, maxWidth);
 
-  pdf.y += Math.ceil(metrics.length / cols) * (cardHeight + gap) + 14;
+    if (lines.length > 1) {
+      size = 13;
+      lines = wrapText(value, size, maxWidth);
+    }
+    if (lines.length > 1) {
+      size = 10;
+      lines = wrapText(value, size, maxWidth);
+    }
+    if (lines.length > 2) {
+      size = 8;
+      lines = wrapText(value, size, maxWidth);
+    }
+    return { lines, size };
+  }
+
+  const rowsCount = Math.ceil(metrics.length / cols);
+
+  for (let r = 0; r < rowsCount; r++) {
+    const rowMetrics = metrics.slice(r * cols, (r + 1) * cols);
+
+    const processedMetrics = rowMetrics.map((metric) => {
+      const maxWidth = cardWidth - 20;
+      const { lines, size } = getWrappedLinesAndSize(String(metric.value), maxWidth);
+      const reqHeight = 22 + lines.length * (size * 1.15) + 8;
+      return { metric, lines, size, reqHeight };
+    });
+
+    const rowHeight = Math.max(46, ...processedMetrics.map((m) => m.reqHeight));
+
+    pdf.ensureSpace(rowHeight + gap);
+
+    processedMetrics.forEach((pm, col) => {
+      const x = MARGIN_X + col * (cardWidth + gap);
+      const y = pdf.y;
+
+      pdf.rect(x, PAGE_HEIGHT - y - rowHeight + 10, cardWidth, rowHeight, "0.96 0.98 1.00");
+      pdf.text(pm.metric.label, x + 10, PAGE_HEIGHT - y - 7, { size: 8, font: "F2", color: "0.39 0.45 0.55" });
+
+      const totalValueHeight = pm.lines.length * pm.size * 1.15;
+      const startY = y + 7 + ((rowHeight - 17) - totalValueHeight) / 2;
+      let valY = startY + pm.size;
+
+      pm.lines.forEach((line) => {
+        pdf.text(line, x + 10, PAGE_HEIGHT - valY, { size: pm.size, font: "F2", color: "0.02 0.08 0.16" });
+        valY += pm.size * 1.15;
+      });
+    });
+
+    pdf.y += rowHeight + gap;
+  }
+
+  pdf.y += 14 - gap;
 }
 
 function writeVulnerability(pdf, vulnerability, index) {

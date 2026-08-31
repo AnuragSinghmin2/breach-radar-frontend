@@ -20,6 +20,10 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
+import {
+  createDomainSecurityReportPdf,
+  getDomainReportFilename,
+} from "../utils/domainReportPdf";
 import "./Reports.css";
 
 const included = [
@@ -76,7 +80,7 @@ function statusTone(status) {
 export default function Reports() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { reports, domains, loading, refreshReports } = useDashboard();
+  const { reports, domains, vulnerabilities, loading, refreshReports } = useDashboard();
   const initialDomain = searchParams.get("domain") || "";
   const [query, setQuery] = useState(initialDomain);
   const [statusFilter, setStatusFilter] = useState("All");
@@ -236,18 +240,56 @@ export default function Reports() {
     try {
       setDownloadingId(report._id);
       setMessage(`Preparing PDF for ${report.id}...`);
-      const blob = await reportApi.downloadReportPdf(report._id);
-      const url = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+
+      const domainVulnerabilities = vulnerabilities.filter((item) => {
+        const domainName = item.domainId?.domain || item.domain || "";
+        return domainName.toLowerCase() === report.domain.toLowerCase();
+      });
+
+      const blob = createDomainSecurityReportPdf({
+        domain: { domain: report.domain, score: report.score },
+        vulnerabilities: domainVulnerabilities,
+      });
+
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${report.id.replace("#", "")}-${report.domain}.pdf`;
+      link.download = getDomainReportFilename(report.domain);
+      document.body.appendChild(link);
       link.click();
-      URL.revokeObjectURL(url);
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
       setMessage(`${report.id} PDF downloaded.`);
     } catch (error) {
-      setMessage(error.response?.data?.message || "Failed to download report PDF.");
+      setMessage(error.message || "Failed to download report PDF.");
     } finally {
       setDownloadingId("");
+    }
+  }
+
+  function openReportPdfInNewTab(report) {
+    if (!report?._id || !isCompleted(report)) {
+      setMessage("Only completed reports are ready for PDF preview.");
+      return;
+    }
+
+    try {
+      const domainVulnerabilities = vulnerabilities.filter((item) => {
+        const domainName = item.domainId?.domain || item.domain || "";
+        return domainName.toLowerCase() === report.domain.toLowerCase();
+      });
+
+      const blob = createDomainSecurityReportPdf({
+        domain: { domain: report.domain, score: report.score },
+        vulnerabilities: domainVulnerabilities,
+      });
+
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      window.setTimeout(() => URL.revokeObjectURL(url), 3000);
+    } catch (error) {
+      setMessage(error.message || "Failed to open report PDF.");
     }
   }
 
@@ -410,7 +452,14 @@ export default function Reports() {
 
               {paginatedReports.map((report) => (
                 <div className={`reports-row ${selected?.id === report.id ? "selected" : ""}`} key={report.id}>
-                  <button className="reports-name-cell" type="button" onClick={() => setSelected(report)}>
+                  <button
+                    className="reports-name-cell"
+                    type="button"
+                    onClick={() => {
+                      setSelected(report);
+                      openReportPdfInNewTab(report);
+                    }}
+                  >
                     <span className="reports-pdf-icon">PDF</span>
                     <strong title={report.title}>
                       <span>{report.title}</span>

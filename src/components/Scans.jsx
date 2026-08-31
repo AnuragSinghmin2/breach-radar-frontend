@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Activity,
@@ -14,6 +14,7 @@ import {
   Info,
   ListChecks,
   Loader2,
+  Radar,
   Shield,
   ShieldCheck,
   Siren,
@@ -36,6 +37,8 @@ const checkLabels = {
   headers: "Security Headers",
   ports: "Port Exposure",
   malware: "Malware Signals",
+  compliance: "Compliance Audits",
+  businessLogic: "Business Logic Checks",
   apiSecurity: "API Security (BOLA)",
   cloudInfrastructure: "Exposed Admin Panels",
   fileUpload: "File Upload Checks",
@@ -56,7 +59,7 @@ function getVisiblePages(currentPage, totalPages) {
   return Array.from({ length: end - start + 1 }, (_, index) => start + index);
 }
 
-function ScanStatusPanel({ scan, formatScanTime }) {
+function ScanStatusPanel({ scan, formatScanTime, onNewScan }) {
   if (!scan) return null;
 
   const isRunning =
@@ -91,6 +94,25 @@ function ScanStatusPanel({ scan, formatScanTime }) {
         </div>
       </div>
 
+      {isRunning && (
+        <div className="scan-progress-container">
+          <div className="scan-progress-header">
+            <div className="scan-progress-label">
+              <Radar className="scan-radar-spinning" size={16} />
+              <span>Scan in progress...</span>
+            </div>
+            <span className="scan-progress-percentage">In Progress</span>
+          </div>
+          <div className="scan-progress-bar-bg">
+            <div className="scan-progress-bar-fill" />
+          </div>
+          <div className="scan-status-details">
+            <Activity className="scan-details-icon" size={14} />
+            <span>Running OWASP Top 10 checks, SSL/TLS handshake inspection, security headers analysis and port sweep...</span>
+          </div>
+        </div>
+      )}
+
       {scan.status === SCAN_STATUS.COMPLETED && (
         <div className="scans-status-findings">
           <span className="critical">{scan.vulnerabilitiesCount.critical} Critical</span>
@@ -101,6 +123,14 @@ function ScanStatusPanel({ scan, formatScanTime }) {
       )}
 
       {scan.errorDetail && <p className="scans-status-error">{scan.errorDetail}</p>}
+
+      {(scan.status === SCAN_STATUS.COMPLETED || scan.status === SCAN_STATUS.FAILED) && onNewScan && (
+        <div style={{ marginTop: "16px", display: "flex", justifyContent: "flex-end" }}>
+          <button className="scans-secondary-btn" style={{ margin: 0, height: "34px" }} onClick={onNewScan}>
+            Start New Scan
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -109,12 +139,14 @@ export default function Scans() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const {
+    scans,
     filteredHistory,
     vulnerabilities,
     statusFilter,
     setStatusFilter,
     message,
     activeScan,
+    activeScans,
     stats,
     domains,
     startScan,
@@ -125,7 +157,10 @@ export default function Scans() {
     error,
     loading,
     setMessage,
+    setActiveScanId,
   } = useScans();
+
+  const [showWizard, setShowWizard] = useState(false);
 
   const [selectedDomain, setSelectedDomain] = useState(searchParams.get("domain") || "");
   const [selectedType, setSelectedType] = useState("Full Scan");
@@ -174,6 +209,9 @@ export default function Scans() {
     const paramDomain = searchParams.get("domain");
     if (paramDomain && domains.includes(paramDomain)) {
       setSelectedDomain(paramDomain);
+      setShowWizard(true);
+      setActiveStep(0);
+      navigate("/dashboard/scans", { replace: true });
       return;
     }
     if (selectedDomain && !domains.includes(selectedDomain)) {
@@ -183,7 +221,7 @@ export default function Scans() {
     if (!selectedDomain && domains.length > 0) {
       setSelectedDomain(domains[0]);
     }
-  }, [domains, searchParams, selectedDomain]);
+  }, [domains, searchParams, selectedDomain, navigate]);
 
   useEffect(() => {
     setScanHistoryPage(1);
@@ -276,6 +314,7 @@ export default function Scans() {
     try {
       await startScan({ domain: selectedDomain, scanType: selectedType, checks });
       setActiveStep(0);
+      setShowWizard(false);
     } catch (err) {
       setMessage(err.response?.data?.message || "Failed to start scan.");
     }
@@ -334,10 +373,36 @@ export default function Scans() {
       {(message || error) && <div className="scans-message">{message || error}</div>}
 
       <div className="scans-main-grid">
-        <div className="scans-left-column">
-          <section className="scans-panel scans-new-panel" id="new-scan">
-            <h3>New Scan</h3>
-            <p>Move through each step to create and launch a focused security scan.</p>
+        {activeScans?.length > 0 && !showWizard ? (
+          <div className="scans-status-stack">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700" }}>Active Scans</h3>
+              <button
+                className="scans-primary-btn"
+                style={{ margin: 0, height: "34px", padding: "0 14px", fontSize: "12px" }}
+                onClick={() => setShowWizard(true)}
+              >
+                Start Another Scan
+              </button>
+            </div>
+            {activeScans.map((scan) => (
+              <ScanStatusPanel
+                key={scan.id}
+                scan={scan}
+                formatScanTime={formatScanTime}
+                onNewScan={() => setShowWizard(true)}
+              />
+            ))}
+          </div>
+        ) : (
+          <section className="scans-panel scans-new-panel scans-new-panel-improved" id="new-scan">
+            <div className="new-scan-header">
+              <div className="new-scan-header-accent" />
+              <div className="new-scan-header-text">
+                <h3>New Scan</h3>
+                <p>Move through each step to create and launch a focused security scan.</p>
+              </div>
+            </div>
 
             <div className="scans-steps">
               <div className="scans-steps-progress" aria-hidden="true">
@@ -348,20 +413,29 @@ export default function Scans() {
                 const isActive = index === activeStep;
                 const isFuture = index > activeStep;
 
+                let circleClass = "";
+                if (isActive) circleClass = "circle-active";
+                else if (isCompleted) circleClass = "circle-completed";
+                else circleClass = "circle-inactive";
+
+                let labelClass = isActive ? "label-active" : "label-inactive";
+
                 return (
-                <button
-                  className={`scans-step ${isCompleted ? "completed" : ""} ${isActive ? "active" : ""} ${isFuture ? "future" : ""}`}
-                  type="button"
-                  key={label}
-                  onClick={() => goToStep(index)}
-                  disabled={isFuture && index !== activeStep + 1}
-                >
-                  <span className={isCompleted || isActive ? "active" : ""}>
-                    {isCompleted ? <Check size={12} /> : index + 1}
-                  </span>
-                  <strong>{label}</strong>
-                  <small>{help}</small>
-                </button>
+                  <button
+                    className={`scans-step ${isCompleted ? "completed" : ""} ${isActive ? "active" : ""} ${isFuture ? "future" : ""}`}
+                    type="button"
+                    key={label}
+                    onClick={() => goToStep(index)}
+                    disabled={isFuture && index !== activeStep + 1}
+                  >
+                    <span className={`stepper-circle ${circleClass}`}>
+                      {isCompleted ? <Check size={12} /> : index + 1}
+                    </span>
+                    <div className="label-text">
+                      <strong className={`label-title ${labelClass}`}>{label}</strong>
+                      <small className={`label-desc ${labelClass}`}>{help}</small>
+                    </div>
+                  </button>
                 );
               })}
             </div>
@@ -376,11 +450,26 @@ export default function Scans() {
                 <div className="scans-step-content">
                   <label className="scans-step-field">
                     <span>Verified Domain</span>
-                    <button type="button" onClick={() => setOpenMenu(openMenu === "domain" ? "" : "domain")}>
-                      <Globe2 size={17} />
-                      {selectedDomain || "No verified domains"}
-                      {selectedDomain && <Badge tone="green">Active</Badge>}
-                      <ChevronDown size={16} />
+                    <button
+                      className="domain-selector-card"
+                      type="button"
+                      onClick={() => setOpenMenu(openMenu === "domain" ? "" : "domain")}
+                    >
+                      <div className="domain-globe-icon-box">
+                        <Globe2 size={18} />
+                      </div>
+                      <div className="domain-info">
+                        <span className="domain-name-text">
+                          {selectedDomain || "No verified domains"}
+                        </span>
+                        <span className="domain-meta-text">
+                          Verified & Active Domain
+                        </span>
+                      </div>
+                      {selectedDomain && (
+                        <span className="domain-active-badge">Active</span>
+                      )}
+                      <ChevronDown size={16} style={{ color: "#6b8a80" }} />
                     </button>
                     {openMenu === "domain" && (
                       <div className="scans-dropdown">
@@ -482,9 +571,19 @@ export default function Scans() {
               )}
             </div>
 
-            <div className="scans-action-row">
+            <div className="action-buttons-row">
+              {activeScans?.length > 0 && (
+                <button
+                  className="btn-previous"
+                  type="button"
+                  style={{ marginRight: "auto" }}
+                  onClick={() => setShowWizard(false)}
+                >
+                  Cancel & Back
+                </button>
+              )}
               <button
-                className="scans-secondary-btn"
+                className="btn-previous"
                 type="button"
                 onClick={previousStep}
                 disabled={activeStep === 0}
@@ -492,7 +591,7 @@ export default function Scans() {
                 Previous
               </button>
               <button
-                className="scans-primary-btn"
+                className="btn-continue"
                 type="button"
                 onClick={continueWizard}
                 disabled={activeStep === 3 ? !canStartScan || !canContinue : !canContinue}
@@ -501,51 +600,7 @@ export default function Scans() {
               </button>
             </div>
           </section>
-
-          <ScanStatusPanel scan={activeScan} formatScanTime={formatScanTime} />
-
-          <section className="scans-panel scans-vuln-panel">
-            <div className="scans-section-head">
-              <h3>Recent Vulnerabilities <span>(from last scans)</span></h3>
-              <button type="button" onClick={() => navigate("/dashboard/vulnerabilities")}>View All</button>
-            </div>
-
-            <div className="scans-vuln-table">
-              <div className="scans-vuln-head">
-                <span>Vulnerability</span>
-                <span>Domain</span>
-                <span>Severity</span>
-                <span>Status</span>
-                <span>Detected At</span>
-              </div>
-              {vulnerabilities.map((item) => (
-                <button
-                  className="scans-vuln-row"
-                  type="button"
-                  key={item.id || `${item.name}-${item.domain}`}
-                  onClick={() =>
-                    navigate(
-                      `/dashboard/vulnerabilities?domain=${item.domain}&severity=${item.severity.toLowerCase()}`
-                    )
-                  }
-                >
-                  <span><Siren size={15} /> {item.name}</span>
-                  <span>{item.domain}</span>
-                  <Badge tone={item.tone}>{item.severity}</Badge>
-                  <Badge tone="red">{item.status}</Badge>
-                  <span>{item.detectedAt}</span>
-                </button>
-              ))}
-              {!loading && vulnerabilities.length === 0 && (
-                <div className="scans-empty">No scan data available</div>
-              )}
-            </div>
-
-            <button className="scans-muted-btn" type="button" onClick={() => navigate("/dashboard/vulnerabilities")}>
-              <ListChecks size={15} /> View All Vulnerabilities <ArrowRight size={15} />
-            </button>
-          </section>
-        </div>
+        )}
 
         <aside className="scans-right-column">
           <section className="scans-panel scans-overview-panel">
@@ -666,6 +721,48 @@ export default function Scans() {
             )}
           </section>
         </aside>
+
+        <section className="scans-panel scans-vuln-panel">
+          <div className="scans-section-head">
+            <h3>Recent Vulnerabilities <span>(from last scans)</span></h3>
+            <button type="button" onClick={() => navigate("/dashboard/vulnerabilities")}>View All</button>
+          </div>
+
+          <div className="scans-vuln-table">
+            <div className="scans-vuln-head">
+              <span>Vulnerability</span>
+              <span>Domain</span>
+              <span>Severity</span>
+              <span>Status</span>
+              <span>Detected At</span>
+            </div>
+            {vulnerabilities.map((item) => (
+              <button
+                className="scans-vuln-row"
+                type="button"
+                key={item.id || `${item.name}-${item.domain}`}
+                onClick={() =>
+                  navigate(
+                    `/dashboard/vulnerabilities?domain=${item.domain}&severity=${item.severity.toLowerCase()}`
+                  )
+                }
+              >
+                <span><Siren size={15} /> {item.name}</span>
+                <span>{item.domain}</span>
+                <Badge tone={item.tone}>{item.severity}</Badge>
+                <Badge tone="red">{item.status}</Badge>
+                <span>{item.detectedAt}</span>
+              </button>
+            ))}
+            {!loading && vulnerabilities.length === 0 && (
+              <div className="scans-empty">No scan data available</div>
+            )}
+          </div>
+
+          <button className="scans-muted-btn" type="button" onClick={() => navigate("/dashboard/vulnerabilities")}>
+            <ListChecks size={15} /> View All Vulnerabilities <ArrowRight size={15} />
+          </button>
+        </section>
       </div>
 
       <section className="scans-tip-panel">

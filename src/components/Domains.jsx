@@ -10,6 +10,7 @@ import {
   EllipsisVertical,
   Filter,
   Globe2,
+  Loader2,
   Search,
   ShieldCheck,
   ShieldPlus,
@@ -99,7 +100,7 @@ function ScoreRing({ value, tone }) {
 
 export default function Domains() {
   const navigate = useNavigate();
-  const { domains, vulnerabilities, stats: dashboardStats, loading, refreshDomains, refreshScans, refreshStats } =
+  const { domains, scans, vulnerabilities, stats: dashboardStats, loading, refreshDomains, refreshScans, refreshStats } =
     useDashboard();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
@@ -109,6 +110,7 @@ export default function Domains() {
   const [message, setMessage] = useState("");
   const [generatingReportDomain, setGeneratingReportDomain] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [addingDomain, setAddingDomain] = useState(false);
 
   useEffect(() => {
     function scrollToHash() {
@@ -185,14 +187,48 @@ export default function Domains() {
   const filteredDomains = useMemo(() => {
     const cleanQuery = query.trim().toLowerCase();
 
-    return domains.filter((item) => {
+    const filtered = domains.filter((item) => {
       const matchesQuery = item.domain.toLowerCase().includes(cleanQuery);
       const matchesStatus = statusFilter === "All Status" || item.status === statusFilter;
       const matchesCritical = !criticalOnly || item.vulnerabilities.critical > 0;
 
       return matchesQuery && matchesStatus && matchesCritical;
     });
-  }, [criticalOnly, domains, query, statusFilter]);
+
+    const getDomainTierInfo = (item) => {
+      // Find scan in progress or queued
+      const hasActiveScan = scans?.some(
+        (scan) =>
+          scan.domainId?.domain === item.domain &&
+          (scan.status === "In Progress" || scan.status === "Queued")
+      );
+
+      if (hasActiveScan) {
+        return { tier: 1, date: item.createdAt ? new Date(item.createdAt).getTime() : 0 };
+      }
+
+      // Newly added or not scanned yet
+      const isNew = item.verificationStatus !== "verified" || item.scoreLabel === "Not Scanned";
+      if (isNew) {
+        return { tier: 2, date: item.createdAt ? new Date(item.createdAt).getTime() : 0 };
+      }
+
+      // Already scanned
+      return { tier: 3, date: item.createdAt ? new Date(item.createdAt).getTime() : 0 };
+    };
+
+    return filtered.sort((a, b) => {
+      const infoA = getDomainTierInfo(a);
+      const infoB = getDomainTierInfo(b);
+
+      if (infoA.tier !== infoB.tier) {
+        return infoA.tier - infoB.tier;
+      }
+
+      // Sort newest first
+      return infoB.date - infoA.date;
+    });
+  }, [criticalOnly, domains, query, statusFilter, scans]);
 
   const totalDomains = filteredDomains.length;
   const totalPages = Math.max(1, Math.ceil(totalDomains / DOMAINS_PER_PAGE));
@@ -251,6 +287,7 @@ export default function Domains() {
       return;
     }
 
+    setAddingDomain(true);
     try {
       const added = await domainApi.addDomain({ domain: value });
       setNewDomain("");
@@ -260,6 +297,8 @@ export default function Domains() {
       openVerification(added);
     } catch (error) {
       setMessage(error.response?.data?.message || "Failed to add domain.");
+    } finally {
+      setAddingDomain(false);
     }
   }
 
@@ -367,15 +406,17 @@ export default function Domains() {
     if (!verifyModalDomain) return;
     setVerifying(true);
     setVerifyError("");
+    const targetDomain = verifyModalDomain.domain;
     try {
       if (verifyTab === "dns") {
         await domainApi.verifyDomainDns(verifyModalDomain._id, bypass);
       } else {
         await domainApi.verifyDomainHtml(verifyModalDomain._id, bypass);
       }
-      setMessage(`Domain ${verifyModalDomain.domain} verified successfully!`);
+      setMessage(`Domain ${targetDomain} verified successfully!`);
       setVerifyModalDomain(null);
-      await Promise.all([refreshDomains(), refreshStats()]);
+      Promise.all([refreshDomains(), refreshStats()]).catch(console.error);
+      navigate(`/dashboard/scans?domain=${encodeURIComponent(targetDomain)}`);
     } catch (error) {
       setVerifyError(error.response?.data?.message || "Verification failed. Please check records and try again.");
     } finally {
@@ -428,8 +469,8 @@ export default function Domains() {
           <button className="outline" type="button" onClick={() => navigate("/dashboard/settings/plan-billing")}>
             Upgrade Plan
           </button>
-          <button className="primary" type="submit">
-            Add Domain
+          <button className="primary" type="submit" disabled={addingDomain}>
+            {addingDomain ? "Adding..." : "Add Domain"}
           </button>
         </form>
       </section>
@@ -497,13 +538,35 @@ export default function Domains() {
                     </div>
                   </td>
                   <td>
-                    <div className={`domain-status ${item.status === "Needs Attention" ? "warning" : item.status === "Inactive" ? "inactive-row" : ""}`}>
-                      <span>
-                        <i className={item.verificationStatus !== "verified" ? "pending-dot" : ""} />
-                        {item.verificationStatus !== "verified" ? "Pending Verification" : item.status}
-                      </span>
-                      <small>{item.statusDetail}</small>
-                    </div>
+                    {(() => {
+                      const activeScanForDomain = scans?.find(
+                        (scan) =>
+                          scan.domainId?.domain === item.domain &&
+                          (scan.status === "In Progress" || scan.status === "Queued")
+                      );
+
+                      if (activeScanForDomain) {
+                        return (
+                          <div className="domain-status scanning">
+                            <span>
+                              <Loader2 size={12} className="scanning-spin" />
+                              {activeScanForDomain.status === "In Progress" ? "Scanning" : "Queued"}
+                            </span>
+                            <small>{activeScanForDomain.scanType || "Scan in progress"}</small>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className={`domain-status ${item.status === "Needs Attention" ? "warning" : item.status === "Inactive" ? "inactive-row" : ""}`}>
+                          <span>
+                            <i className={item.verificationStatus !== "verified" ? "pending-dot" : ""} />
+                            {item.verificationStatus !== "verified" ? "Pending Verification" : item.status}
+                          </span>
+                          <small>{item.statusDetail}</small>
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td>
                     <div className="domain-score-cell">
@@ -550,10 +613,25 @@ export default function Domains() {
                             <ShieldPlus size={15} />
                             <span>View Vulnerabilities</span>
                           </button>
-                          <button type="button" onClick={() => scanDomain(item.domain)}>
-                            <PlayCircle size={15} />
-                            <span>Scan Now</span>
-                          </button>
+                          {(() => {
+                            const isScanning = scans?.some(
+                              (scan) =>
+                                scan.domainId?.domain === item.domain &&
+                                (scan.status === "In Progress" || scan.status === "Queued")
+                            );
+                            const hasBeenScanned = item.scoreLabel !== "Not Scanned";
+
+                            return (
+                              <button
+                                type="button"
+                                disabled={isScanning}
+                                onClick={() => scanDomain(item.domain)}
+                              >
+                                <PlayCircle size={15} />
+                                <span>{isScanning ? "Scanning..." : hasBeenScanned ? "Rescan" : "Scan Now"}</span>
+                              </button>
+                            );
+                          })()}
                           <button
                             type="button"
                             onClick={() => navigate(`/dashboard/reports?domain=${encodeURIComponent(item.domain)}`)}

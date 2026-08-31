@@ -1233,3 +1233,409 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Beautiful Scan Progress & Radar Animation */
+.scan-progress-container {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(8, 20, 36, 0.6);
+  border: 1px solid rgba(0, 214, 143, 0.25);
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.scan-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scan-progress-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+.scan-radar-spinning {
+  color: #00d68f;
+  filter: drop-shadow(0 0 4px rgba(0, 214, 143, 0.6));
+  animation: scan-radar-spin 2.5s linear infinite, scan-radar-pulse 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes scan-radar-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scan-radar-pulse {
+  from {
+    opacity: 0.65;
+    transform: scale(0.95) rotate(0deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.1) rotate(360deg);
+  }
+}
+
+.scan-progress-percentage {
+  font-size: 11px;
+  color: #00d68f;
+  background: rgba(0, 214, 143, 0.15);
+  border: 1px solid rgba(0, 214, 143, 0.35);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.scan-progress-bar-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.scan-progress-bar-fill {
+  height: 100%;
+  width: 35%;
+  background: linear-gradient(90deg, #00d68f, #0084ff);
+  border-radius: 999px;
+  position: absolute;
+  box-shadow: 0 0 8px rgba(0, 214, 143, 0.5);
+  animation: scan-indeterminate-slide 2s infinite ease-in-out;
+}
+
+@keyframes scan-indeterminate-slide {
+  0% {
+    left: -35%;
+  }
+  50% {
+    left: 100%;
+    width: 20%;
+  }
+  100% {
+    left: 100%;
+    width: 20%;
+  }
+}
+
+.scan-status-details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.45;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 8px 12px;
+  border-radius: 5px;
+  border-left: 2px solid #00d68f;
+}
+
+.scan-details-icon {
+  color: #00d68f;
+  flex-shrink: 0;
+  animation: scan-details-pulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes scan-details-pulse {
+  from {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.scans-status-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Custom New Scan Panel UI Improvements */
+.scans-new-panel-improved {
+  background: linear-gradient(180deg, rgba(7, 18, 32, 0.98), rgba(3, 12, 23, 0.98)) !important;
+  border-radius: 7px !important;
+  border: 1px solid rgba(42, 69, 96, 0.7) !important;
+  padding: 24px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018), 0 18px 36px rgba(0, 0, 0, 0.16) !important;
+}
+
+.scans-new-panel-improved .new-scan-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 24px;
+}
+
+.scans-new-panel-improved .new-scan-header-accent {
+  width: 4px;
+  height: 36px;
+  background-color: #16e095;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.scans-new-panel-improved .new-scan-header-text h3 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #e2f0eb !important;
+  margin: 0 !important;
+}
+
+.scans-new-panel-improved .new-scan-header-text p {
+  font-size: 13px !important;
+  color: #aeb8c7 !important;
+  margin: 4px 0 0 0 !important;
+}
+
+/* Stepper Stepper Styles */
+.scans-new-panel-improved .stepper-container {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.scans-new-panel-improved .stepper-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+
+.scans-new-panel-improved .stepper-step:disabled {
+  cursor: not-allowed;
+}
+
+.scans-new-panel-improved .stepper-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  margin-bottom: 10px;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+/* Stepper Connector Lines */
+.scans-new-panel-improved .stepper-connector {
+  position: absolute;
+  top: 12px;
+  height: 2px;
+  z-index: 1;
+  background: rgba(71, 92, 116, 0.7) !important;
+  transition: background-color 0.25s ease;
+}
+
+/* Connector Line Segment Styles: 
+   Segment 0 goes from step 0 to step 1
+   Segment 1 goes from step 1 to step 2
+   Segment 2 goes from step 2 to step 3 */
+.scans-new-panel-improved .connector-seg-0 {
+  left: calc(12.5% + 12px);
+  right: calc(62.5% + 12px);
+}
+.scans-new-panel-improved .connector-seg-1 {
+  left: calc(37.5% + 12px);
+  right: calc(37.5% + 12px);
+}
+.scans-new-panel-improved .connector-seg-2 {
+  left: calc(62.5% + 12px);
+  right: calc(12.5% + 12px);
+}
+
+.scans-new-panel-improved .connector-seg-active {
+  background: #16e095 !important;
+}
+
+/* Circle States */
+.scans-new-panel-improved .circle-active {
+  background: #16e095 !important;
+  border: none !important;
+  color: #04120d !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 0 4px rgba(22,224,149,0.2) !important;
+}
+
+.scans-new-panel-improved .circle-completed {
+  border: 2px solid #16e095 !important;
+  color: #16e095 !important;
+  background: rgba(22,224,149,0.15) !important;
+}
+
+.scans-new-panel-improved .circle-inactive {
+  border: 2px solid rgba(71, 92, 116, 0.7) !important;
+  color: #7f8da0 !important;
+  background: rgba(4, 13, 25, 0.62) !important;
+}
+
+/* Step Label States */
+.scans-new-panel-improved .label-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scans-new-panel-improved .label-title {
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.25s ease;
+}
+
+.scans-new-panel-improved .label-desc {
+  font-size: 10px;
+  transition: color 0.25s ease;
+}
+
+.scans-new-panel-improved .label-active {
+  color: #16e095 !important;
+  font-weight: 600 !important;
+}
+
+.scans-new-panel-improved .label-inactive {
+  color: #aeb8c7 !important;
+}
+
+/* Domain Selector Card */
+.scans-new-panel-improved .domain-selector-card {
+  background: rgba(4, 13, 25, 0.62) !important;
+  border: 1px solid rgba(42, 69, 96, 0.72) !important;
+  border-left: 3px solid #00d68f !important;
+  border-radius: 8px !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+  cursor: pointer !important;
+}
+
+.scans-new-panel-improved .domain-globe-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: rgba(22,224,149,0.1) !important;
+  color: #16e095 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.scans-new-panel-improved .domain-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-grow: 1;
+}
+
+.scans-new-panel-improved .domain-name-text {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #f8fafc !important;
+}
+
+.scans-new-panel-improved .domain-meta-text {
+  font-size: 12px !important;
+  color: #aeb8c7 !important;
+}
+
+.scans-new-panel-improved .domain-active-badge {
+  background: rgba(22,224,149,0.12) !important;
+  color: #16e095 !important;
+  border: 1px solid rgba(22,224,149,0.25) !important;
+  border-radius: 999px !important;
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+}
+
+/* Action Buttons Row */
+.scans-new-panel-improved .action-buttons-row {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+}
+
+.scans-new-panel-improved .btn-previous {
+  background: transparent !important;
+  border: 1px solid rgba(0, 214, 143, 0.42) !important;
+  color: #00d68f !important;
+  border-radius: 6px !important;
+  padding: 10px 20px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.scans-new-panel-improved .btn-previous:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+.scans-new-panel-improved .btn-previous:not(:disabled):hover {
+  background: rgba(0, 214, 143, 0.08) !important;
+  border-color: rgba(0, 214, 143, 0.6) !important;
+}
+
+.scans-new-panel-improved .btn-continue {
+  background: linear-gradient(180deg, #16e095, #08bf7e) !important;
+  color: #04120d !important;
+  font-weight: 900 !important;
+  border-radius: 6px !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  font-size: 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.scans-new-panel-improved .btn-continue:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.scans-new-panel-improved .btn-continue:not(:disabled):hover {
+  background: linear-gradient(180deg, #12c984, #06aa70) !important;
+  transform: translateY(-1px) !important;
+}
+
