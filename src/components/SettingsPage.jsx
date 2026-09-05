@@ -437,8 +437,13 @@ function ProfileSettings() {
     selectAvatar(event.dataTransfer.files?.[0]);
   }
 
-  const avatarUrl = avatarPreview || resolveAvatarUrl(account?.profile?.avatar);
+  const [avatarBroken, setAvatarBroken] = useState(false);
+  const avatarUrl = avatarPreview || (!avatarBroken ? resolveAvatarUrl(account?.profile?.avatar) : "");
   const initials = getInitials(profile.name, profile.email);
+
+  useEffect(() => {
+    setAvatarBroken(false);
+  }, [account?.profile?.avatar]);
 
   return (
     <div className="profile-settings-layout">
@@ -455,7 +460,7 @@ function ProfileSettings() {
 
             <div className="profile-avatar-wrap">
               <div className="profile-avatar-preview">
-                {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initials}</span>}
+                {avatarUrl ? <img src={avatarUrl} alt="" onError={() => setAvatarBroken(true)} /> : <span>{initials}</span>}
               </div>
             </div>
 

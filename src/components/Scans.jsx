@@ -65,6 +65,53 @@ function ScanStatusPanel({ scan, formatScanTime, onNewScan }) {
   const isRunning =
     scan.status === SCAN_STATUS.QUEUED || scan.status === SCAN_STATUS.IN_PROGRESS;
 
+  const [progress, setProgress] = useState(() => {
+    if (scan.status === SCAN_STATUS.COMPLETED) return 100;
+    if (typeof scan.progress === 'number' && scan.progress > 0) return scan.progress;
+    return 12;
+  });
+
+  useEffect(() => {
+    if (!isRunning) {
+      if (scan.status === SCAN_STATUS.COMPLETED) setProgress(100);
+      return;
+    }
+
+    if (typeof scan.progress === 'number' && scan.progress > 0) {
+      setProgress(scan.progress);
+    }
+
+    const startTime = new Date(scan.startedAt || scan.createdAt || Date.now()).getTime();
+
+    const timer = setInterval(() => {
+      const elapsedSec = (Date.now() - startTime) / 1000;
+      const isQuick = scan.scanType === "Quick Scan";
+      const targetSec = isQuick ? 22 : 38;
+      const ratio = Math.min(elapsedSec / targetSec, 1);
+      // Smooth logarithmic curve from 12% up to 96%
+      const calculated = Math.min(96, Math.floor(12 + 84 * Math.sqrt(ratio)));
+      setProgress((prev) => Math.max(prev, calculated));
+    }, 350);
+
+    return () => clearInterval(timer);
+  }, [isRunning, scan.status, scan.startedAt, scan.createdAt, scan.scanType, scan.progress]);
+
+  const getPhaseDetails = (pct) => {
+    if (pct < 25) {
+      return "Initializing scanner containers, DNS resolution, and SSL handshake inspection...";
+    }
+    if (pct < 50) {
+      return "Running OWASP Top 10 checks, SSL/TLS certificates, security headers, and port sweep...";
+    }
+    if (pct < 75) {
+      return "Probing web logic, authentication policies, API security, and injection vectors...";
+    }
+    if (pct < 95) {
+      return "Aggregating vulnerability findings, calculating CVSS risk score, and compiling evidence...";
+    }
+    return "Finalizing security audit report and preparing remediation workflow...";
+  };
+
   return (
     <section className="scans-panel scans-status-panel">
       <div className="scans-section-head">
@@ -101,14 +148,17 @@ function ScanStatusPanel({ scan, formatScanTime, onNewScan }) {
               <Radar className="scan-radar-spinning" size={16} />
               <span>Scan in progress...</span>
             </div>
-            <span className="scan-progress-percentage">In Progress</span>
+            <span className="scan-progress-percentage">{progress}%</span>
           </div>
           <div className="scan-progress-bar-bg">
-            <div className="scan-progress-bar-fill" />
+            <div
+              className="scan-progress-bar-fill"
+              style={{ width: `${progress}%` }}
+            />
           </div>
           <div className="scan-status-details">
             <Activity className="scan-details-icon" size={14} />
-            <span>Running OWASP Top 10 checks, SSL/TLS handshake inspection, security headers analysis and port sweep...</span>
+            <span>{getPhaseDetails(progress)}</span>
           </div>
         </div>
       )}

@@ -19,3 +19,23 @@ export async function sendTestNotification() {
   const { data } = await apiClient.post("/notifications/test");
   return data;
 }
+
+export async function markAsRead(id) {
+  const { data } = await apiClient.patch(`/notifications/${id}/read`);
+  return data;
+}
+
+export async function markAllAsRead() {
+  const { data } = await apiClient.patch("/notifications/read-all");
+  return data;
+}
+
+export async function deleteNotification(id) {
+  const { data } = await apiClient.delete(`/notifications/${id}`);
+  return data;
+}
+
+export async function clearAllNotifications() {
+  const { data } = await apiClient.delete("/notifications");
+  return data;
+}

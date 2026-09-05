@@ -13,6 +13,7 @@ import SupportModal from "./SupportModal";
 import TrustedCompaniesMarquee from "./TrustedCompaniesMarquee";
 import PlatformStats from "./PlatformStats";
 import UnderTheHood from "./UnderTheHood";
+import { getPublicPricing } from "../services/api/pricingService";
 import "./LandingPage.css";
 
 const metrics = [
@@ -38,33 +39,33 @@ const features = [
   },
   {
     icon: FileText,
-    title: "Detailed Reports",
-    text: "Get in-depth reports with actionable insights, fix recommendations, and risk assessment.",
-    tone: "purple",
-  },
-  {
-    icon: Activity,
-    title: "Real-time Monitoring",
-    text: "Continuous monitoring and instant alerts for new vulnerabilities and security threats.",
+    title: "Compliance Reports",
+    text: "Generate audit-ready reports for OWASP Top 10, CWE/SANS, SOC 2, and ISO 27001.",
     tone: "blue",
   },
   {
+    icon: Activity,
+    title: "Continuous Monitoring",
+    text: "Automated scheduled scans ensure you are always ahead of new CVE disclosures.",
+    tone: "purple",
+  },
+  {
     icon: Zap,
-    title: "Easy Integration",
-    text: "Seamlessly integrate with your existing CI/CD pipeline and development workflow.",
-    tone: "yellow",
+    title: "Instant Alerts",
+    text: "Get real-time Slack and email notifications when critical issues are detected.",
+    tone: "amber",
   },
   {
     icon: Users,
-    title: "Team Management",
-    text: "Manage your team, set permissions, security collaboration, and improve threats.",
-    tone: "pink",
+    title: "Team Collaboration",
+    text: "Assign vulnerabilities to teammates, track remediation progress, and comment on findings.",
+    tone: "teal",
   },
   {
     icon: ShieldCheck,
-    title: "Compliance Ready",
-    text: "Meet industry compliance standards with automated compliance checking and accurate.",
-    tone: "cyan",
+    title: "Remediation Guidance",
+    text: "Step-by-step fix recommendations with code snippets tailored to your stack.",
+    tone: "red",
   },
 ];
 
@@ -72,62 +73,26 @@ const processSteps = [
   {
     number: "01",
     icon: Globe,
-    title: "Add Your Domain",
-    text: "Enter your domain and verify ownership using our simple verification methods.",
+    title: "Add Your Target",
+    text: "Enter your domain or IP to verify ownership and begin securing your attack surface.",
   },
   {
     number: "02",
     icon: Target,
-    title: "Start Scanning",
-    text: "Our AI-powered scanner analyzes your website for vulnerabilities.",
+    title: "Launch Deep Scan",
+    text: "Our multi-engine scanner probes for OWASP Top 10, misconfigs, CVEs, and open ports.",
   },
   {
     number: "03",
     icon: BarChart2,
-    title: "Get Results",
-    text: "Receive detailed reports with security score and vulnerability details.",
+    title: "Review Results",
+    text: "Get a clear severity breakdown with proof-of-concept evidence for every issue.",
   },
   {
     number: "04",
     icon: Lock,
     title: "Fix & Secure",
     text: "Follow our recommendations to fix issues and secure your app/domain.",
-  },
-];
-
-const pricingPlans = [
-  {
-    name: "Free",
-    desc: "Perfect for individuals getting started",
-    price: "0",
-    suffix: "/mo",
-    features: ["1 User Seat", "1 Verified Domain", "2 Scans / month", "Basic Reports", "Community Support"],
-    cta: "Get Started Free",
-  },
-  {
-    name: "Starter",
-    desc: "Perfect for small websites & startups",
-    price: "999",
-    suffix: "/mo",
-    features: ["3 User Seats", "5 Verified Domains", "30 Scans / month", "Email Alerts", "Standard Support", "Basic API Access"],
-    cta: "Get Started",
-  },
-  {
-    name: "Professional",
-    desc: "Great for growing businesses",
-    price: "2,999",
-    suffix: "/mo",
-    popular: true,
-    features: ["10 User Seats", "25 Verified Domains", "200 Scans / month", "Continuous Monitoring", "Full API Access", "Priority Support", "Compliance Reports"],
-    cta: "Get Started",
-  },
-  {
-    name: "Enterprise",
-    desc: "For large organizations",
-    price: "9,999",
-    suffix: "/mo",
-    features: ["Unlimited User Seats", "Unlimited Domains", "Unlimited Scans", "Custom Scanning Agents", "SAML SSO Integration", "Dedicated TAM", "Custom Integrations"],
-    cta: "Get Started",
   },
 ];
 
@@ -279,6 +244,38 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+
+  // Dynamic pricing plans state
+  const [pricingPlans, setPricingPlans] = useState([]);
+  const [pricingLoading, setPricingLoading] = useState(true);
+  const [pricingError, setPricingError] = useState(null);
+
+  // Fetch dynamic pricing plans from public API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchPricing = async () => {
+      try {
+        setPricingLoading(true);
+        const data = await getPublicPricing();
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          setPricingPlans(data);
+          setPricingError(null);
+        }
+      } catch (err) {
+        console.error("[LandingPage] Failed to fetch pricing:", err);
+        if (isMounted) {
+          setPricingError("Unable to load pricing at this moment.");
+        }
+      } finally {
+        if (isMounted) setPricingLoading(false);
+      }
+    };
+
+    fetchPricing();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Demo section state
   const [demoStep, setDemoStep] = useState(1);
@@ -658,38 +655,60 @@ export default function LandingPage() {
           <h2 id="pricing-title">Choose the Perfect Plan for You</h2>
           <p>Simple, transparent pricing. No hidden fees.</p>
 
-          <div className="pricing-grid">
-            {pricingPlans.map((plan) => (
-              <article className={plan.popular ? "price-card popular" : "price-card"} key={plan.name}>
-                {plan.popular && <span className="popular-badge">Most Popular</span>}
-                <h3>{plan.name}</h3>
-                <p>{plan.desc}</p>
-                <div className={plan.custom ? "price custom-price" : "price"}>
-                  {plan.custom ? (
-                    <strong>{plan.price}</strong>
-                  ) : (
-                    <>
-                      <span>₹</span>
-                      <strong>{plan.price}</strong>
-                      <small>{plan.suffix}</small>
-                    </>
-                  )}
-                </div>
-                <ul>
-                  {plan.features.map((feature) => (
-                    <li key={feature}>{feature}</li>
-                  ))}
-                </ul>
-                <button
-                  className={plan.custom ? "sales-btn" : "start-btn"}
-                  type="button"
-                  onClick={() => navigate("/register")}
-                >
-                  {plan.cta}
-                </button>
-              </article>
-            ))}
-          </div>
+          {pricingLoading && pricingPlans.length === 0 ? (
+            <div className="pricing-grid" style={{ opacity: 0.7 }}>
+              <div style={{ textAlign: "center", width: "100%", gridColumn: "1 / -1", padding: "40px 0", color: "#94a3b8" }}>
+                Loading pricing plans...
+              </div>
+            </div>
+          ) : pricingError && pricingPlans.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px 0", color: "#f87171" }}>
+              {pricingError}
+            </div>
+          ) : (
+            <div className="pricing-grid">
+              {pricingPlans.map((plan) => {
+                const isPopular = Boolean(plan.popular || plan.isPopular);
+                const isCustom = Boolean(plan.custom || (plan.rawPrice === 0 && plan.name?.toLowerCase() === 'enterprise') || (plan.price === '0' && plan.name?.toLowerCase() === 'enterprise'));
+                const formattedPrice = typeof plan.price === 'number' ? plan.price.toLocaleString('en-IN') : plan.price;
+                const suffix = plan.suffix || (plan.billingInterval === 'year' ? '/yr' : '/mo');
+                const description = plan.desc || plan.description || '';
+                const ctaText = plan.cta || plan.ctaText || (plan.rawPrice === 0 || plan.price === '0' ? 'Get Started Free' : 'Get Started');
+                const featuresList = Array.isArray(plan.features) ? plan.features : [];
+
+                return (
+                  <article className={isPopular ? "price-card popular" : "price-card"} key={plan._id || plan.id || plan.name}>
+                    {isPopular && <span className="popular-badge">Most Popular</span>}
+                    <h3>{plan.displayName || plan.name}</h3>
+                    <p>{description}</p>
+                    <div className={isCustom ? "price custom-price" : "price"}>
+                      {isCustom ? (
+                        <strong>{formattedPrice}</strong>
+                      ) : (
+                        <>
+                          <span>₹</span>
+                          <strong>{formattedPrice}</strong>
+                          <small>{suffix}</small>
+                        </>
+                      )}
+                    </div>
+                    <ul>
+                      {featuresList.map((feature, idx) => (
+                        <li key={idx}>{feature}</li>
+                      ))}
+                    </ul>
+                    <button
+                      className={isCustom ? "sales-btn" : "start-btn"}
+                      type="button"
+                      onClick={() => navigate("/register")}
+                    >
+                      {ctaText}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          )}
 
           <div className="pricing-notes">
             <span>30-Day Money Back Guarantee</span>

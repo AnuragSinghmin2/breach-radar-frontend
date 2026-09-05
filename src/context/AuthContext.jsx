@@ -121,56 +121,56 @@ export function AuthProvider({ children }) {
 
 
     async function bootstrap() {
-
       try {
-
         if (isSessionValid()) {
-
+          const stored = getStoredUser();
+          const token = getStoredAccessToken();
           if (!active) return;
+          setUser(stored);
+          setAccessToken(token);
 
-          setUser(getStoredUser());
-
-          setAccessToken(getStoredAccessToken());
-
+          // Background re-hydration from backend to ensure profile picture & data are synchronized
+          try {
+            const profileUser = await userApi.getProfile();
+            if (active && profileUser) {
+              const normalized = normalizeAuthUser(profileUser, token);
+              setUser(normalized);
+              saveAuthSession(token, normalized);
+            }
+          } catch (profileErr) {
+            logAuthTrace("Background profile hydration skipped/failed", profileErr?.message);
+          }
           return;
-
         }
-
-
 
         const storedUser = getStoredUser();
-
         if (!storedUser) {
-
           if (active) clearSession();
-
           return;
-
         }
 
-
-
-        await refreshAccessToken();
-
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          try {
+            const profileUser = await userApi.getProfile();
+            if (active && profileUser) {
+              const normalized = normalizeAuthUser(profileUser, newToken);
+              setUser(normalized);
+              saveAuthSession(newToken, normalized);
+            }
+          } catch (profileErr) {
+            logAuthTrace("Post-refresh profile hydration skipped/failed", profileErr?.message);
+          }
+        }
       } catch (error) {
-
         logAuthTrace("AuthContext bootstrap refresh failed", error);
-
         if (active) clearSession();
-
       } finally {
-
         if (active) setIsLoading(false);
-
       }
-
     }
 
-
-
     bootstrap();
-
-
 
     return () => {
 

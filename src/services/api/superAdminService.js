@@ -85,6 +85,11 @@ export async function deleteSubscriptionPlan(id) {
   return data;
 }
 
+export async function toggleSubscriptionPlanStatus(id, isActive) {
+  const { data } = await apiClient.patch(`/super-admin/subscriptions/${id}/status`, { isActive });
+  return data;
+}
+
 export async function getPayments() {
   const { data } = await apiClient.get("/super-admin/payments");
   return data;
@@ -175,6 +180,7 @@ export const superAdminApi = {
   getSubscriptionPlans,
   createSubscriptionPlan,
   updateSubscriptionPlan,
+  toggleSubscriptionPlanStatus,
   deleteSubscriptionPlan,
   getPayments,
   refundPayment,
