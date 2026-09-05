@@ -13,7 +13,7 @@ import SupportModal from "./SupportModal";
 import TrustedCompaniesMarquee from "./TrustedCompaniesMarquee";
 import PlatformStats from "./PlatformStats";
 import UnderTheHood from "./UnderTheHood";
-import { getPublicPricing } from "../services/api/pricingService";
+import { getPublicPricing, DEFAULT_FALLBACK_PLANS } from "../services/api/pricingService";
 import "./LandingPage.css";
 
 const metrics = [
@@ -245,9 +245,9 @@ export default function LandingPage() {
   const location = useLocation();
   const [isSupportOpen, setIsSupportOpen] = useState(false);
 
-  // Dynamic pricing plans state
-  const [pricingPlans, setPricingPlans] = useState([]);
-  const [pricingLoading, setPricingLoading] = useState(true);
+  // Dynamic pricing plans state with instant default fallback
+  const [pricingPlans, setPricingPlans] = useState(DEFAULT_FALLBACK_PLANS);
+  const [pricingLoading, setPricingLoading] = useState(false);
   const [pricingError, setPricingError] = useState(null);
 
   // Fetch dynamic pricing plans from public API
@@ -255,17 +255,13 @@ export default function LandingPage() {
     let isMounted = true;
     const fetchPricing = async () => {
       try {
-        setPricingLoading(true);
         const data = await getPublicPricing();
         if (isMounted && Array.isArray(data) && data.length > 0) {
           setPricingPlans(data);
           setPricingError(null);
         }
       } catch (err) {
-        console.error("[LandingPage] Failed to fetch pricing:", err);
-        if (isMounted) {
-          setPricingError("Unable to load pricing at this moment.");
-        }
+        console.warn("[LandingPage] Using fallback pricing plans:", err?.message);
       } finally {
         if (isMounted) setPricingLoading(false);
       }
