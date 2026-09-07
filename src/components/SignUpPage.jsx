@@ -84,13 +84,26 @@ export default function SignUpPage() {
     }
   }
 
+  function getGoogleAuthUrl() {
+    if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
+      return "/api/v1/auth/google";
+    }
+
+    const apiBase = (import.meta.env.VITE_API_BASE_URL || "/api/v1").replace(/\/+$/, "");
+    const absoluteBase = /^https?:\/\//i.test(apiBase)
+      ? apiBase
+      : `${window.location.origin}${apiBase.startsWith("/") ? "" : "/"}${apiBase}`;
+
+    return `${absoluteBase}/auth/google`;
+  }
+
   function handleGoogleSignUp() {
     if (!acceptedTerms) {
       setError("You must agree to the Terms and Conditions and Privacy Policy.");
       return;
     }
 
-    window.location.href = "https://breach-radar-backend.onrender.com/api/v1/auth/google";
+    window.location.href = getGoogleAuthUrl();
   }
 
   return (

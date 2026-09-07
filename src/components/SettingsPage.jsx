@@ -181,7 +181,7 @@ const defaultExclusions = ["/logout", "/admin/delete", "*.pdf", "staging.interna
 
 const integrationCatalog = [
   { key: "slack", name: "Slack", desc: "Send critical alerts and scan updates to security channels.", status: "Connected", icon: MessageSquare, target: "#security-alerts" },
-  { key: "github", name: "GitHub", desc: "Create issues for vulnerabilities and sync remediation status.", status: "Connected", icon: Code2, target: "breach-radar/app" },
+  { key: "github", name: "GitHub", desc: "Create issues for vulnerabilities and sync remediation status.", status: "Connected", icon: Code2, target: "pentestradar/app" },
   { key: "jira", name: "Jira", desc: "Open tickets when vulnerabilities cross SLA thresholds.", status: "Available", icon: Wrench, target: "SEC project" },
   { key: "webhook", name: "Webhook", desc: "Post scan, report, and monitoring events to custom endpoints.", status: "Connected", icon: Webhook, target: "3 endpoints" },
 ];
