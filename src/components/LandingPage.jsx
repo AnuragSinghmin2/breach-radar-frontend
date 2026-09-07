@@ -665,12 +665,21 @@ export default function LandingPage() {
             <div className="pricing-grid">
               {pricingPlans.map((plan) => {
                 const isPopular = Boolean(plan.popular || plan.isPopular);
-                const isCustom = Boolean(plan.custom || (plan.rawPrice === 0 && plan.name?.toLowerCase() === 'enterprise') || (plan.price === '0' && plan.name?.toLowerCase() === 'enterprise'));
-                const formattedPrice = typeof plan.price === 'number' ? plan.price.toLocaleString('en-IN') : plan.price;
+                const rawPriceNum = typeof plan.rawPrice === 'number' 
+                  ? plan.rawPrice 
+                  : (typeof plan.price === 'number' ? plan.price : Number(String(plan.price || '0').replace(/[^0-9.]/g, '')) || 0);
+                const isCustom = Boolean(plan.custom || (rawPriceNum === 0 && plan.name?.toLowerCase() === 'enterprise'));
+                const formattedPrice = rawPriceNum.toLocaleString('en-IN');
                 const suffix = plan.suffix || (plan.billingInterval === 'year' ? '/yr' : '/mo');
                 const description = plan.desc || plan.description || '';
-                const ctaText = plan.cta || plan.ctaText || (plan.rawPrice === 0 || plan.price === '0' ? 'Get Started Free' : 'Get Started');
-                const featuresList = Array.isArray(plan.features) ? plan.features : [];
+                const ctaText = plan.cta || plan.ctaText || (rawPriceNum === 0 ? 'Get Started Free' : 'Get Started');
+                
+                let featuresList = Array.isArray(plan.features) && plan.features.length > 0 ? [...plan.features] : [];
+                if (featuresList.length === 0) {
+                  if (plan.seatLimit) featuresList.push(`${plan.seatLimit >= 999999 ? 'Unlimited' : plan.seatLimit} User Seat${plan.seatLimit === 1 ? '' : 's'}`);
+                  if (plan.domainLimit) featuresList.push(`${plan.domainLimit >= 999999 ? 'Unlimited' : plan.domainLimit} Verified Domain${plan.domainLimit === 1 ? '' : 's'}`);
+                  if (plan.scanLimit) featuresList.push(`${plan.scanLimit >= 999999 ? 'Unlimited' : plan.scanLimit} Scans / month`);
+                }
 
                 return (
                   <article className={isPopular ? "price-card popular" : "price-card"} key={plan._id || plan.id || plan.name}>
@@ -679,7 +688,7 @@ export default function LandingPage() {
                     <p>{description}</p>
                     <div className={isCustom ? "price custom-price" : "price"}>
                       {isCustom ? (
-                        <strong>{formattedPrice}</strong>
+                        <strong>Custom</strong>
                       ) : (
                         <>
                           <span>₹</span>

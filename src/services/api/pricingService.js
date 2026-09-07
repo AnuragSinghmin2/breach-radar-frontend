@@ -1,4 +1,5 @@
 import { apiClient } from "./client";
+import { getApiOrigin, PRODUCTION_API_URL } from "../../utils/apiBase";
 
 export const DEFAULT_FALLBACK_PLANS = [
   {
@@ -16,6 +17,9 @@ export const DEFAULT_FALLBACK_PLANS = [
     isPopular: false,
     cta: "Get Started Free",
     ctaText: "Get Started Free",
+    domainLimit: 1,
+    scanLimit: 2,
+    seatLimit: 1,
     features: [
       "1 User Seat",
       "1 Verified Domain",
@@ -39,6 +43,9 @@ export const DEFAULT_FALLBACK_PLANS = [
     isPopular: false,
     cta: "Get Started",
     ctaText: "Get Started",
+    domainLimit: 5,
+    scanLimit: 30,
+    seatLimit: 3,
     features: [
       "3 User Seats",
       "5 Verified Domains",
@@ -63,6 +70,9 @@ export const DEFAULT_FALLBACK_PLANS = [
     isPopular: true,
     cta: "Get Started",
     ctaText: "Get Started",
+    domainLimit: 25,
+    scanLimit: 200,
+    seatLimit: 10,
     features: [
       "10 User Seats",
       "25 Verified Domains",
@@ -88,6 +98,9 @@ export const DEFAULT_FALLBACK_PLANS = [
     isPopular: false,
     cta: "Get Started",
     ctaText: "Get Started",
+    domainLimit: 999999,
+    scanLimit: 999999,
+    seatLimit: 999999,
     features: [
       "Unlimited User Seats",
       "Unlimited Domains",
@@ -119,9 +132,11 @@ export async function getPublicPricing() {
     console.warn("[pricingService] apiClient.get('/pricing') failed, trying direct endpoint:", err?.message);
   }
 
-  // Direct fetch fallback for production / local environments
+  // Direct fetch fallback for production / local environments using absolute backend URL
   try {
-    const response = await fetch(`/api/v1/pricing?_t=${Date.now()}`, {
+    const apiOrigin = getApiOrigin();
+    const endpoint = `${apiOrigin}/api/v1/pricing?_t=${Date.now()}`;
+    const response = await fetch(endpoint, {
       headers: {
         "Cache-Control": "no-cache, no-store, must-revalidate",
         Pragma: "no-cache",
@@ -134,7 +149,26 @@ export async function getPublicPricing() {
       }
     }
   } catch (err2) {
-    console.warn("[pricingService] Direct fetch failed, returning default plans:", err2?.message);
+    console.warn("[pricingService] Direct fetch failed, trying Cloud Run fallback:", err2?.message);
+  }
+
+  // Secondary Cloud Run direct fallback
+  try {
+    const directUrl = `${PRODUCTION_API_URL}/pricing?_t=${Date.now()}`;
+    const response = await fetch(directUrl, {
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+    });
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data?.plans) && data.plans.length > 0) {
+        return data.plans;
+      }
+    }
+  } catch (err3) {
+    console.warn("[pricingService] Cloud Run direct fetch failed, using fallback:", err3?.message);
   }
 
   return DEFAULT_FALLBACK_PLANS;
@@ -144,3 +178,4 @@ export default {
   getPublicPricing,
   DEFAULT_FALLBACK_PLANS
 };
+
