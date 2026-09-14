@@ -11,6 +11,8 @@ import Footer from "./Footer";
 import LandingNavbar from "./LandingNavbar";
 import SupportModal from "./SupportModal";
 import TrustedCompaniesMarquee from "./TrustedCompaniesMarquee";
+import PlatformStats from "./PlatformStats";
+import UnderTheHood from "./UnderTheHood";
 import "./LandingPage.css";
 
 const metrics = [
@@ -395,7 +397,14 @@ export default function LandingPage() {
               <button className="start-btn" type="button" onClick={() => navigate("/register")}>
                 Start Scanning Now
               </button>
-              <button className="demo-btn" type="button">
+              <button
+                className="demo-btn"
+                type="button"
+                onClick={() => {
+                  document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" });
+                  window.history.replaceState(null, "", "/#demo");
+                }}
+              >
                 <span>View Demo</span>
                 <span className="play">▶</span>
               </button>
@@ -639,6 +648,10 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <PlatformStats />
+
+        <UnderTheHood />
 
         <section className="pricing-section" id="pricing" aria-labelledby="pricing-title">
           <div className="section-kicker">Pricing</div>

@@ -114,7 +114,7 @@ export default function SuperAdminDashboard() {
   return (
     <div className="sa-container">
       {/* 1. Statistics Cards */}
-      <div className="sa-stats-grid">
+      <div className="sa-stats-grid sa-dashboard-stats-grid">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -126,7 +126,6 @@ export default function SuperAdminDashboard() {
                 <span className="sa-stat-label">{card.title}</span>
                 <span className={`sa-stat-value ${card.valueClassName || ""}`}>{card.value}</span>
               </div>
-              <span className="sa-stat-growth">{"\u2191"} {card.growth} from last 7 days</span>
             </article>
           );
         })}

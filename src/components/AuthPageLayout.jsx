@@ -82,7 +82,7 @@ export default function AuthPageLayout({ children }) {
         </section>
       </main>
 
-      <Footer />
+      <Footer showSupport onOpenSupport={() => setIsSupportOpen(true)} />
 
       <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
     </div>

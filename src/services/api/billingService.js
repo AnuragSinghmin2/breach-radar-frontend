@@ -60,6 +60,16 @@ export async function logRazorpayClientEvent(payload) {
   return data;
 }
 
+export async function createPaypalOrder(payload) {
+  const { data } = await apiClient.post("/payment/paypal/create-order", payload);
+  return data;
+}
+
+export async function capturePaypalPayment(payload) {
+  const { data } = await apiClient.post("/payment/paypal/capture", payload);
+  return data;
+}
+
 export async function updateUsageAlerts(payload) {
   const { data } = await apiClient.put("/billing/usage-alerts", payload);
   return data;

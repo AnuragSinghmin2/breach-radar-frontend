@@ -7,7 +7,7 @@ const trustedDomains = [
   "ilovepdfeditor.com",
   "dropoutdigital.com",
   "vgmsecurity.com",
-  "breachradar.com",
+  "pentestradar.com",
   "dorkradar.com",
   "360flashdrive.com",
   "sashospital.com",

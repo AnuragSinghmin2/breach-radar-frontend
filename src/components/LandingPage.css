@@ -2734,3 +2734,296 @@ button {
     min-width: 140px;
   }
 }
+
+/* PLATFORM STATISTICS SECTION */
+.stats-section {
+  padding: 80px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 40px;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-value {
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 850;
+  color: #19ef91; /* Neon green matching PenTestRadar's primary theme color */
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #9fb2ad;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Loading/Skeleton Styles */
+.stats-section.loading .stat-card.skeleton {
+  background: none;
+  border: none;
+}
+
+.stat-value-placeholder {
+  width: 110px;
+  height: 54px;
+  border-radius: 8px;
+  background: rgba(32, 50, 74, 0.4);
+  margin: 0 auto 12px auto;
+}
+
+.stat-label-placeholder {
+  width: 90px;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(32, 50, 74, 0.3);
+  margin: 0 auto;
+}
+
+.animate-pulse {
+  animation: statsPulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes statsPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+/* Error Styles */
+.stats-section.error {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.stats-error-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.error-icon {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-content h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 2px 0;
+}
+
+.error-content p {
+  font-size: 13px;
+  color: #aeb8c7;
+  margin: 0;
+}
+
+.retry-btn {
+  padding: 8px 16px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+}
+
+/* Responsive Rules */
+@media (max-width: 1024px) {
+  .stats-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-section {
+    padding: 40px 0;
+  }
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .stat-value {
+    font-size: clamp(24px, 4vw, 32px);
+  }
+  .stat-label {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-container {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+/* UNDER THE HOOD SECTION */
+.under-hood-section {
+  scroll-margin-top: 24px;
+  border-top: 1px solid rgba(176, 228, 218, 0.1);
+  background:
+    radial-gradient(circle at 8% 28%, rgba(16, 138, 255, 0.05), transparent 26%),
+    radial-gradient(circle at 88% 20%, rgba(17, 240, 145, 0.05), transparent 27%),
+    linear-gradient(180deg, #041012 0%, #02080b 100%);
+  padding: 80px 0;
+}
+
+.under-hood-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  text-align: center;
+}
+
+.under-hood-shell h2 {
+  color: #f4fffb;
+  font-size: clamp(26px, 3.2vw, 38px);
+  font-weight: 850;
+  line-height: 1.15;
+  margin-top: 12px;
+}
+
+.under-hood-desc {
+  margin: 16px auto 0;
+  color: #8da29d;
+  font-size: 16px;
+  max-width: 680px;
+  line-height: 1.6;
+}
+
+.under-hood-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.under-hood-card {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  align-items: flex-start;
+  padding: 30px 28px;
+  border: 1px solid rgba(182, 228, 220, 0.08);
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(14, 29, 38, 0.92), rgba(7, 18, 25, 0.94));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.under-hood-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(25, 239, 145, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.under-hood-icon {
+  position: relative;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  color: #1def91;
+  background: rgba(29, 239, 145, 0.1);
+  box-shadow: 0 0 20px rgba(29, 239, 145, 0.12);
+}
+
+.under-hood-icon.blue {
+  color: #328bff;
+  background: rgba(50, 139, 255, 0.1);
+  box-shadow: 0 0 20px rgba(50, 139, 255, 0.12);
+}
+
+.under-hood-icon.cyan {
+  color: #12d7d1;
+  background: rgba(18, 215, 209, 0.1);
+  box-shadow: 0 0 20px rgba(18, 215, 209, 0.12);
+}
+
+.under-hood-icon.purple {
+  color: #a56aff;
+  background: rgba(165, 106, 255, 0.1);
+  box-shadow: 0 0 20px rgba(165, 106, 255, 0.12);
+}
+
+.under-hood-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.under-hood-info h3 {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.under-hood-info p {
+  color: #8da29d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Responsive Under The Hood Rules */
+@media (max-width: 900px) {
+  .under-hood-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .under-hood-section {
+    padding: 60px 0;
+  }
+  .under-hood-card {
+    padding: 24px;
+  }
+}
+

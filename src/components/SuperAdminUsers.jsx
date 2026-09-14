@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { ChevronLeft, ChevronRight, Edit2, Trash2, UserX, UserCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit2, Trash2, UserX, UserCheck, Download } from "lucide-react";
 import { formatCurrency } from "../utils/format";
 import "./SuperAdmin.css";
 
@@ -24,6 +24,66 @@ export default function SuperAdminUsers() {
   const [newPlan, setNewPlan] = useState("");
   const [submitError, setSubmitError] = useState("");
 
+  // Export Users state
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const exportContainerRef = useRef(null);
+
+  const triggerToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 4000);
+  };
+
+  const handleExport = async (format) => {
+    setShowExportDropdown(false);
+    if (exporting) return;
+    try {
+      setExporting(true);
+      const data = await superAdminApi.exportUsers(format);
+      
+      const blob = new Blob([data], {
+        type:
+          format === "xlsx"
+            ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            : format === "json"
+            ? "application/json"
+            : "text/csv",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const todayStr = new Date().toISOString().split("T")[0];
+      a.download = `users-export-${todayStr}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      triggerToast(`Users exported successfully as ${format.toUpperCase()}!`, "success");
+    } catch (err) {
+      console.error("Export failed:", err);
+      triggerToast("Failed to export users. Please try again.", "error");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!showExportDropdown) return undefined;
+    function handleClickOutside(event) {
+      if (exportContainerRef.current && !exportContainerRef.current.contains(event.target)) {
+        setShowExportDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showExportDropdown]);
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -41,7 +101,7 @@ export default function SuperAdminUsers() {
       const p = await superAdminApi.getSubscriptionPlans();
       setPlans(p);
     } catch (err) {
-      logger.error("Failed to load subscription plans: " + err.message);
+      console.error("Failed to load subscription plans: " + err.message);
     }
   };
 
@@ -149,6 +209,31 @@ export default function SuperAdminUsers() {
           </select>
 
           <button className="sa-btn sa-btn-secondary" onClick={loadData}>Refresh</button>
+
+          <div className="sa-export-container" ref={exportContainerRef}>
+            <button 
+              type="button"
+              className="sa-btn sa-btn-secondary sa-btn-export" 
+              onClick={() => setShowExportDropdown(!showExportDropdown)}
+              disabled={exporting}
+            >
+              <Download size={14} />
+              <span>{exporting ? "Exporting..." : "Export Users"}</span>
+            </button>
+            {showExportDropdown && (
+              <div className="sa-export-dropdown" role="menu">
+                <button type="button" onClick={() => handleExport("xlsx")} role="menuitem">
+                  Export as Excel (.xlsx)
+                </button>
+                <button type="button" onClick={() => handleExport("csv")} role="menuitem">
+                  Export as CSV (.csv)
+                </button>
+                <button type="button" onClick={() => handleExport("json")} role="menuitem">
+                  Export as JSON (.json)
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {error && <div style={{ color: "#ef4444", marginBottom: "16px" }}>{error}</div>}
@@ -317,6 +402,13 @@ export default function SuperAdminUsers() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`sa-toast sa-toast-${toast.type}`}>
+          <span>{toast.message}</span>
         </div>
       )}
     </div>

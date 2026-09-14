@@ -4187,3 +4187,547 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Premium redesign for billing upgrade modal */
+.billing-modal {
+  width: min(600px, 95vw) !important;
+  max-width: 600px !important;
+  background: #07111f !important; /* Very dark navy background */
+  border: 1px solid rgba(42, 69, 96, 0.6) !important; /* Subtle blue-gray borders */
+  border-radius: 8px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.7) !important;
+  padding: 24px 28px !important;
+  gap: 16px !important;
+}
+
+.billing-modal h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.billing-modal-subtitle {
+  font-size: 13px;
+  color: #aeb8c7;
+  margin: 0 0 4px 0;
+  line-height: 1.5;
+}
+
+/* Plan Features limits section */
+.billing-modal-features {
+  background: rgba(3, 12, 23, 0.4) !important;
+  border: 1px solid rgba(42, 69, 96, 0.5) !important;
+  border-radius: 6px !important;
+  padding: 16px 20px !important;
+  margin: 4px 0 !important;
+  display: flex;
+  gap: 20px;
+  align-items: start;
+}
+
+.limits-label-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 80px;
+  flex-shrink: 0;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.limits-label-col strong {
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.limits-label-col span {
+  font-size: 11px;
+  color: #aeb8c7;
+}
+
+.billing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.billing-features-grid li {
+  font-size: 11px !important;
+  color: #aeb8c7 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.35;
+}
+
+.billing-features-grid li.two-line-limit {
+  align-items: flex-start;
+}
+
+.billing-features-grid li.two-line-limit span {
+  line-height: 1.25;
+}
+
+.emerald-check {
+  color: #00d68f !important;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Monthly / Yearly cycle selector */
+.billing-cycle-toggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background: transparent !important;
+  border: 1px solid rgba(42, 69, 96, 0.5) !important;
+  border-radius: 6px !important;
+  padding: 8px !important;
+  margin-bottom: 16px !important;
+  gap: 12px;
+}
+
+.billing-cycle-toggle button {
+  background: transparent !important;
+  border: 0 !important;
+  color: #cbd5e1 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 16px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.billing-cycle-toggle button.active {
+  background: #00d68f !important; /* Emerald green */
+  color: #07111f !important; /* Dark text */
+  font-weight: 700 !important;
+  box-shadow: 0 0 8px rgba(0, 214, 143, 0.25) !important;
+}
+
+.billing-cycle-toggle button:not(.active):hover {
+  color: #ffffff !important;
+}
+
+/* Highlighted summary box: Amount to Pay */
+.billing-amount-summary-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(42, 69, 96, 0.3) !important;
+  border-bottom: 1px solid rgba(42, 69, 96, 0.3) !important;
+  padding: 14px 6px !important;
+  margin-bottom: 20px !important;
+  background: transparent !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-radius: 0 !important;
+}
+
+.summary-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #aeb8c7;
+}
+
+.summary-value {
+  margin: 0;
+  color: #00d68f;
+  font-size: 22px;
+  font-weight: 800;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.summary-suffix {
+  font-size: 11px;
+  color: #aeb8c7;
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+/* Choose Payment Method side-by-side cards */
+.payment-method-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.payment-method-card {
+  background: rgba(3, 12, 23, 0.3) !important;
+  border: 1px solid rgba(42, 69, 96, 0.5) !important;
+  border-radius: 8px !important;
+  padding: 18px 16px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.payment-method-card:hover {
+  border-color: rgba(0, 214, 143, 0.3) !important;
+}
+
+.payment-method-card.selected {
+  border-color: #00d68f !important;
+  background: rgba(0, 214, 143, 0.03) !important;
+  box-shadow: 0 0 10px rgba(0, 214, 143, 0.1) !important;
+}
+
+.custom-radio {
+  margin-top: 6px !important;
+  flex-shrink: 0;
+}
+
+.radio-indicator {
+  width: 14px !important;
+  height: 14px !important;
+  border: 1.5px solid rgba(148, 163, 184, 0.4) !important;
+  border-radius: 50% !important;
+  display: block !important;
+  position: relative !important;
+  background: transparent !important;
+}
+
+.payment-method-card.selected .radio-indicator {
+  border-color: #00d68f !important;
+}
+
+.payment-method-card.selected .radio-indicator::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 3.5px !important;
+  left: 3.5px !important;
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #00d68f !important;
+  box-shadow: none !important;
+}
+
+.provider-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.logo-capsule {
+  background: #ffffff !important;
+  border-radius: 6px !important;
+  padding: 6px 18px !important;
+  margin-bottom: 10px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: fit-content;
+  box-shadow: none !important;
+}
+
+.logo-capsule img {
+  height: 14px !important;
+  max-width: 80px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.provider-name {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-bottom: 2px !important;
+}
+
+.provider-desc {
+  font-size: 11px !important;
+  color: #cbd5e1 !important;
+  line-height: 1.35 !important;
+}
+
+/* Security footnote block */
+.security-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 6px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.security-icon {
+  color: #aeb8c7 !important;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.security-text {
+  font-size: 12px !important;
+  color: #aeb8c7 !important;
+  line-height: 1.45 !important;
+}
+
+/* Bottom actions */
+.billing-modal-actions button.secondary {
+  border: 1px solid rgba(42, 69, 96, 0.6) !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  padding: 8px 24px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease;
+}
+
+.billing-modal-actions button.secondary:hover {
+  border-color: rgba(148, 163, 184, 0.4) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.billing-modal-actions button.primary {
+  background: #00d68f !important;
+  color: #020710 !important;
+  font-weight: 700 !important;
+  padding: 8px 24px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 214, 143, 0.15) !important;
+}
+
+.billing-modal-actions button.primary:hover:not(:disabled) {
+  background: #05e298 !important;
+  box-shadow: 0 4px 12px -1px rgba(0, 214, 143, 0.3) !important;
+}
+
+/* Responsive configurations */
+@media (max-width: 768px) {
+  .billing-modal-features {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .billing-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .billing-modal {
+    padding: 20px !important;
+  }
+  .billing-features-grid {
+    grid-template-columns: 1fr;
+  }
+  .payment-method-selector {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* Invoice History status badges */
+.invoice-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.invoice-status-badge.paid {
+  background: rgba(0, 214, 143, 0.08) !important;
+  border: 1px solid rgba(0, 214, 143, 0.25) !important;
+  color: #00d68f !important;
+}
+
+.invoice-status-badge.pending {
+  background: rgba(234, 179, 8, 0.08) !important;
+  border: 1px solid rgba(234, 179, 8, 0.25) !important;
+  color: #eab308 !important;
+}
+
+.invoice-status-badge.failed,
+.invoice-status-badge.unpaid {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  color: #ef4444 !important;
+}
+
+/* Recent Transactions table redesign styles */
+.billing-invoices-panel .team-members-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.billing-invoices-panel .team-members-table th {
+  padding: 12px 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  border-bottom: 1.5px solid rgba(148, 163, 184, 0.15);
+  font-weight: 700;
+  text-align: left;
+}
+
+.billing-invoices-panel .team-members-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #cbd5e1;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.billing-invoices-panel .team-members-table tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+  color: #ffffff;
+}
+
+/* Transactions Table status badges */
+.txn-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.txn-status-badge.succeeded {
+  background: rgba(0, 214, 143, 0.08) !important;
+  border: 1px solid rgba(0, 214, 143, 0.25) !important;
+  color: #00d68f !important;
+}
+
+.txn-status-badge.pending {
+  background: rgba(234, 179, 8, 0.08) !important;
+  border: 1px solid rgba(234, 179, 8, 0.25) !important;
+  color: #eab308 !important;
+}
+
+.txn-status-badge.failed {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  color: #ef4444 !important;
+}
+
+/* Multi-step Choose Payment Method styles */
+.payment-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 16px 0;
+}
+
+.payment-option-card {
+  background: rgba(3, 12, 23, 0.3) !important;
+  border: 1px solid rgba(42, 69, 96, 0.5) !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  transition: all 0.2s ease;
+}
+
+.payment-option-card:hover {
+  border-color: rgba(0, 214, 143, 0.3) !important;
+}
+
+.payment-option-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin-bottom: 6px !important;
+}
+
+.payment-option-desc {
+  font-size: 12px !important;
+  color: #cbd5e1 !important;
+  font-weight: 500 !important;
+  margin-bottom: 2px !important;
+}
+
+.payment-option-subdesc {
+  font-size: 11px !important;
+  color: #64748b !important;
+  margin-bottom: 16px !important;
+}
+
+.pay-btn {
+  background: #00d68f !important;
+  color: #07111f !important;
+  font-weight: 700 !important;
+  border: 0 !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  font-size: 12px !important;
+  text-align: center;
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: #05e298 !important;
+  box-shadow: 0 0 10px rgba(0, 214, 143, 0.3) !important;
+}
+
+.pay-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.payment-back-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.back-btn {
+  background: transparent !important;
+  border: 1px solid rgba(42, 69, 96, 0.6) !important;
+  color: #cbd5e1 !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  padding: 8px 32px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.back-btn:hover:not(:disabled) {
+  border-color: rgba(148, 163, 184, 0.4) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
+}
+
+.back-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .payment-options-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}

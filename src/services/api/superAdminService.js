@@ -145,6 +145,15 @@ export async function updateCustomerSubscriptionStatus(id, status) {
   return data;
 }
 
+export async function exportUsers(format) {
+  const { data } = await apiClient.get("/super-admin/users/export", {
+    params: { format },
+    responseType: "blob"
+  });
+  return data;
+}
+
+
 export function getErrorMessage(error, fallback = "Something went wrong") {
   return error?.response?.data?.message || error?.message || fallback;
 }
@@ -178,5 +187,6 @@ export const superAdminApi = {
   getSystemHealth,
   getCustomerSubscriptions,
   changeCustomerPlan,
-  updateCustomerSubscriptionStatus
+  updateCustomerSubscriptionStatus,
+  exportUsers
 };

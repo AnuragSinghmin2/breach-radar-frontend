@@ -24,6 +24,7 @@ import HomePage from "./pages/HomePage";
 import CaseStudiesPage from "./pages/CaseStudiesPage";
 import AwardsRecognitionPage from "./pages/AwardsRecognitionPage";
 import SolutionFeaturePage from "./pages/SolutionFeaturePage";
+import SecurityScannersPage from "./pages/SecurityScannersPage";
 import ResourceDetailPage from "./pages/ResourceDetailPage";
 import DashboardPage from "./pages/DashboardPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -63,6 +64,7 @@ function App() {
 <Route path="/refund-policy" element={<RefundPolicyPage />} />
 <Route path="/terms-of-service" element={<TermsOfServicePage />} />
       <Route path="/solutions/:slug" element={<SolutionFeaturePage />} />
+      <Route path="/security-scanners" element={<SecurityScannersPage />} />
       <Route path="/case-studies" element={<CaseStudiesPage />} />
       <Route path="/resources/:slug" element={<ResourceDetailPage />} />
       <Route
