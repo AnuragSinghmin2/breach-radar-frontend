@@ -37,11 +37,6 @@ const checkLabels = {
   headers: "Security Headers",
   ports: "Port Exposure",
   malware: "Malware Signals",
-<<<<<<< HEAD
-=======
-  compliance: "Compliance Audits",
-  businessLogic: "Business Logic Checks",
->>>>>>> 3e96fde2da3debf187c4cccc33b956a37d9c0298
   apiSecurity: "API Security (BOLA)",
   cloudInfrastructure: "Exposed Admin Panels",
   fileUpload: "File Upload Checks",
