@@ -1324,3 +1324,28 @@
     width: 100%;
   }
 }
+
+.domain-add-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.domain-status.scanning span {
+  color: #0b83ff; /* Active scan blue */
+}
+
+.domain-status.scanning .scanning-spin {
+  color: #0b83ff;
+  animation: domainsSpin 1.2s linear infinite;
+  display: inline-block;
+}
+
+@keyframes domainsSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

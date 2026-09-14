@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { resolveAvatarUrl } from "../utils/profile";
+import { getInitials, resolveAvatarUrl } from "../utils/profile";
 import BrandLogo from "./BrandLogo";
 import Footer from "./Footer";
 import AdminProfileMenu from "./AdminProfileMenu";
@@ -27,13 +27,22 @@ import "./Sidebar.css";
 import "./Header.css";
 import "../App.css";
 
+import NotificationDropdown from "./NotificationDropdown";
+
 export default function SuperAdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 760);
   const [theme, setTheme] = useState("dark");
+  const [avatarBroken, setAvatarBroken] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const avatarUrl = resolveAvatarUrl(user?.profile?.avatar);
+
+  const avatarUrl = !avatarBroken ? resolveAvatarUrl(user?.profile?.avatar) : "";
+  const initials = getInitials(user?.profile?.name, user?.email);
+
+  useEffect(() => {
+    setAvatarBroken(false);
+  }, [user?.profile?.avatar]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -211,7 +220,11 @@ export default function SuperAdminLayout() {
           </div>
 
           <div className="user-profile">
-            <img src={avatarUrl || "https://i.pravatar.cc/40"} alt="user" />
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" onError={() => setAvatarBroken(true)} />
+            ) : (
+              <span className="sidebar-user-initials">{initials}</span>
+            )}
             <div className="user-info">
               <p className="user-name">{user?.profile?.name || "Super Admin"}</p>
               <span className="user-email">{user?.email}</span>
@@ -246,11 +259,7 @@ export default function SuperAdminLayout() {
                 {theme === "dark" ? <Moon className="icon" /> : <Sun className="icon" />}
               </button>
 
-              <div className="header-notification">
-                <button className="icon-btn" type="button" title="Notifications">
-                  <Bell className="icon" />
-                </button>
-              </div>
+              <NotificationDropdown />
 
               <AdminProfileMenu user={user} onLogout={handleLogout} />
             </div>

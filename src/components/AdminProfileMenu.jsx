@@ -7,11 +7,16 @@ import "./AdminProfile.css";
 export default function AdminProfileMenu({ user, onLogout }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [avatarBroken, setAvatarBroken] = useState(false);
   const containerRef = useRef(null);
 
-  const avatarUrl = resolveAvatarUrl(user?.profile?.avatar);
+  const avatarUrl = !avatarBroken ? resolveAvatarUrl(user?.profile?.avatar) : "";
   const initials = getInitials(user?.profile?.name, user?.email);
   const roleLabel = user?.role === "super_admin" ? "Super Admin" : "Admin";
+
+  useEffect(() => {
+    setAvatarBroken(false);
+  }, [user?.profile?.avatar]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -49,7 +54,7 @@ export default function AdminProfileMenu({ user, onLogout }) {
         onClick={() => setOpen((current) => !current)}
       >
         <span className="user-avatar admin-profile-avatar">
-          {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initials}</span>}
+          {avatarUrl ? <img src={avatarUrl} alt="" onError={() => setAvatarBroken(true)} /> : <span>{initials}</span>}
         </span>
         <span className="admin-profile-trigger-copy">
           <strong>{user?.profile?.name || "Admin"}</strong>
@@ -62,7 +67,7 @@ export default function AdminProfileMenu({ user, onLogout }) {
         <div className="admin-profile-dropdown" role="menu">
           <div className="admin-profile-dropdown-head">
             <span className="user-avatar admin-profile-avatar">
-              {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initials}</span>}
+              {avatarUrl ? <img src={avatarUrl} alt="" onError={() => setAvatarBroken(true)} /> : <span>{initials}</span>}
             </span>
             <span>
               <strong>{user?.profile?.name || "Admin"}</strong>

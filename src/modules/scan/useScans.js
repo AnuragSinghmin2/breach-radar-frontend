@@ -121,6 +121,23 @@ export function useScans() {
     return () => clearInterval(interval);
   }, [hasActiveScans, activeScanId, refreshScans]);
 
+  const activeScans = useMemo(() => {
+    const runningOrQueued = scans.filter(
+      (scan) =>
+        scan.status === SCAN_STATUS.QUEUED ||
+        scan.status === SCAN_STATUS.IN_PROGRESS
+    );
+
+    if (activeScanId) {
+      const selectedScan = scans.find((scan) => scan.id === activeScanId);
+      if (selectedScan && !runningOrQueued.some((s) => s.id === activeScanId)) {
+        return [selectedScan, ...runningOrQueued];
+      }
+    }
+
+    return runningOrQueued;
+  }, [scans, activeScanId]);
+
   const activeScan = useMemo(() => {
     if (activeScanId) {
       return scans.find((scan) => scan.id === activeScanId) || null;
@@ -135,11 +152,21 @@ export function useScans() {
     );
   }, [scans, activeScanId]);
 
-  const filteredHistory = useMemo(
-    () =>
-      scans.filter((scan) => statusFilter === "All" || scan.status === statusFilter),
-    [scans, statusFilter]
-  );
+  const filteredHistory = useMemo(() => {
+    const list = scans.filter((scan) => statusFilter === "All" || scan.status === statusFilter);
+
+    return list.sort((a, b) => {
+      const isActA = a.status === SCAN_STATUS.QUEUED || a.status === SCAN_STATUS.IN_PROGRESS;
+      const isActB = b.status === SCAN_STATUS.QUEUED || b.status === SCAN_STATUS.IN_PROGRESS;
+
+      if (isActA && !isActB) return -1;
+      if (!isActA && isActB) return 1;
+
+      const dateA = a.startedAt || a.createdAt;
+      const dateB = b.startedAt || b.createdAt;
+      return new Date(dateB) - new Date(dateA);
+    });
+  }, [scans, statusFilter]);
 
   const stats = useMemo(() => {
     const total = scans.length || 1;
@@ -209,6 +236,7 @@ export function useScans() {
     error,
     loading,
     activeScan,
+    activeScans,
     activeScanId,
     setActiveScanId,
     stats,

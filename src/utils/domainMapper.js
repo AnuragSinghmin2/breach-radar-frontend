@@ -10,6 +10,7 @@ export function mapApiDomain(domain, vulnCounts = null) {
     _id: domain._id,
     domain: domain.domain,
     added: `Added on ${formatDate(domain.createdAt)}`,
+    createdAt: domain.createdAt,
     tag: domain.tag,
     iconTone: ICON_TONES[toneIndex],
     status: domain.status,

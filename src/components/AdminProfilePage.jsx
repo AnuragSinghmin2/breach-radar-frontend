@@ -100,6 +100,7 @@ export default function AdminProfilePage() {
       setAccount(result.user);
       setAvatarFile(null);
       setMessage({ type: "success", text: result.message || "Profile picture updated." });
+      await refreshProfile();
     } catch (uploadError) {
       setMessage({ type: "error", text: getErrorMessage(uploadError, "Failed to upload profile picture.") });
     } finally {
@@ -115,6 +116,7 @@ export default function AdminProfilePage() {
       setAccount(result.user);
       setAvatarFile(null);
       setMessage({ type: "success", text: result.message || "Profile picture removed." });
+      await refreshProfile();
     } catch (error) {
       setMessage({ type: "error", text: getErrorMessage(error, "Failed to remove profile picture.") });
     } finally {
@@ -150,6 +152,7 @@ export default function AdminProfilePage() {
       setAccount(result.user);
       setForm({ name: result.user?.profile?.name || "", email: result.user?.email || "" });
       setMessage({ type: "success", text: result.message || "Profile updated successfully." });
+      await refreshProfile();
     } catch (error) {
       setMessage({ type: "error", text: getErrorMessage(error, "Failed to update profile.") });
     } finally {
@@ -157,8 +160,13 @@ export default function AdminProfilePage() {
     }
   }
 
-  const avatarUrl = avatarPreview || resolveAvatarUrl(account?.profile?.avatar || user?.profile?.avatar);
+  const [avatarBroken, setAvatarBroken] = useState(false);
+  const avatarUrl = avatarPreview || (!avatarBroken ? resolveAvatarUrl(account?.profile?.avatar || user?.profile?.avatar) : "");
   const initials = getInitials(form.name, form.email);
+
+  useEffect(() => {
+    setAvatarBroken(false);
+  }, [account?.profile?.avatar, user?.profile?.avatar]);
 
   if (loading) {
     return (
@@ -176,7 +184,7 @@ export default function AdminProfilePage() {
       <section className="admin-profile-card">
         <div className="admin-profile-avatar-row">
           <div className="admin-profile-avatar-wrap">
-            {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initials}</span>}
+            {avatarUrl ? <img src={avatarUrl} alt="" onError={() => setAvatarBroken(true)} /> : <span>{initials}</span>}
           </div>
 
           <div className="admin-profile-avatar-actions">

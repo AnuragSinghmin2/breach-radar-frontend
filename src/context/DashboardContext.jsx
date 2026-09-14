@@ -102,6 +102,30 @@ export function DashboardProvider({ children }) {
     refreshAll();
   }, [isAuthenticated, refreshAll]);
 
+  useEffect(() => {
+    if (!isAuthenticated) return undefined;
+
+    const hasActive = scans.some(
+      (scan) => scan.status === "In Progress" || scan.status === "Queued"
+    );
+
+    if (!hasActive) return undefined;
+
+    const interval = setInterval(async () => {
+      try {
+        await Promise.all([
+          refreshScans(),
+          refreshDomains(),
+          refreshStats(),
+        ]);
+      } catch (err) {
+        // Polling errors are non-fatal
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, scans, refreshScans, refreshDomains, refreshStats]);
+
   const recentScans = useMemo(() => scans.slice(0, 5), [scans]);
 
   const recentVulnerabilities = useMemo(

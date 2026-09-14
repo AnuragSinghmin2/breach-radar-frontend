@@ -68,10 +68,15 @@ export default function Sidebar({ isOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const avatarUrl = resolveAvatarUrl(user?.profile?.avatar);
+  const [avatarBroken, setAvatarBroken] = useState(false);
+  const avatarUrl = !avatarBroken ? resolveAvatarUrl(user?.profile?.avatar) : "";
   const initials = getInitials(user?.profile?.name, user?.email);
   const isSettingsRoute = location.pathname.startsWith("/dashboard/settings");
   const [settingsOpen, setSettingsOpen] = useState(isSettingsRoute);
+
+  useEffect(() => {
+    setAvatarBroken(false);
+  }, [user?.profile?.avatar]);
   const [planData, setPlanData] = useState(null);
   const [planUsage, setPlanUsage] = useState([]);
   const [planLoading, setPlanLoading] = useState(true);
@@ -300,7 +305,7 @@ export default function Sidebar({ isOpen }) {
       </div>
 
       <div className="user-profile">
-        {avatarUrl ? <img src={avatarUrl} alt="" /> : <span className="sidebar-user-initials">{initials}</span>}
+        {avatarUrl ? <img src={avatarUrl} alt="" onError={() => setAvatarBroken(true)} /> : <span className="sidebar-user-initials">{initials}</span>}
         <div className="user-info">
           <p className="user-name">{user?.profile?.name || user?.email || ""}</p>
           <span className="user-email">{user?.email || ""}</span>

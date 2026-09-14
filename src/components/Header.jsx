@@ -4,6 +4,7 @@ import { Bell, Download, FileText, Menu, Moon, Plus, Sun } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import UserProfileMenu from "./UserProfileMenu";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function Header({ toggleSidebar }) {
   const location = useLocation();
@@ -157,16 +158,7 @@ export default function Header({ toggleSidebar }) {
           <ThemeIcon className="icon" />
         </button>
 
-        <div className="header-notification">
-          <button
-            className="icon-btn"
-            type="button"
-            aria-label="Show notifications"
-            title="Notifications"
-          >
-            <Bell className="icon" />
-          </button>
-        </div>
+        <NotificationDropdown />
 
         <button className="add-btn" type="button" onClick={handleAction}>
           <ActionIcon size={16} /> {actionText}

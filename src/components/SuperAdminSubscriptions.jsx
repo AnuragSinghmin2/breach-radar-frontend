@@ -1,6 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { superAdminApi, getErrorMessage } from "../services/api/superAdminService";
-import { ChevronLeft, ChevronRight, Plus, Edit2, Trash2, UserCheck, UserX, Settings } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Edit2,
+  Trash2,
+  UserCheck,
+  UserX,
+  Settings,
+  Star,
+  CheckCircle2,
+  XCircle,
+  Eye,
+  EyeOff
+} from "lucide-react";
 import { formatCurrency } from "../utils/format";
 import "./SuperAdmin.css";
 
@@ -8,7 +22,7 @@ const SUBSCRIPTIONS_PER_PAGE = 8;
 
 export default function SuperAdminSubscriptions() {
   const [activeTab, setActiveTab] = useState("plans"); // 'plans' or 'customers'
-  
+
   // Plans tier state
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,11 +38,21 @@ export default function SuperAdminSubscriptions() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
   const [name, setName] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
-  const [domainLimit, setDomainLimit] = useState(0);
-  const [scanLimit, setScanLimit] = useState(0);
+  const [currency, setCurrency] = useState("INR");
+  const [billingInterval, setBillingInterval] = useState("month");
+  const [domainLimit, setDomainLimit] = useState(1);
+  const [scanLimit, setScanLimit] = useState(5);
+  const [seatLimit, setSeatLimit] = useState(1);
+  const [sortOrder, setSortOrder] = useState(0);
+  const [isActive, setIsActive] = useState(true);
+  const [isPopular, setIsPopular] = useState(false);
+  const [ctaText, setCtaText] = useState("Get Started");
   const [features, setFeatures] = useState("");
   const [submitError, setSubmitError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   // Customer plan manual change state
   const [changingSub, setChangingSub] = useState(null);
@@ -39,7 +63,7 @@ export default function SuperAdminSubscriptions() {
     try {
       setLoading(true);
       const data = await superAdminApi.getSubscriptionPlans();
-      setPlans(data);
+      setPlans(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(getErrorMessage(err, "Failed to load subscription plans"));
     } finally {
@@ -51,7 +75,7 @@ export default function SuperAdminSubscriptions() {
     try {
       setCustomersLoading(true);
       const data = await superAdminApi.getCustomerSubscriptions();
-      setCustomers(data);
+      setCustomers(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(getErrorMessage(err, "Failed to load customer subscriptions"));
     } finally {
@@ -74,6 +98,7 @@ export default function SuperAdminSubscriptions() {
     const start = (plansPage - 1) * SUBSCRIPTIONS_PER_PAGE;
     return plans.slice(start, start + SUBSCRIPTIONS_PER_PAGE);
   }, [plans, plansPage]);
+
   const plansPageNumbers = useMemo(() => {
     const maxVisiblePages = 5;
     const halfWindow = Math.floor(maxVisiblePages / 2);
@@ -89,6 +114,7 @@ export default function SuperAdminSubscriptions() {
     const start = (customersPage - 1) * SUBSCRIPTIONS_PER_PAGE;
     return customers.slice(start, start + SUBSCRIPTIONS_PER_PAGE);
   }, [customers, customersPage]);
+
   const customersPageNumbers = useMemo(() => {
     const maxVisiblePages = 5;
     const halfWindow = Math.floor(maxVisiblePages / 2);
@@ -114,9 +140,18 @@ export default function SuperAdminSubscriptions() {
   const openCreateModal = () => {
     setEditingPlan(null);
     setName("");
+    setDisplayName("");
+    setDescription("");
     setPrice(0);
-    setDomainLimit(0);
-    setScanLimit(0);
+    setCurrency("INR");
+    setBillingInterval("month");
+    setDomainLimit(1);
+    setScanLimit(5);
+    setSeatLimit(1);
+    setSortOrder(plans.length + 1);
+    setIsActive(true);
+    setIsPopular(false);
+    setCtaText("Get Started");
     setFeatures("");
     setSubmitError("");
     setModalOpen(true);
@@ -124,17 +159,26 @@ export default function SuperAdminSubscriptions() {
 
   const openEditModal = (plan) => {
     setEditingPlan(plan);
-    setName(plan.name);
-    setPrice(plan.price);
-    setDomainLimit(plan.domainLimit);
-    setScanLimit(plan.scanLimit);
-    setFeatures(plan.features ? plan.features.join(", ") : "");
+    setName(plan.name || "");
+    setDisplayName(plan.displayName || plan.name || "");
+    setDescription(plan.description || plan.desc || "");
+    setPrice(plan.price !== undefined ? plan.price : 0);
+    setCurrency(plan.currency || "INR");
+    setBillingInterval(plan.billingInterval || "month");
+    setDomainLimit(plan.domainLimit !== undefined ? plan.domainLimit : 1);
+    setScanLimit(plan.scanLimit !== undefined ? plan.scanLimit : 5);
+    setSeatLimit(plan.seatLimit !== undefined ? plan.seatLimit : 1);
+    setSortOrder(plan.sortOrder !== undefined ? plan.sortOrder : 0);
+    setIsActive(plan.isActive !== undefined ? plan.isActive : true);
+    setIsPopular(Boolean(plan.isPopular || plan.popular));
+    setCtaText(plan.ctaText || plan.cta || "Get Started");
+    setFeatures(plan.features ? plan.features.join("\n") : "");
     setSubmitError("");
     setModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this subscription plan? Existing subscribed users will remain on their current limits until manually upgraded.")) return;
+  const handleDelete = async (id, planName) => {
+    if (!window.confirm(`Are you sure you want to delete the plan "${planName}"? Existing subscribed users will remain on their current limits until manually adjusted.`)) return;
     try {
       await superAdminApi.deleteSubscriptionPlan(id);
       loadPlans();
@@ -143,16 +187,40 @@ export default function SuperAdminSubscriptions() {
     }
   };
 
+  const handleTogglePlanStatus = async (plan) => {
+    try {
+      const nextStatus = !plan.isActive;
+      await superAdminApi.toggleSubscriptionPlanStatus(plan._id, nextStatus);
+      loadPlans();
+    } catch (err) {
+      alert(getErrorMessage(err, "Failed to update plan status"));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
+    setSaving(true);
 
-    const featuresList = features.split(",").map(f => f.trim()).filter(f => f.length > 0);
+    const featuresList = features
+      .split(/[\n,]+/)
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0);
+
     const planPayload = {
-      name,
+      name: name.trim(),
+      displayName: displayName.trim() || name.trim(),
+      description: description.trim(),
       price: Number(price),
+      currency,
+      billingInterval,
       domainLimit: Number(domainLimit),
       scanLimit: Number(scanLimit),
+      seatLimit: Number(seatLimit),
+      sortOrder: Number(sortOrder),
+      isActive: Boolean(isActive),
+      isPopular: Boolean(isPopular),
+      ctaText: ctaText.trim() || (Number(price) === 0 ? "Get Started Free" : "Get Started"),
       features: featuresList
     };
 
@@ -166,6 +234,8 @@ export default function SuperAdminSubscriptions() {
       loadPlans();
     } catch (err) {
       setSubmitError(getErrorMessage(err, "Failed to save subscription plan"));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -200,14 +270,14 @@ export default function SuperAdminSubscriptions() {
     <div className="sa-container">
       {/* Tab Selectors */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <button 
-          className={activeTab === "plans" ? "sa-btn" : "sa-btn sa-btn-secondary"} 
+        <button
+          className={activeTab === "plans" ? "sa-btn" : "sa-btn sa-btn-secondary"}
           onClick={() => setActiveTab("plans")}
         >
           SaaS Tier Packages
         </button>
-        <button 
-          className={activeTab === "customers" ? "sa-btn" : "sa-btn sa-btn-secondary"} 
+        <button
+          className={activeTab === "customers" ? "sa-btn" : "sa-btn sa-btn-secondary"}
           onClick={() => setActiveTab("customers")}
         >
           Customer Subscriptions
@@ -217,7 +287,12 @@ export default function SuperAdminSubscriptions() {
       {activeTab === "plans" ? (
         <div className="sa-card">
           <div className="sa-card-header">
-            <h3>SaaS Plan Tiers</h3>
+            <div>
+              <h3>SaaS Pricing Tiers & Plans</h3>
+              <p style={{ margin: "4px 0 0", color: "#94a3b8", fontSize: "12px" }}>
+                Active plans appear dynamically on the Landing Page and checkout.
+              </p>
+            </div>
             <button className="sa-btn" onClick={openCreateModal}>
               <Plus size={14} /> Create Plan
             </button>
@@ -232,10 +307,12 @@ export default function SuperAdminSubscriptions() {
               <table className="sa-table">
                 <thead>
                   <tr>
+                    <th>Sort</th>
                     <th>Plan Name</th>
-                    <th>Price / Month</th>
-                    <th>Domain Limit</th>
-                    <th>Scan Limit</th>
+                    <th>Price / Interval</th>
+                    <th>Limits (Domain / Scan / Seat)</th>
+                    <th>Highlight</th>
+                    <th>Status</th>
                     <th>Feature Highlights</th>
                     <th>Actions</th>
                   </tr>
@@ -243,19 +320,56 @@ export default function SuperAdminSubscriptions() {
                 <tbody>
                   {plans.length === 0 ? (
                     <tr>
-                      <td colSpan={6} style={{ textAlign: "center" }} className="sa-empty">No subscription plans defined. Click "Create Plan" to define one.</td>
+                      <td colSpan={8} style={{ textAlign: "center" }} className="sa-empty">
+                        No subscription plans defined. Click "Create Plan" to define one.
+                      </td>
                     </tr>
                   ) : (
                     paginatedPlans.map((p) => (
                       <tr key={p._id}>
-                        <td style={{ fontWeight: 700, color: "#f8fafc" }}>{p.name}</td>
-                        <td style={{ color: "#eab308", fontWeight: 600 }}>
-                          {p.price === 0 && p.name === 'Enterprise' ? 'Custom' : formatCurrency(p.price, p.currency || "INR")}
-                        </td>
-                        <td>{p.domainLimit >= 999999 ? 'Unlimited' : p.domainLimit}</td>
-                        <td>{p.scanLimit >= 999999 ? 'Unlimited' : p.scanLimit}</td>
+                        <td style={{ color: "#64748b", fontWeight: 600 }}>#{p.sortOrder || 0}</td>
                         <td>
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          <div style={{ display: "flex", flexDirection: "column" }}>
+                            <span style={{ fontWeight: 700, color: "#f8fafc" }}>
+                              {p.displayName || p.name}
+                            </span>
+                            {p.description && (
+                              <span style={{ fontSize: "11px", color: "#94a3b8" }}>
+                                {p.description}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ color: "#eab308", fontWeight: 600 }}>
+                          {p.price === 0 && p.name === "Enterprise"
+                            ? "Custom"
+                            : `${formatCurrency(p.price, p.currency || "INR")} / ${p.billingInterval === "year" ? "yr" : "mo"}`}
+                        </td>
+                        <td style={{ fontSize: "12px" }}>
+                          <div>Domains: <strong>{p.domainLimit >= 999999 ? "Unlimited" : p.domainLimit}</strong></div>
+                          <div>Scans: <strong>{p.scanLimit >= 999999 ? "Unlimited" : p.scanLimit}</strong></div>
+                          <div>Seats: <strong>{p.seatLimit >= 999999 ? "Unlimited" : p.seatLimit}</strong></div>
+                        </td>
+                        <td>
+                          {p.isPopular ? (
+                            <span className="sa-badge" style={{ background: "rgba(234, 179, 8, 0.15)", color: "#eab308" }}>
+                              <Star size={11} fill="#eab308" /> Popular
+                            </span>
+                          ) : (
+                            <span style={{ color: "#64748b", fontSize: "12px" }}>—</span>
+                          )}
+                        </td>
+                        <td>
+                          <span className={`sa-badge ${p.isActive ? "sa-badge-active" : "sa-badge-suspended"}`}>
+                            {p.isActive ? (
+                              <><CheckCircle2 size={11} /> Active</>
+                            ) : (
+                              <><XCircle size={11} /> Inactive</>
+                            )}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxWidth: "260px" }}>
                             {p.features?.map((f, idx) => (
                               <span key={idx} className="sa-badge sa-badge-user" style={{ fontSize: "10px" }}>
                                 {f}
@@ -264,7 +378,7 @@ export default function SuperAdminSubscriptions() {
                           </div>
                         </td>
                         <td>
-                          <div style={{ display: "flex", gap: "8px" }}>
+                          <div style={{ display: "flex", gap: "6px" }}>
                             <button
                               className="sa-btn sa-btn-secondary"
                               style={{ padding: "4px 8px" }}
@@ -274,9 +388,17 @@ export default function SuperAdminSubscriptions() {
                               <Edit2 size={12} />
                             </button>
                             <button
+                              className={`sa-btn ${p.isActive ? "sa-btn-secondary" : "sa-btn"}`}
+                              style={{ padding: "4px 8px" }}
+                              onClick={() => handleTogglePlanStatus(p)}
+                              title={p.isActive ? "Deactivate Plan (Hide from Landing Page)" : "Activate Plan (Show on Landing Page)"}
+                            >
+                              {p.isActive ? <EyeOff size={12} /> : <Eye size={12} />}
+                            </button>
+                            <button
                               className="sa-btn sa-btn-danger"
                               style={{ padding: "4px 8px" }}
-                              onClick={() => handleDelete(p._id)}
+                              onClick={() => handleDelete(p._id, p.name)}
                               title="Delete Plan"
                             >
                               <Trash2 size={12} />
@@ -413,73 +535,182 @@ export default function SuperAdminSubscriptions() {
       {/* Plan Creator modal */}
       {modalOpen && (
         <div className="sa-modal-backdrop">
-          <div className="sa-modal">
+          <div className="sa-modal" style={{ width: "min(620px, 95vw)" }}>
             <div className="sa-modal-header">
-              <h3>{editingPlan ? `Edit Plan Config: ${editingPlan.name}` : "Create New Subscription Plan"}</h3>
-              <button className="sa-modal-close" onClick={() => setModalOpen(false)}>X</button>
+              <h3>{editingPlan ? `Edit Plan: ${editingPlan.displayName || editingPlan.name}` : "Create New Subscription Plan"}</h3>
+              <button className="sa-modal-close" onClick={() => setModalOpen(false)}>✕</button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="sa-modal-body">
-                {submitError && <div style={{ color: "#ef4444" }}>{submitError}</div>}
+                {submitError && <div style={{ color: "#ef4444", fontSize: "13px" }}>{submitError}</div>}
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div className="sa-form-group">
+                    <label>Plan Key Name *</label>
+                    <input
+                      type="text"
+                      required
+                      className="sa-form-input"
+                      placeholder="e.g. Starter, Professional, Business"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="sa-form-group">
+                    <label>Display Title</label>
+                    <input
+                      type="text"
+                      className="sa-form-input"
+                      placeholder="e.g. Professional Plan"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                    />
+                  </div>
+                </div>
 
                 <div className="sa-form-group">
-                  <label>Plan Name</label>
+                  <label>Subtitle / Description</label>
                   <input
                     type="text"
-                    required
                     className="sa-form-input"
-                    placeholder="e.g. Starter, Professional, Business"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Great for growing businesses"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
 
-                <div className="sa-form-group">
-                  <label>Monthly Price (INR)</label>
-                  <input
-                    type="number"
-                    min={0}
-                    required
-                    className="sa-form-input"
-                    placeholder="0"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+                  <div className="sa-form-group">
+                    <label>Price (INR) *</label>
+                    <input
+                      type="number"
+                      min={0}
+                      required
+                      className="sa-form-input"
+                      placeholder="0"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="sa-form-group">
+                    <label>Currency</label>
+                    <input
+                      type="text"
+                      className="sa-form-input"
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="sa-form-group">
+                    <label>Interval</label>
+                    <select
+                      className="sa-select"
+                      style={{ padding: "10px" }}
+                      value={billingInterval}
+                      onChange={(e) => setBillingInterval(e.target.value)}
+                    >
+                      <option value="month">Monthly (/mo)</option>
+                      <option value="year">Yearly (/yr)</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "12px" }}>
+                  <div className="sa-form-group">
+                    <label title=">= 999999 for Unlimited">Domains Limit *</label>
+                    <input
+                      type="number"
+                      min={0}
+                      required
+                      className="sa-form-input"
+                      placeholder="1"
+                      value={domainLimit}
+                      onChange={(e) => setDomainLimit(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="sa-form-group">
+                    <label title=">= 999999 for Unlimited">Scans Limit *</label>
+                    <input
+                      type="number"
+                      min={0}
+                      required
+                      className="sa-form-input"
+                      placeholder="5"
+                      value={scanLimit}
+                      onChange={(e) => setScanLimit(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="sa-form-group">
+                    <label title=">= 999999 for Unlimited">Seats Limit</label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="sa-form-input"
+                      placeholder="1"
+                      value={seatLimit}
+                      onChange={(e) => setSeatLimit(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="sa-form-group">
+                    <label>Sort Order</label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="sa-form-input"
+                      placeholder="1"
+                      value={sortOrder}
+                      onChange={(e) => setSortOrder(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div className="sa-form-group">
+                    <label>Button CTA Text</label>
+                    <input
+                      type="text"
+                      className="sa-form-input"
+                      placeholder="e.g. Get Started / Get Started Free"
+                      value={ctaText}
+                      onChange={(e) => setCtaText(e.target.value)}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", gap: "20px", alignItems: "center", paddingTop: "18px" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", color: "#dbe3ee", fontSize: "13px" }}>
+                      <input
+                        type="checkbox"
+                        checked={isActive}
+                        onChange={(e) => setIsActive(e.target.checked)}
+                      />
+                      Active (Published)
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", color: "#eab308", fontSize: "13px" }}>
+                      <input
+                        type="checkbox"
+                        checked={isPopular}
+                        onChange={(e) => setIsPopular(e.target.checked)}
+                      />
+                      Most Popular Badge
+                    </label>
+                  </div>
                 </div>
 
                 <div className="sa-form-group">
-                  <label>Max Domains Limit</label>
-                  <input
-                    type="number"
-                    min={0}
-                    required
-                    className="sa-form-input"
-                    placeholder="1"
-                    value={domainLimit}
-                    onChange={(e) => setDomainLimit(e.target.value)}
-                  />
-                </div>
-
-                <div className="sa-form-group">
-                  <label>Max Monthly Scans Limit</label>
-                  <input
-                    type="number"
-                    min={0}
-                    required
-                    className="sa-form-input"
-                    placeholder="5"
-                    value={scanLimit}
-                    onChange={(e) => setScanLimit(e.target.value)}
-                  />
-                </div>
-
-                <div className="sa-form-group">
-                  <label>Features List (comma-separated)</label>
+                  <label>Features List (one per line or comma-separated)</label>
                   <textarea
-                    rows={3}
+                    rows={4}
                     className="sa-form-input"
                     style={{ resize: "vertical", fontFamily: "inherit" }}
-                    placeholder="e.g. SSL scans, Email alerts, Priority support"
+                    placeholder="1 User Seat&#10;1 Verified Domain&#10;2 Scans / month&#10;Basic Reports&#10;Community Support"
                     value={features}
                     onChange={(e) => setFeatures(e.target.value)}
                   />
@@ -489,8 +720,8 @@ export default function SuperAdminSubscriptions() {
                 <button type="button" className="sa-btn sa-btn-secondary" onClick={() => setModalOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="sa-btn">
-                  Save PlanConfig
+                <button type="submit" className="sa-btn" disabled={saving}>
+                  {saving ? "Saving..." : editingPlan ? "Update Plan" : "Create Plan"}
                 </button>
               </div>
             </form>
@@ -504,7 +735,7 @@ export default function SuperAdminSubscriptions() {
           <div className="sa-modal">
             <div className="sa-modal-header">
               <h3>Manual Plan Change: {changingSub.organizationId?.name}</h3>
-              <button className="sa-modal-close" onClick={() => setChangingSub(null)}>X</button>
+              <button className="sa-modal-close" onClick={() => setChangingSub(null)}>✕</button>
             </div>
             <form onSubmit={handleManualPlanChange}>
               <div className="sa-modal-body">
@@ -513,15 +744,16 @@ export default function SuperAdminSubscriptions() {
                 </p>
                 <div className="sa-form-group">
                   <label>Select Target Plan</label>
-                  <select 
+                  <select
                     className="sa-select"
-                    value={manualPlanName} 
+                    value={manualPlanName}
                     onChange={(e) => setManualPlanName(e.target.value)}
                   >
-                    <option value="Starter">Starter</option>
-                    <option value="Professional">Professional</option>
-                    <option value="Business">Business</option>
-                    <option value="Enterprise">Enterprise</option>
+                    {plans.map((p) => (
+                      <option key={p._id || p.name} value={p.name}>
+                        {p.displayName || p.name} ({formatCurrency(p.price, p.currency || "INR")})
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
