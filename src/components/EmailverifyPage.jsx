@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AuthPageLayout from "./AuthPageLayout";
+import { normalizeApiBaseUrl } from "../utils/apiBase";
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 export default function EmailverifyPage() {
   const navigate = useNavigate();
@@ -27,7 +30,7 @@ export default function EmailverifyPage() {
 
   async function verifyEmail() {
     try {
-      const res = await fetch("/api/v1/auth/verify-email", {
+      const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, email }),
@@ -53,7 +56,7 @@ export default function EmailverifyPage() {
     if (!resendEmail) return;
     setResendLoading(true);
     try {
-      await fetch("/api/v1/auth/resend-verification", {
+      await fetch(`${API_BASE_URL}/auth/resend-verification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: resendEmail }),

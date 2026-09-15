@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthPageLayout from "./AuthPageLayout";
+import { normalizeApiBaseUrl } from "../utils/apiBase";
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 export default function CheckMail() {
   const navigate = useNavigate();
@@ -13,7 +16,7 @@ export default function CheckMail() {
     if (!email) return;
     setResendLoading(true);
     try {
-      await fetch("/api/v1/auth/resend-verification", {
+      await fetch(`${API_BASE_URL}/auth/resend-verification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

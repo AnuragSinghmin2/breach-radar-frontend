@@ -11,6 +11,9 @@ import {
 import { logAuthTrace, normalizeAuthUser, saveAuthSession, getTokenExpiryMs } from "../utils/session";
 
 import { setAccessToken, clearAccessToken } from "../services/api/client";
+import { normalizeApiBaseUrl } from "../utils/apiBase";
+
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
 
 
@@ -296,7 +299,7 @@ export function AuthProvider({ children }) {
 
     // Fetch user profile using the token from Google OAuth callback
 
-    const res = await fetch('/api/v1/users/profile', {
+    const res = await fetch(`${API_BASE_URL}/users/profile`, {
 
       headers: { Authorization: `Bearer ${accessToken}` },
 
