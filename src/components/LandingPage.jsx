@@ -13,10 +13,7 @@ import SupportModal from "./SupportModal";
 import TrustedCompaniesMarquee from "./TrustedCompaniesMarquee";
 import PlatformStats from "./PlatformStats";
 import UnderTheHood from "./UnderTheHood";
-<<<<<<< HEAD
-=======
 import { getPublicPricing, DEFAULT_FALLBACK_PLANS } from "../services/api/pricingService";
->>>>>>> 3e96fde2da3debf187c4cccc33b956a37d9c0298
 import "./LandingPage.css";
 
 const metrics = [
