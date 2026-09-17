@@ -15,6 +15,7 @@ import {
   Quote,
   ArrowRight,
 } from "lucide-react";
+import { FaInstagram, FaFacebook, FaLinkedin, FaGlobe } from "react-icons/fa";
 import Footer from "../components/Footer";
 import LandingNavbar from "../components/LandingNavbar";
 import "../components/LandingPage.css";
@@ -94,8 +95,8 @@ export default function FounderPage() {
 
               <div className="founder-profile-info">
                 <div className="profile-details">
-                  <h3>Founder &amp; Chief Security Architect</h3>
-                  <p className="founder-badge-text">PentestRadar • Made in India, Built for the World</p>
+                  <h3 className="founder-name">Mrityunjay Singh</h3>
+                  <p className="founder-badge-text">Founder &amp; CEO • PentestRadar</p>
                 </div>
                 <div className="founder-stats-pill">
                   <Award size={18} className="stat-icon" />
@@ -105,16 +106,62 @@ export default function FounderPage() {
             </div>
 
             <div className="founder-hero-image-col">
-              <div className="founder-image-wrapper">
-                <img
-                  src="/founder.jpg"
-                  alt="Founder of PentestRadar"
-                  className="founder-portrait"
-                />
-                <div className="founder-image-glow"></div>
-                <div className="founder-image-badge">
-                  <Globe size={16} />
-                  <span>Global Vision</span>
+              <div className="founder-image-card">
+                <div className="founder-image-wrapper">
+                  <img
+                    src="/founder.jpg"
+                    alt="Mrityunjay Singh - Founder & CEO of PentestRadar"
+                    className="founder-portrait"
+                  />
+                  <div className="founder-image-glow"></div>
+                  <div className="founder-image-badge">
+                    <Globe size={16} />
+                    <span>Global Vision</span>
+                  </div>
+                </div>
+
+                {/* SOCIAL MEDIA LINKS UNDER FOUNDER IMAGE */}
+                <div className="founder-social-links">
+                  <a
+                    href="https://in.linkedin.com/in/mrityunjay-singh-ceo"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="founder-social-icon linkedin"
+                    title="LinkedIn - Mrityunjay Singh"
+                    aria-label="LinkedIn Profile"
+                  >
+                    <FaLinkedin />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/mrityunjayceo"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="founder-social-icon instagram"
+                    title="Instagram - @mrityunjayceo"
+                    aria-label="Instagram Profile"
+                  >
+                    <FaInstagram />
+                  </a>
+                  <a
+                    href="https://www.facebook.com/dharnamrityunjay"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="founder-social-icon facebook"
+                    title="Facebook - Mrityunjay Singh"
+                    aria-label="Facebook Profile"
+                  >
+                    <FaFacebook />
+                  </a>
+                  <a
+                    href="https://mrityunjaysingh.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="founder-social-icon website"
+                    title="Personal Website - mrityunjaysingh.com"
+                    aria-label="Official Website"
+                  >
+                    <FaGlobe />
+                  </a>
                 </div>
               </div>
             </div>
@@ -345,8 +392,8 @@ export default function FounderPage() {
               </blockquote>
               <div className="founder-signature-block">
                 <div className="sig-details">
-                  <span className="sig-name">Founder &amp; Security Architect</span>
-                  <span className="sig-company">PentestRadar</span>
+                  <span className="sig-name">Mrityunjay Singh</span>
+                  <span className="sig-company">Founder &amp; CEO, PentestRadar</span>
                 </div>
               </div>
             </div>

@@ -73,10 +73,11 @@
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
 }
 
-.profile-details h3 {
+.profile-details h3.founder-name {
   color: #f6fffb;
-  font-size: 16px;
-  font-weight: 750;
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.2px;
   margin: 0;
 }
 
@@ -104,6 +105,65 @@
   flex: 0 0 auto;
   display: flex;
   justify-content: center;
+}
+
+.founder-image-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.founder-social-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.founder-social-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(14, 29, 38, 0.85);
+  border: 1px solid rgba(25, 239, 145, 0.25);
+  color: #b8e5dd;
+  font-size: 18px;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.founder-social-icon:hover {
+  transform: translateY(-4px);
+  border-color: rgba(25, 239, 145, 0.6);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5), 0 0 16px rgba(25, 239, 145, 0.25);
+}
+
+.founder-social-icon.linkedin:hover {
+  color: #0077b5;
+  border-color: rgba(0, 119, 181, 0.6);
+  background: rgba(0, 119, 181, 0.14);
+}
+
+.founder-social-icon.instagram:hover {
+  color: #e1306c;
+  border-color: rgba(225, 48, 108, 0.6);
+  background: rgba(225, 48, 108, 0.14);
+}
+
+.founder-social-icon.facebook:hover {
+  color: #1877f2;
+  border-color: rgba(24, 119, 242, 0.6);
+  background: rgba(24, 119, 242, 0.14);
+}
+
+.founder-social-icon.website:hover {
+  color: #19ef91;
+  border-color: rgba(25, 239, 145, 0.6);
+  background: rgba(25, 239, 145, 0.14);
 }
 
 .founder-image-wrapper {
