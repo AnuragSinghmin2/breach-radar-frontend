@@ -18,8 +18,8 @@ export async function login({ email, password, rememberMe = false }) {
   return { ...data, user };
 }
 
-export async function register({ email, password, name }) {
-  const { data } = await apiClient.post("/auth/register", { email, password, name });
+export async function register({ email, password, name, accountType }) {
+  const { data } = await apiClient.post("/auth/register", { email, password, name, accountType });
   const user = normalizeAuthUser(data.user, data.accessToken);
 
   logAuthTrace("authService register response", data);

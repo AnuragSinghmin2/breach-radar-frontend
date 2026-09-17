@@ -111,7 +111,7 @@ export default function PlatformStats() {
     return (
       <section className="stats-section loading" aria-label="Loading platform statistics">
         <div className="stats-container">
-          {[...Array(5)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <div key={i} className="stat-card skeleton">
               <div className="stat-value-placeholder animate-pulse"></div>
               <div className="stat-label-placeholder animate-pulse"></div>
@@ -172,9 +172,16 @@ export default function PlatformStats() {
 
         <div className="stat-card">
           <strong className="stat-value">
-            <StatNumber value={stats?.aiModels} suffix="" trigger={isInViewport} />
+            <StatNumber value={stats?.cyberSecurityExperts} suffix="+" trigger={isInViewport} />
           </strong>
-          <span className="stat-label">AI Models</span>
+          <span className="stat-label">Cyber Security Experts</span>
+        </div>
+
+        <div className="stat-card">
+          <strong className="stat-value">
+            <StatNumber value={stats?.businesses} suffix="+" trigger={isInViewport} />
+          </strong>
+          <span className="stat-label">Businesses</span>
         </div>
       </div>
     </section>

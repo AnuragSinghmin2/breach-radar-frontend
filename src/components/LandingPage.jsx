@@ -97,28 +97,29 @@ const processSteps = [
 ];
 
 const testimonials = [
-  {
-    quote:
-      "PentestRadar helped us identify critical vulnerabilities that could have been exploited. The reports are detailed and easy to understand.",
-    name: "Rahul Sharma",
-    role: "CTO, TechCorp",
-    avatar: "RS",
-  },
-  {
-    quote:
-      "The best security scanning tool we've used. Fast, accurate, and the support team is fantastic.",
-    name: "Priya Patel",
-    role: "Security Head, DevStudio",
-    avatar: "PP",
-  },
-  {
-    quote:
-      "Comprehensive scanning with actionable insights. Highly recommended for any business serious about security.",
-    name: "Amit Kumar",
-    role: "Founder, WebSecure",
-    avatar: "AK",
-  },
+  { quote: "PentestRadar helped us identify critical vulnerabilities that could have been exploited. The reports are detailed and easy to understand.", name: "Rahul Sharma", role: "CTO, TechCorp", avatar: "RS" },
+  { quote: "The best security scanning tool we've used. Fast, accurate, and the support team is fantastic.", name: "Priya Patel", role: "Security Head, DevStudio", avatar: "PP" },
+  { quote: "Comprehensive scanning with actionable insights. Highly recommended for any business serious about security.", name: "Amit Kumar", role: "Founder, WebSecure", avatar: "AK" },
+  { quote: "We caught a critical misconfiguration before it ever reached production. PentestRadar is now part of our release checklist.", name: "Neha Verma", role: "Engineering Lead, Cloudbase", avatar: "NV" },
+  { quote: "Setup took minutes and the dashboard makes it easy for non-technical stakeholders to understand our risk posture.", name: "Arjun Mehta", role: "Founder, ShopEasy", avatar: "AM" },
+  { quote: "Support is responsive and the scan reports are thorough enough to hand straight to our compliance team.", name: "Sanya Kapoor", role: "IT Manager, Finlytics", avatar: "SK" },
+  { quote: "We switched from a manual audit process to PentestRadar and cut our review time in half.", name: "Vikram Rao", role: "VP Engineering, Nimbus", avatar: "VR" },
+  { quote: "The severity breakdown makes it easy to prioritize what to fix first instead of guessing.", name: "Ishita Singh", role: "AppSec Lead, Quantica", avatar: "IS" },
+  { quote: "Clear reports our clients actually understand. It's become part of every project handoff.", name: "Karan Malhotra", role: "Agency Owner, PixelForge", avatar: "KM" },
+  { quote: "Scheduled scans caught an exposed admin panel we didn't know was live.", name: "Divya Nair", role: "DevOps Lead, Stackline", avatar: "DN" },
+  { quote: "Straightforward pricing and no surprise limits. Exactly what a growing team needs.", name: "Rohan Gupta", role: "Co-founder, Fintrail", avatar: "RG" },
+  { quote: "Our compliance audits go smoother now that we have consistent scan history to show.", name: "Meera Iyer", role: "Compliance Manager, Suvidha", avatar: "MI" },
+  { quote: "The dashboard gives our whole team visibility without needing a dedicated security hire yet.", name: "Aditya Joshi", role: "CEO, Loopwork", avatar: "AJ" },
+  { quote: "We use it across every client domain we manage. Consistent, reliable results.", name: "Simran Kaur", role: "Founder, WebNest Studio", avatar: "SK2" },
+  { quote: "Findings come with clear remediation steps, which saves our developers a lot of back and forth.", name: "Nikhil Desai", role: "Backend Lead, Corebridge", avatar: "ND" },
+  { quote: "It caught an outdated SSL config that our previous tool completely missed.", name: "Pooja Reddy", role: "IT Head, Medivault", avatar: "PR" },
+  { quote: "Onboarding was quick and the support team actually responds fast.", name: "Farhan Ali", role: "Founder, QuickCart", avatar: "FA" },
+  { quote: "We run a scan before every major release now. It's part of our workflow.", name: "Ananya Bose", role: "QA Lead, Brightlane", avatar: "AB" },
+  { quote: "Great value for a small team that can't afford a full-time security analyst.", name: "Suresh Pillai", role: "Owner, Pillai Textiles", avatar: "SP" },
+  { quote: "The reporting is clean enough to send directly to our board without extra editing.", name: "Kavya Menon", role: "COO, Northwind Health", avatar: "KM2" },
 ];
+
+const marqueeTestimonials = [...testimonials, ...testimonials];
 
 function DashboardMockup() {
   return (
@@ -726,13 +727,14 @@ export default function LandingPage() {
           <div className="section-kicker">Testimonials</div>
           <h2 id="testimonials-title">What Our Customers Say</h2>
 
-          <div className="testimonial-wrap">
-            <button className="slider-btn prev" type="button" aria-label="Previous testimonial">
-              &lt;
-            </button>
-            <div className="testimonial-grid">
-              {testimonials.map((item) => (
-                <article className="testimonial-card" key={item.name}>
+          <div className="testimonial-marquee">
+            <div className="testimonial-marquee-track">
+              {marqueeTestimonials.map((item, index) => (
+                <article
+                  className="testimonial-card"
+                  key={`${item.name}-${index}`}
+                  aria-hidden={index >= testimonials.length}
+                >
                   <div className="stars">★★★★★</div>
                   <p>{item.quote}</p>
                   <div className="customer">
@@ -745,15 +747,6 @@ export default function LandingPage() {
                 </article>
               ))}
             </div>
-            <button className="slider-btn next" type="button" aria-label="Next testimonial">
-              &gt;
-            </button>
-          </div>
-
-          <div className="slider-dots" aria-hidden="true">
-            <span></span>
-            <span className="active"></span>
-            <span></span>
           </div>
         </section>
 

@@ -16,6 +16,7 @@ import {
   ListChecks,
   Award,
   HeartHandshake,
+  UserCircle2,
 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 
@@ -103,6 +104,7 @@ const navDropdowns = [
     title: "Company",
     items: [
       { icon: Info, title: "About Us", text: "Meet the PentestRadar team", href: "/about" },
+      { icon: UserCircle2, title: "Founder", text: "The story behind PentestRadar", href: "/founder" },
       { icon: BookOpen, title: "Case Studies", text: "Real results from real customers", href: "/case-studies" },
       { icon: Award, title: "Awards & Recognition", text: "Milestones we're proud of", href: "/awards-recognition" },
       { icon: HeartHandshake, title: "Support", text: "Ways to back our mission", action: "support" },

@@ -70,19 +70,6 @@ export default function SignInPage() {
     return () => window.clearTimeout(timer);
   }, [successMessage]);
 
-  function getGoogleAuthUrl() {
-    if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
-      return "/api/v1/auth/google";
-    }
-
-    const apiBase = (import.meta.env.VITE_API_BASE_URL || "/api/v1").replace(/\/+$/, "");
-    const absoluteBase = /^https?:\/\//i.test(apiBase)
-      ? apiBase
-      : `${window.location.origin}${apiBase.startsWith("/") ? "" : "/"}${apiBase}`;
-
-    return `${absoluteBase}/auth/google`;
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
@@ -197,18 +184,6 @@ export default function SignInPage() {
             Create Account
           </button>
         </p>
-
-        <div className="divider">
-          <span></span>
-          or continue with
-          <span></span>
-        </div>
-
-        <div className="social-login">
-          <button type="button" onClick={() => window.location.href = getGoogleAuthUrl()}>
-            <span className="google">G</span>Google
-          </button>
-        </div>
 
         <div className="secure-note">
           <span></span>

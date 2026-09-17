@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import AboutUsPage from "./pages/AboutUsPage";
+import FounderPage from "./pages/FounderPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import RefundPolicyPage from "./pages/RefundPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
@@ -60,6 +61,7 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<AboutUsPage />} />
+      <Route path="/founder" element={<FounderPage />} />
 <Route path="/privacy" element={<PrivacyPolicyPage />} />
 <Route path="/refund-policy" element={<RefundPolicyPage />} />
 <Route path="/terms-of-service" element={<TermsOfServicePage />} />

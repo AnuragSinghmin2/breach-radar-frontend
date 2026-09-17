@@ -33,6 +33,7 @@ export default function SignUpPage() {
   const location = useLocation();
   const { register } = useAuth();
   const [name, setName] = useState("");
+  const [role, setRole] = useState("");
   const [email, setEmail] = useState(location.state?.invitedEmail || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -45,6 +46,11 @@ export default function SignUpPage() {
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
+
+    if (!role) {
+      setError("Please select who you are.");
+      return;
+    }
 
     const validationErrors = validateRegisterForm({
       name,
@@ -62,7 +68,7 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      await register(email.trim(), password, name.trim());
+      await register(email.trim(), password, name.trim(), role);
       const inviteToken = location.state?.inviteToken || sessionStorage.getItem(PENDING_INVITE_TOKEN_KEY);
 
       if (inviteToken) {
@@ -84,28 +90,6 @@ export default function SignUpPage() {
     }
   }
 
-  function getGoogleAuthUrl() {
-    if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
-      return "/api/v1/auth/google";
-    }
-
-    const apiBase = (import.meta.env.VITE_API_BASE_URL || "/api/v1").replace(/\/+$/, "");
-    const absoluteBase = /^https?:\/\//i.test(apiBase)
-      ? apiBase
-      : `${window.location.origin}${apiBase.startsWith("/") ? "" : "/"}${apiBase}`;
-
-    return `${absoluteBase}/auth/google`;
-  }
-
-  function handleGoogleSignUp() {
-    if (!acceptedTerms) {
-      setError("You must agree to the Terms and Conditions and Privacy Policy.");
-      return;
-    }
-
-    window.location.href = getGoogleAuthUrl();
-  }
-
   return (
     <form className="signin-card signup-card" onSubmit={handleSubmit}>
       <div className="form-lock form-user-add"></div>
@@ -124,6 +108,24 @@ export default function SignUpPage() {
           onChange={(e) => setName(e.target.value)}
           autoComplete="name"
         />
+      </div>
+
+      <label className="field-label" htmlFor="whoAreYou">
+        Who are you?
+      </label>
+      <div className="input-shell role">
+        <select
+          id="whoAreYou"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          required
+        >
+          <option value="" disabled hidden>Select your role</option>
+          <option value="individual">Individual</option>
+          <option value="cyber_security_expert">Cyber Security Expert</option>
+          <option value="organization">Organization / Business</option>
+        </select>
+        <span className="chev"></span>
       </div>
 
       <label className="field-label" htmlFor="signupEmail">
@@ -209,18 +211,6 @@ export default function SignUpPage() {
           Sign In
         </button>
       </p>
-
-      <div className="divider">
-        <span></span>
-        or sign up with
-        <span></span>
-      </div>
-
-      <div className="social-login">
-        <button type="button" disabled={!acceptedTerms} onClick={handleGoogleSignUp}>
-          <span className="google">G</span>Google
-        </button>
-      </div>
 
       <div className="secure-note">
         <span></span>

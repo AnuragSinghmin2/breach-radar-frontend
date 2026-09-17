@@ -317,9 +317,9 @@ export function AuthProvider({ children }) {
 
 
 
-  const register = useCallback(async (email, password, name) => {
+  const register = useCallback(async (email, password, name, accountType) => {
 
-    const data = await authApi.register({ email, password, name });
+    const data = await authApi.register({ email, password, name, accountType });
 
     applySession(data.user, data.accessToken, { rememberMe: true });
 

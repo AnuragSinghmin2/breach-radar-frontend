@@ -950,3 +950,64 @@
     text-align: left;
   }
 }
+/* --- Role dropdown ("Who are you?") --- */
+.input-shell select {
+  width: 100%;
+  min-height: 58px;
+  border: 1px solid rgba(199, 232, 226, 0.13);
+  border-radius: 9px;
+  padding: 0 44px 0 58px;
+  color: #edf8f5;
+  background: rgba(255, 255, 255, 0.04);
+  font: inherit;
+  font-size: 16px;
+  outline: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.input-shell select:invalid {
+  color: #93a4a1;
+}
+
+.input-shell select option {
+  background: #0b1622;
+  color: #edf8f5;
+}
+
+.input-shell.role::before {
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 18px;
+  height: 14px;
+  border: 2px solid #9cabaa;
+  border-radius: 3px;
+  transform: translateY(-50%);
+}
+
+.input-shell.role::after {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border: 2px solid #9cabaa;
+  border-radius: 50%;
+  transform: translateY(-95%);
+}
+
+.input-shell.role .chev {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #9cabaa;
+  border-bottom: 2px solid #9cabaa;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}

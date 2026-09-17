@@ -1685,20 +1685,40 @@ button {
   line-height: 1.15;
 }
 
-.testimonial-wrap {
-  position: relative;
+.testimonial-marquee {
   margin-top: 26px;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
-.testimonial-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-  width: min(1040px, calc(100% - 80px));
-  margin: 0 auto;
+.testimonial-marquee-track {
+  --testimonial-gap: 28px;
+  --testimonial-half-gap: 14px;
+  display: flex;
+  width: max-content;
+  gap: var(--testimonial-gap);
+  padding: 8px 0 16px;
+  animation: testimonial-marquee 60s linear infinite;
+  will-change: transform;
+}
+
+.testimonial-marquee:hover .testimonial-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes testimonial-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - var(--testimonial-half-gap)));
+  }
 }
 
 .testimonial-card {
+  flex: 0 0 auto;
+  width: 340px;
   min-height: 204px;
   padding: 28px 30px;
   border: 1px solid rgba(184, 229, 221, 0.1);
@@ -1757,60 +1777,7 @@ button {
   font-size: 11px;
 }
 
-.slider-btn {
-  position: absolute;
-  top: 50%;
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border: 1px solid rgba(198, 238, 231, 0.1);
-  border-radius: 50%;
-  color: #d7e8e4;
-  background: rgba(12, 25, 34, 0.9);
-  transform: translateY(-50%);
-  font-size: 22px;
-  font-weight: 800;
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, filter 180ms ease, transform 180ms ease;
-}
 
-.slider-btn:hover:not(:disabled) {
-  filter: brightness(1.06);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-  transform: translateY(calc(-50% - 1px));
-}
-
-.slider-btn:active:not(:disabled) {
-  filter: brightness(0.98);
-  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.14);
-  transform: translateY(-50%) scale(0.98);
-}
-
-.slider-btn.prev {
-  left: 0;
-}
-
-.slider-btn.next {
-  right: 0;
-}
-
-.slider-dots {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 34px;
-}
-
-.slider-dots span {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #54736c;
-}
-
-.slider-dots .active {
-  background: #18ef91;
-}
 
 .newsletter-section {
   display: grid;
@@ -2051,14 +2018,7 @@ button {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .testimonial-grid {
-    width: 100%;
-    gap: 16px;
-  }
 
-  .slider-btn {
-    display: none;
-  }
 
   .newsletter-section {
     grid-template-columns: 70px 1fr;
@@ -2237,11 +2197,8 @@ button {
     padding: 12px 0 34px;
   }
 
-  .testimonial-grid {
-    grid-template-columns: 1fr;
-  }
-
   .testimonial-card {
+    width: 280px;
     min-height: 0;
     padding: 24px 20px;
   }
@@ -2745,8 +2702,8 @@ button {
 
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 40px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
   padding: 0 20px;
   text-align: center;
 }
@@ -2768,9 +2725,9 @@ button {
 }
 
 .stat-value {
-  font-size: clamp(28px, 3.2vw, 44px);
+  font-size: clamp(22px, 2.4vw, 34px);
   font-weight: 850;
-  color: #19ef91; /* Neon green matching PenTestRadar's primary theme color */
+  color: #19ef91;
   line-height: 1;
   letter-spacing: -0.02em;
   margin-bottom: 12px;
@@ -2889,7 +2846,7 @@ button {
     gap: 24px;
   }
   .stat-value {
-    font-size: clamp(24px, 4vw, 32px);
+    font-size: clamp(20px, 3.2vw, 26px);
   }
   .stat-label {
     font-size: 13px;
