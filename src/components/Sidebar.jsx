@@ -31,7 +31,13 @@ const settingsLinks = [
   ["Activity Log", "/dashboard/settings/activity-log"],
 ];
 
-const PLAN_NAMES_WITH_UPGRADE = new Set(["Starter", "Professional", "Business"]);
+const PLAN_NAMES_WITH_UPGRADE = new Set(["Free", "free", "FREE", "Starter", "starter", "STARTER", "Professional", "professional", "PROFESSIONAL", "Business", "business", "BUSINESS"]);
+
+const canUpgradePlan = (name) => {
+  if (!name) return false;
+  const normalized = String(name).trim().toLowerCase();
+  return ["free", "starter", "professional", "business"].includes(normalized);
+};
 
 const statusMeta = {
   ACTIVE: { label: "ACTIVE", className: "active" },
@@ -64,7 +70,7 @@ function formatUsageValue(metric) {
   return `${Number(metric.used || 0).toLocaleString()}/${metric.limit}`;
 }
 
-export default function Sidebar({ isOpen }) {
+export default function Sidebar({ isOpen, onNavigate }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -126,6 +132,7 @@ export default function Sidebar({ isOpen }) {
   }, [loadPlanSummary]);
 
   async function handleLogout() {
+    handleItemClick();
     await logout();
     navigate("/login", { replace: true });
   }
@@ -140,6 +147,12 @@ export default function Sidebar({ isOpen }) {
     getUsageMetric(planUsage, "seats"),
   ];
 
+  function handleItemClick() {
+    if (onNavigate && window.innerWidth <= 760) {
+      onNavigate();
+    }
+  }
+
   function scrollContentToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
     const contentArea = document.querySelector(".content-area");
@@ -148,10 +161,15 @@ export default function Sidebar({ isOpen }) {
     }
   }
 
+  function handleDomainsClick() {
+    scrollContentToTop();
+    handleItemClick();
+  }
+
   return (
     <div className={`sidebar ${isOpen ? "show" : "hide"}`}>
       <div className="logo">
-        <NavLink to="/dashboard" end className="logo-link" aria-label="Go to dashboard">
+        <NavLink to="/dashboard" end className="logo-link" aria-label="Go to dashboard" onClick={handleItemClick}>
           <BrandLogo className="sidebar-brand-logo" iconSize={30} />
           <p>Security Platform</p>
         </NavLink>
@@ -163,6 +181,7 @@ export default function Sidebar({ isOpen }) {
           end
           title="Dashboard"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          onClick={handleItemClick}
         >
           <Home size={18} /> <span className="menu-label">Dashboard</span>
         </NavLink>
@@ -171,7 +190,7 @@ export default function Sidebar({ isOpen }) {
           to="/dashboard/domains"
           title="Domains"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
-          onClick={scrollContentToTop}
+          onClick={handleDomainsClick}
         >
           <Globe size={18} /> <span className="menu-label">Domains</span>
         </NavLink>
@@ -180,6 +199,7 @@ export default function Sidebar({ isOpen }) {
           to="/dashboard/scans"
           title="Scans"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          onClick={handleItemClick}
         >
           <Scan size={18} /> <span className="menu-label">Scans</span>
         </NavLink>
@@ -188,6 +208,7 @@ export default function Sidebar({ isOpen }) {
           to="/dashboard/vulnerabilities"
           title="Vulnerabilities"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          onClick={handleItemClick}
         >
           <ShieldAlert size={18} /> <span className="menu-label">Vulnerabilities</span>
         </NavLink>
@@ -195,6 +216,7 @@ export default function Sidebar({ isOpen }) {
           to="/dashboard/reports"
           title="Reports"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          onClick={handleItemClick}
         >
           <FileText size={18} /> <span className="menu-label">Reports</span>
         </NavLink>
@@ -202,6 +224,7 @@ export default function Sidebar({ isOpen }) {
           to="/dashboard/monitoring"
           title="Monitoring"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          onClick={handleItemClick}
         >
           <Activity size={18} /> <span className="menu-label">Monitoring</span>
         </NavLink>
@@ -209,6 +232,7 @@ export default function Sidebar({ isOpen }) {
           to="/dashboard/remediation"
           title="Remediation"
           className={({ isActive }) => (isActive ? "menu-item active" : "menu-item")}
+          onClick={handleItemClick}
         >
           <Wrench size={18} /> <span className="menu-label">Remediation</span>
         </NavLink>
@@ -239,6 +263,7 @@ export default function Sidebar({ isOpen }) {
                 className={({ isActive }) =>
                   isActive ? "settings-subitem active" : "settings-subitem"
                 }
+                onClick={handleItemClick}
               >
                 {label}
               </NavLink>
@@ -278,8 +303,16 @@ export default function Sidebar({ isOpen }) {
               ))}
             </div>
 
-            {PLAN_NAMES_WITH_UPGRADE.has(planName) ? (
-              <button className="upgrade-btn" type="button" onClick={() => navigate("/dashboard/settings/plan-billing")}>
+            {canUpgradePlan(planName) ? (
+              <button
+                className="upgrade-btn"
+                type="button"
+                onClick={() => {
+                  handleItemClick();
+                  navigate("/dashboard/settings/plan-billing");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
                 Upgrade Plan
               </button>
             ) : (

@@ -22,7 +22,11 @@ export default function AppLayout({ children }) {
     <DashboardProvider>
     <div className="app-wrapper">
       <div className="app-container">
-        <Sidebar isOpen={sidebarOpen} />
+        <Sidebar isOpen={sidebarOpen} onNavigate={() => setSidebarOpen(false)} />
+        <div
+          className={`sidebar-backdrop ${sidebarOpen ? "visible" : ""}`}
+          onClick={() => setSidebarOpen(false)}
+        />
         <div className="main-content">
           <Header toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="content-area">

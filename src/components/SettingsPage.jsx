@@ -1160,7 +1160,7 @@ function PlanBillingSettings() {
     }
   }
 
-  const currentPlan = billing?.subscription?.currentPlan || billing?.organization?.subscriptionPlan || "Starter";
+  const currentPlan = billing?.subscription?.currentPlan || billing?.organization?.subscriptionPlan || "Free";
   const activePlan = billing?.activePlan || billing?.plans?.find((plan) => plan.name === currentPlan) || null;
   const isOwner = billing?.role === "OWNER";
   const currency = activePlan?.currency || "INR";
@@ -1204,11 +1204,11 @@ function PlanBillingSettings() {
       return;
     }
 
-    const planOrder = ["Starter", "Professional", "Business", "Enterprise"];
-    const currentIdx = planOrder.indexOf(currentPlan);
-    const targetIdx = planOrder.indexOf(plan.name);
+    const planOrder = ["Free", "Starter", "Professional", "Business", "Enterprise"];
+    const currentIdx = planOrder.findIndex((p) => p.toLowerCase() === (currentPlan || "").toLowerCase());
+    const targetIdx = planOrder.findIndex((p) => p.toLowerCase() === (plan.name || "").toLowerCase());
 
-    if (plan.name === currentPlan) return;
+    if ((plan.name || "").toLowerCase() === (currentPlan || "").toLowerCase()) return;
 
     if (targetIdx < currentIdx) {
       // Downgrade check
@@ -1742,24 +1742,27 @@ function PlanBillingSettings() {
           <p>Switch plans as your monitored domains, scan volume, and reporting needs grow.</p>
         </div>
         <div className="billing-plan-grid">
-          {(billing?.plans || []).map((plan) => (
-            <article className={plan.name === currentPlan ? "billing-plan-card active" : "billing-plan-card"} key={plan.name}>
-              <div className="billing-plan-head">
-                <h4>{plan.displayName || plan.name}</h4>
-                {plan.name === currentPlan && <span>Current</span>}
-              </div>
-              <strong>{formatMoney(plan[billingCycle], plan.currency)}<small>/{billingCycle === "monthly" ? "mo" : "yr"}</small></strong>
-              <p>{planDescription(plan)}</p>
-              <ul>
-                {planLimits(plan).map((limit) => (
-                  <li key={limit}><Check size={14} /> {limit}</li>
-                ))}
-              </ul>
-              <button type="button" onClick={() => handleSelectPlan(plan)} disabled={!isOwner || plan.name === currentPlan || (plan.name === "Enterprise" && currentPlan === "Enterprise")}>
-                {plan.name === currentPlan ? "Selected" : "Choose Plan"}
-              </button>
-            </article>
-          ))}
+          {(billing?.plans || []).map((plan) => {
+            const isCurrent = (plan.name || "").toLowerCase() === (currentPlan || "").toLowerCase();
+            return (
+              <article className={isCurrent ? "billing-plan-card active" : "billing-plan-card"} key={plan.name}>
+                <div className="billing-plan-head">
+                  <h4>{plan.displayName || plan.name}</h4>
+                  {isCurrent && <span>Current</span>}
+                </div>
+                <strong>{formatMoney(plan[billingCycle], plan.currency)}<small>/{billingCycle === "monthly" ? "mo" : "yr"}</small></strong>
+                <p>{planDescription(plan)}</p>
+                <ul>
+                  {planLimits(plan).map((limit) => (
+                    <li key={limit}><Check size={14} /> {limit}</li>
+                  ))}
+                </ul>
+                <button type="button" onClick={() => handleSelectPlan(plan)} disabled={!isOwner || isCurrent}>
+                  {isCurrent ? "Selected" : "Choose Plan"}
+                </button>
+              </article>
+            );
+          })}
           {!loading && !billing?.plans?.length && <p>No active plans are configured.</p>}
         </div>
       </section>

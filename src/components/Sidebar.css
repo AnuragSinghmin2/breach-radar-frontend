@@ -550,11 +550,31 @@
   white-space: nowrap;
 }
 
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 760px) {
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.6);
+    z-index: 180;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .sidebar-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .sidebar {
     position: fixed;
     inset: 0 auto 0 0;
-    z-index: 100;
+    z-index: 200;
     width: min(280px, 86vw);
     max-width: 86vw;
     border-right: 1px solid rgba(42, 69, 96, 0.72);
@@ -573,5 +593,7 @@
     box-shadow: none;
     align-items: stretch;
     gap: 20px;
+    overflow: hidden;
+    pointer-events: none;
   }
 }
