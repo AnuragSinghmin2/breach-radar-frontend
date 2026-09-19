@@ -1970,14 +1970,14 @@ button {
 
   .hero-section {
     grid-template-columns: 1fr;
-    padding-top: 46px;
+    padding-top: 24px;
   }
 
   .hero-copy {
     max-width: 760px;
     text-align: center;
     margin: 0 auto;
-    transform: translateY(-60px);
+    transform: translateY(0);
   }
 
   .hero-copy p,
@@ -2067,7 +2067,11 @@ button {
 
   .hero-section {
     gap: 26px;
-    padding-top: 34px;
+    padding-top: 20px;
+  }
+
+  .hero-copy {
+    transform: translateY(0);
   }
 
   .hero-copy h1 {
